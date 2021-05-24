@@ -1,24 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
 
+import './App.css';
+import React,{useState} from "react";
+import Header from './Header';
+import {BrowserRouter as Router,Switch,Route} from "react-router-dom";
+import Content from './Content';
+import {AuthContextProvider} from './AuthContext';
 function App() {
+  const [openSignIn, setopenSignIn] = useState(false)
+  const [openSignUp, setopenSignUp] = useState(false)
+
   return (
+<Router>
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <AuthContextProvider>
+    <Header openSignIn={openSignIn} setopenSignIn={setopenSignIn} openSignUp={openSignUp} setopenSignUp={setopenSignUp}/>
+    <Switch>
+    <Route exact path="/">
+          <Content/>
+        </Route> 
+        
+      </Switch>
+      <Route exact path="/signin"><h1>fckkkk</h1>
+      </Route>
+      </AuthContextProvider>
     </div>
+    </Router>
   );
 }
 
