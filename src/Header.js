@@ -55,17 +55,8 @@ const Pending = () => {
     </div>
   )
 }
-const Banner = ()=>{
-  return (
-  
-    <div className="banner">
-     
-    </div>
-  )
- 
-}
+
 const LoggedinHeader = ({setisloggedin}) => {
-  
   const classes = useStyles();
   let history = useHistory();
   const logout = ()=>{
@@ -96,7 +87,7 @@ const LoggedinHeader = ({setisloggedin}) => {
           {/* </Link> */}
           {/* 2nd link */}
           <div className="header_option" onClick={()=>{logout()}}>Logout</div>
-          <Link to="/signup" className="header_link">
+          <Link to="/postad" className="header_link">
             <div className="header_option">
               <Button
                 variant="contained"
@@ -112,7 +103,6 @@ const LoggedinHeader = ({setisloggedin}) => {
         </div>
       </nav>
       <Pending />
-      <Banner/>
     </div>
   )
 }
@@ -165,11 +155,12 @@ export default function Header({ openSignIn, setopenSignIn, openSignUp, setopenS
                 <div className="header_option" onClick={setModalSignUp}>Sign Up</div>
                 {/* </Link> */}
                 {/* 2nd link */}
-                <Link to="/signup" className="header_link">
+                <Link to="/postad" className="header_link">
                   <div className="header_option">
                     <Button
                       variant="contained"
                       color="secondary"
+                      
                       className={classes.button}
                       startIcon={<AddIcon />}
                     >
@@ -182,7 +173,7 @@ export default function Header({ openSignIn, setopenSignIn, openSignUp, setopenS
               </div>
             </nav>
             <Pending />
-            <Banner/>
+          
           </div>
       }
     </div>
