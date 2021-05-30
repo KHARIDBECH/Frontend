@@ -1,4 +1,4 @@
-import React from 'react'
+import React,{useState} from 'react'
 import axios from 'axios';
 import { useForm } from "react-hook-form";
 import './formstyle.css'
@@ -10,10 +10,21 @@ export default function AddDetails() {
         formState: { errors }
     } = useForm();
 
+    const changeCurrency = (price)=>{
+        let temp_price = price
+        let lastThree = temp_price.substring(temp_price.length-3);
+        let otherNumbers = temp_price.substring(0,temp_price.length-3);
+        if(otherNumbers != '')
+            lastThree = ',' + lastThree;
+        let res = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        return res
+    }
     const onSubmit = (data) => {
-        console.log(data)
+   
+        data.price  =  changeCurrency(data.price)
+   
         const options = {
-            url: 'http://localhost:5000/api/stuff',
+            url: 'http://localhost:5000/api/stuff/postad',
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -29,7 +40,12 @@ export default function AddDetails() {
     }; // your form submit function which will invoke after successful validation
 
     console.log(watch("title")); // you can watch individual input by pass the name of the input
+    
+   const currencyConverter = (e)=>{
+       
 
+console.log(e)
+  }
     return (
         <div className="details-container">
             <div className="form-section" style={{ width: "57%" }}>
@@ -41,7 +57,7 @@ export default function AddDetails() {
                             {...register("title", {
                                 required: true,
                                 maxLength: 20,
-                                pattern: /^[A-Za-z]+$/i
+                                pattern: /^[A-Za-z]+/i
                             })}
                         />
                     </div>
@@ -54,7 +70,7 @@ export default function AddDetails() {
                     )}
                     <div className="form-content">
                         <label>Price</label>
-                        <input {...register("price", { required: true, min: 0 })} type="number" />
+                        <input {...register("price", { required: true, min: 0 })} type="number" onChange={currencyConverter}/>
                     </div>
                     {errors?.price?.type === "min" && (
                         <p>Min 0 required</p>

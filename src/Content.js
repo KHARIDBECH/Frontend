@@ -41,12 +41,12 @@ export default function FixedContainer() {
   const [lengthTrack, setlengthTrack] = useState(4)
 
       useEffect(() => {
-          fetch("http://localhost:3000/posts",{
+          fetch("http://localhost:5000/api/stuff/",{
           method: 'GET',
           headers: {'Content-Type':'application/json'}
         })
         .then(response=>{
-          if (response.status===404) {
+          if (response.status===400) {
             throw Error(response.statusText);
         }
         
@@ -70,7 +70,7 @@ export default function FixedContainer() {
      }        
   return (
     <Box pt={20} style={{position: 'relative',
-      top:'377px'
+      top:'288px'
   }}>
       
       <Container fixed >
@@ -79,9 +79,9 @@ export default function FixedContainer() {
       <Grid container spacing={2} direction="row" justify="space" alignItems="stretch">
        
        {
-           data.slice(0,visisble).map((data)=>(
+           data.slice(0,visisble).map((data,index)=>(
             <Grid item xs={3}>
-            <ProductCard className={classes.paper}></ProductCard>
+            <ProductCard key = {index} className={classes.paper} data = {data}></ProductCard>
             </Grid>
            ))
        }
@@ -90,7 +90,7 @@ export default function FixedContainer() {
        
       </Grid>
       {
-        (lengthTrack<=data.length)?<Showmore showMoreItems={showMoreItems}/>:null
+        (lengthTrack<data.length)?<Showmore showMoreItems={showMoreItems}/>:null
       }
       
       

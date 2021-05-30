@@ -22,7 +22,7 @@ function App() {
           <Content/>
         </Route> 
       </Switch>
-      <Route exact path="/postadd"><AdsDetails/>
+      <Route exact path="/postad"><AdsDetails/>
       </Route>
       </AuthContextProvider>
     </div>

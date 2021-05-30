@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ProductCard() {
+export default function ProductCard({data}) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
 
@@ -48,6 +48,7 @@ export default function ProductCard() {
     setExpanded(!expanded);
   };
 
+  
   return (
     <Card className={classes.root}>
       <CardHeader
@@ -61,20 +62,20 @@ export default function ProductCard() {
           <FavoriteIcon />
         </IconButton>
         }
-        title="Shrimp and Chorizo Paella"
+        title={data.title}
         subheader="September 14, 2016"
       />
       <CardMedia
         className={classes.media}
-        image="/static/images/cards/paella.jpg"
+        image={data.imageUrl}
         title="Paella dish"
       />
       <CardContent>
         <Typography variant="body2" color="textSecondary" component="p">
-          This impressive paella is a 
+        <span className="itemPrice">₹ {data.price}</span>
         </Typography>
       </CardContent>
-      <CardActions disableSpacing>
+      {/* <CardActions disableSpacing>
         <IconButton
           className={clsx(classes.expand, {
             [classes.expandOpen]: expanded,
@@ -85,13 +86,12 @@ export default function ProductCard() {
         >
           <ExpandMoreIcon />
         </IconButton>
-      </CardActions>
-      <Collapse in={expanded} timeout="auto" unmountOnExit>
+      </CardActions> */}
+      {/* <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           <Typography paragraph>Method:</Typography>
           <Typography paragraph>
-            Heat 1/2 cup of the broth in a pot until simmering, add saffron and set aside for 10
-            minutes.
+           
           </Typography>
           <Typography paragraph>
             Heat oil in a (14- to 16-inch) paella pan or a large, deep skillet 
@@ -101,7 +101,7 @@ export default function ProductCard() {
             Set aside off of the heat to let rest for 10 minutes, and then 
           </Typography>
         </CardContent>
-      </Collapse>
+      </Collapse> */}
     </Card>
   );
 }
