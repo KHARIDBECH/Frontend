@@ -2,7 +2,7 @@ import React,{useState} from 'react'
 import axios from 'axios';
 import { useForm } from "react-hook-form";
 import './formstyle.css'
-export default function AddDetails() {
+export default function AddDetails(){
     const {
         register,
         handleSubmit,
@@ -35,11 +35,15 @@ export default function AddDetails() {
           
           axios(options)
             .then(response => {
-              console.log(response.status);
-            });
+              console.log(response.data);
+             
+             
+              alert("Your Ad posted succesfully")
+            })
+          
     }; // your form submit function which will invoke after successful validation
 
-    console.log(watch("title")); // you can watch individual input by pass the name of the input
+    // you can watch individual input by pass the name of the input
     
    const currencyConverter = (e)=>{
        
@@ -56,7 +60,7 @@ console.log(e)
                         <input
                             {...register("title", {
                                 required: true,
-                                maxLength: 20,
+                                maxLength: 35,
                                 pattern: /^[A-Za-z]+/i
                             })}
                         />
@@ -80,7 +84,7 @@ console.log(e)
                     )}
                     <div className="form-content">
                         <label>ImageUrl</label>
-                        <input {...register("imageUrl", { required: true })} />
+                        <input {...register("imageUrl", { required: true })}/>
                     </div>
                     {errors.imageUrl?.type === "required" && (
                         <p>Must provide Image URL</p>

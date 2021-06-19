@@ -10,20 +10,24 @@ import {AuthContextProvider} from './AuthContext';
 function App() {
   const [openSignIn, setopenSignIn] = useState(false)
   const [openSignUp, setopenSignUp] = useState(false)
-
+  const [searchVal, setsearchVal] = useState("")
+ 
   return (
 <Router>
     <div className="App">
     <AuthContextProvider>
-    <Header openSignIn={openSignIn} setopenSignIn={setopenSignIn} openSignUp={openSignUp} setopenSignUp={setopenSignUp}/>
+    <Header openSignIn={openSignIn} setopenSignIn={setopenSignIn} openSignUp={openSignUp} setopenSignUp={setopenSignUp} setsearchVal={setsearchVal} searchVal={searchVal}/>
     <Switch>
     <Route exact path="/">
     <Banner/>
-          <Content/>
+          <Content searchVal={searchVal}/>
         </Route> 
       </Switch>
       <Route exact path="/postad"><AdsDetails/>
       </Route>
+      <Route exact path="/item/:productUrl">
+        this is detail
+        </Route>
       </AuthContextProvider>
     </div>
     </Router>

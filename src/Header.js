@@ -106,7 +106,7 @@ const LoggedinHeader = ({setisloggedin}) => {
     </div>
   )
 }
-export default function Header({ openSignIn, setopenSignIn, openSignUp, setopenSignUp,}) {
+export default function Header({ openSignIn, setopenSignIn, openSignUp, setopenSignUp,setsearchVal,searchVal}) {
   const classes = useStyles();
   const [is_Auth,setAuth] = useContext(AuthContext);
   const [isloggedin, setisloggedin] = useState(false)
@@ -126,7 +126,7 @@ export default function Header({ openSignIn, setopenSignIn, openSignUp, setopenS
     setopenSignUp(true)
   }
 
-
+console.log(searchVal)
 
   return (
     <div>
@@ -140,7 +140,9 @@ export default function Header({ openSignIn, setopenSignIn, openSignUp, setopenS
               </Link>
               {/* search Box */}
               <div className="header_search">
-                <input type="text" className="header_searchInput" />
+                <input type="text" className="header_searchInput" val={searchVal} onChange={((e)=>{
+                  setsearchVal(e.target.value)
+                })}/>
                 <SearchIcon className="header_searchIcon" />
               </div>
               <div className="header_nav">
