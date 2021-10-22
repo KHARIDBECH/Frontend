@@ -16,6 +16,7 @@ import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
+
 const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: 345,
@@ -25,19 +26,10 @@ const useStyles = makeStyles((theme) => ({
     height: 0,
     paddingTop: '56.25%', // 16:9
   },
-  expand: {
-    transform: 'rotate(0deg)',
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-      duration: theme.transitions.duration.shortest,
-    }),
-  },
-  expandOpen: {
-    transform: 'rotate(180deg)',
-  },
   avatar: {
     backgroundColor: red[500],
   },
+ 
 }));
 
 export default function ProductCard({data}) {
@@ -48,8 +40,9 @@ export default function ProductCard({data}) {
     setExpanded(!expanded);
   };
 
-  
+  console.log("image wala",data.image)
   return (
+    
     <Card className={classes.root}>
       <CardHeader
         avatar={
@@ -67,7 +60,7 @@ export default function ProductCard({data}) {
       />
       <CardMedia
         className={classes.media}
-        image={data.imageUrl}
+        image={data.image?data.image[0]:null}
         title="Paella dish"
       />
       <CardContent>
@@ -75,34 +68,9 @@ export default function ProductCard({data}) {
         <span className="itemPrice">₹ {data.price}</span>
         </Typography>
       </CardContent>
-      {/* <CardActions disableSpacing>
-        <IconButton
-          className={clsx(classes.expand, {
-            [classes.expandOpen]: expanded,
-          })}
-          onClick={handleExpandClick}
-          aria-expanded={expanded}
-          aria-label="show more"
-        >
-          <ExpandMoreIcon />
-        </IconButton>
-      </CardActions> */}
-      {/* <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <CardContent>
-          <Typography paragraph>Method:</Typography>
-          <Typography paragraph>
-           
-          </Typography>
-          <Typography paragraph>
-            Heat oil in a (14- to 16-inch) paella pan or a large, deep skillet 
-          </Typography>
-         
-          <Typography>
-            Set aside off of the heat to let rest for 10 minutes, and then 
-          </Typography>
-        </CardContent>
-      </Collapse> */}
+      
     </Card>
+  
   );
 }
 

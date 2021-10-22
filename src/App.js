@@ -7,15 +7,17 @@ import Content from './Content';
 import Banner from './Banner';
 import AdsDetails from './AdsDetails';
 import {AuthContextProvider} from './AuthContext';
+import ItemDetails from "./ItemDetails"
 function App() {
   const [openSignIn, setopenSignIn] = useState(false)
   const [openSignUp, setopenSignUp] = useState(false)
 
+ 
   return (
 <Router>
     <div className="App">
     <AuthContextProvider>
-    <Header openSignIn={openSignIn} setopenSignIn={setopenSignIn} openSignUp={openSignUp} setopenSignUp={setopenSignUp}/>
+    <Header openSignIn={openSignIn} setopenSignIn={setopenSignIn} openSignUp={openSignUp} setopenSignUp={setopenSignUp} />
     <Switch>
     <Route exact path="/">
     <Banner/>
@@ -24,6 +26,9 @@ function App() {
       </Switch>
       <Route exact path="/postad"><AdsDetails/>
       </Route>
+      <Route exact path="/item/:productUrl">
+        <ItemDetails/>
+        </Route>
       </AuthContextProvider>
     </div>
     </Router>

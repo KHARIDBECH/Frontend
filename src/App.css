@@ -13,3 +13,21 @@
     right: 0;
     z-index: 1;
 }
+a{
+  text-decoration: none;
+}
+.MuiTypography-displayBlock {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.MuiCardHeader-content{
+  overflow: hidden;
+}
+
+
+
+input {
+  outline:none;
+ }

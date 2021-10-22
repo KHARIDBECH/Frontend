@@ -69,11 +69,10 @@ const Transition = React.forwardRef(function Transition(props, ref) {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(userData)
     })
-    .then((res)=>{
-      res.json()
-    })
-    .then(data=>{
+    .then(res=>res.json())
+    .then((data)=>{
       setopenSignUp(false);
+      console.log("signup",data)
     })
     .catch((err)=>{
      console.log(err)
