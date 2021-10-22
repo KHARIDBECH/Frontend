@@ -106,7 +106,7 @@ const LoggedinHeader = ({setisloggedin}) => {
     </div>
   )
 }
-export default function Header({ openSignIn, setopenSignIn, openSignUp, setopenSignUp,setsearchVal,searchVal}) {
+export default function Header({ openSignIn, setopenSignIn, openSignUp, setopenSignUp}) {
   const classes = useStyles();
   const [is_Auth,setAuth] = useContext(AuthContext);
   const [isloggedin, setisloggedin] = useState(false)
@@ -126,7 +126,7 @@ export default function Header({ openSignIn, setopenSignIn, openSignUp, setopenS
     setopenSignUp(true)
   }
 
-console.log(searchVal)
+
 
   return (
     <div>
@@ -140,9 +140,7 @@ console.log(searchVal)
               </Link>
               {/* search Box */}
               <div className="header_search">
-                <input type="text" className="header_searchInput" val={searchVal} onChange={((e)=>{
-                  setsearchVal(e.target.value)
-                })}/>
+                <input type="text" className="header_searchInput"/>
                 <SearchIcon className="header_searchIcon" />
               </div>
               <div className="header_nav">
@@ -157,8 +155,9 @@ console.log(searchVal)
                 <div className="header_option" onClick={setModalSignUp}>Sign Up</div>
                 {/* </Link> */}
                 {/* 2nd link */}
-                <Link to="/postad" className="header_link">
+              
                   <div className="header_option">
+                  <Link to="/postad" className="header_link">
                     <Button
                       variant="contained"
                       color="secondary"
@@ -168,8 +167,9 @@ console.log(searchVal)
                     >
                       <span style={{ fontFamily: "sans-serif" }}>SELL</span>
                     </Button>
+                    </Link>
                   </div>
-                </Link>
+               
                 <SignIn openSignIn={openSignIn} setopenSignIn={setopenSignIn} setisloggedin={setisloggedin} />
                 <SignUp openSignUp={openSignUp} setopenSignUp={setopenSignUp} />
               </div>

@@ -36,7 +36,7 @@ function Showmore({ showMoreItems }) {
 }
 
 
-export default function Content({ searchVal, productUrl, setProductUrl }) {
+export default function Content({ searchVal}) {
   const classes = useStyles();
   const [data, setdata] = useState([{}])
   const [visible, setvisible] = useState(4)
@@ -66,13 +66,15 @@ export default function Content({ searchVal, productUrl, setProductUrl }) {
       )
       .then((data) => {
         //url logic
+        console.log(data)
         data.map((value) => {
-          console.log(value.title)
+         
           let splitTitle = value.title.split(" ")
           value.title = splitTitle.join('-')
           let idValue = Object.values(value['iid'])
           let modifiedId = idValue.join('')
-          value.productUrl = value.title + "-" + modifiedId
+          value.productUrl = value.title + "id-" + modifiedId
+        
         })
         setdata(data)
         console.log(data)
@@ -99,15 +101,8 @@ export default function Content({ searchVal, productUrl, setProductUrl }) {
           <Grid container spacing={2} direction="row" justify="space" alignItems="stretch">
 
             {
-              data.filter((val) => {
-                if (searchVal == "") {
-                  return val;
-                }
-                else if (val.title.toLowerCase().includes(searchVal.toLowerCase())) {
-                  return val;
-                }
-              })
-                .map((data, index) => (
+              
+              data.slice(0,visible).map((data, index) => (
                   <Grid item xs={3}>
                     <Link to={`/item/${data.productUrl}`}>
                       <ProductCard key={index} className={classes.paper} data={data} ></ProductCard>
@@ -119,10 +114,10 @@ export default function Content({ searchVal, productUrl, setProductUrl }) {
 
 
           </Grid>
-          {/* {
+          {
         (lengthTrack<data.length)?<Showmore showMoreItems={showMoreItems}/>:null
       }
-       */}
+      
 
 
         </div>

@@ -25,3 +25,9 @@ a{
 .MuiCardHeader-content{
   overflow: hidden;
 }
+
+
+
+input {
+  outline:none;
+ }

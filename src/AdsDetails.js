@@ -1,110 +1,130 @@
-import React,{useState} from 'react'
+import React, { useState,useEffect } from 'react'
 import axios from 'axios';
-import { useForm } from "react-hook-form";
-import './formstyle.css'
-export default function AddDetails(){
-    const {
-        register,
-        handleSubmit,
-        watch,
-        formState: { errors }
-    } = useForm();
+import './AdsDetails.css'
+import * as Yup from 'yup';
+import { Formik, Form, Field } from 'formik';
+export default function AddDetails() {
 
-    const changeCurrency = (price)=>{
+    const [formData, setformData] = useState({
+    }
+    )
+    const changeCurrency = (price) => {
         let temp_price = price
-        let lastThree = temp_price.substring(temp_price.length-3);
-        let otherNumbers = temp_price.substring(0,temp_price.length-3);
-        if(otherNumbers != '')
+        let lastThree = temp_price.substring(temp_price.length - 3);
+        let otherNumbers = temp_price.substring(0, temp_price.length - 3);
+        if (otherNumbers != '')
             lastThree = ',' + lastThree;
         let res = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
         return res
     }
-    const onSubmit = (data) => {
-   
-        data.price  =  changeCurrency(data.price)
-   
+  
+    const handleChange = (e) => {
+        if(e.target.name=='images'){
+            setformData({...formData, [`${e.target.name}`]:e.target.files})
+        }
+        else{
+            setformData({...formData, [`${e.target.name}`]:e.target.value})
+        }
+       
+       
+    }
+
+ 
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        const finalData=new FormData();
+        finalData.append('title',formData.title);
+        finalData.append('description',formData.description);
+        finalData.append('price',changeCurrency(formData.price));
+            for(let i=0;i<(formData.images).length;i++){
+                finalData.append(`images`,formData.images[i]);
+            }
+        
         const options = {
             url: 'http://localhost:5000/api/stuff/postad',
             method: 'POST',
+            data: finalData,
             headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json;charset=UTF-8'
-            },
-            data: data
+                Accept: 'application/json',
+                'Content-Type': 'multipart/form-data',
+              }
           };
-          
+
           axios(options)
             .then(response => {
-              console.log(response.data);
-             
-             
+              console.log("response wala",response.data);
+
+
               alert("Your Ad posted succesfully")
             })
-          
-    }; // your form submit function which will invoke after successful validation
 
-    // you can watch individual input by pass the name of the input
-    
-   const currencyConverter = (e)=>{
-       
+    };
+    const currencyConverter = (e) => {
 
-console.log(e)
-  }
+
+        console.log(e)
+    }
+    const SignupSchema = Yup.object().shape({
+        title: Yup.string()
+            .required('Required'),
+        price: Yup.number()
+            .required('Required'),
+        description: Yup.string()
+                     .required('required')
+                      
+    });
+
     return (
         <div className="details-container">
             <div className="form-section" style={{ width: "57%" }}>
-                <form onSubmit={handleSubmit(onSubmit)}>
-
-                    <div className="form-content">
-                        <label>Title</label>
-                        <input
-                            {...register("title", {
-                                required: true,
-                                maxLength: 35,
-                                pattern: /^[A-Za-z]+/i
-                            })}
-                        />
-                    </div>
-                    {errors?.title?.type === "required" && <p>This field is required</p>}
-                    {errors?.title?.type === "maxLength" && (
-                        <p>Title name cannot exceed 20 characters</p>
+                <Formik
+                    initialValues={formData}
+                    validationSchema={SignupSchema}
+                    onSubmit={values => {
+                    
+                        console.log(values);
+                    }}>
+                    {({ errors, touched}) => (
+                        <form onSubmit={handleSubmit} >
+                            <div className="form-content">
+                            <div className="form-row">
+                                <label>Title</label>
+                                <Field name="title" type="text" id="title"
+                                    value={formData.title}
+                                    onChange={handleChange} />
+                                {errors.title && touched.title ? (
+                                    <div>{errors.title}</div>
+                                ) : null}
+                           </div>
+                            <div className="form-row">
+                            <label>price</label>
+                            <Field name="price" type="number" id="number"
+                                    value={formData.price}
+                                    onChange={handleChange} />
+                                {errors.price && touched.price ? (
+                                    <div>{errors.price}</div>
+                                ) : null}
+                           
+                                 </div>
+                                 <div className="form-row">
+                            <label>description</label>
+                            <textarea name="description" type="text" id="text"
+                                    value={formData.description}
+                                    onChange={handleChange} maxlength="50"/>
+                                {errors.description && touched.description ? (
+                                    <div>{errors.description}</div>
+                                ) : null}
+                           
+                                 </div>
+                                 <div className="form-row">
+                                 <input type='file' id='file' name='images' multiple onChange={handleChange}></input>
+                            </div>
+                            <button type="submit">Sign In</button>
+                            </div>
+                            
+                        </form>
                     )}
-                    {errors?.title?.type === "pattern" && (
-                        <p>Alphabetical characters only</p>
-                    )}
-                    <div className="form-content">
-                        <label>Price</label>
-                        <input {...register("price", { required: true, min: 0 })} type="number" onChange={currencyConverter}/>
-                    </div>
-                    {errors?.price?.type === "min" && (
-                        <p>Min 0 required</p>
-                    )}
-                    {errors.price?.type === "required" && (
-                        <p>Must provide price</p>
-                    )}
-                    <div className="form-content">
-                        <label>ImageUrl</label>
-                        <input {...register("imageUrl", { required: true })}/>
-                    </div>
-                    {errors.imageUrl?.type === "required" && (
-                        <p>Must provide Image URL</p>
-                    )}
-                    <div className="form-content">
-                        <label>Description</label>
-                        <textarea {...register("description", {
-                            required: true,
-                            maxLength: 200,
-                        })} style={{
-                            resize: "none", height: "93px"
-                        }} />
-                    </div>
-                    {errors.description && (
-                        <p>Must provide description about your item</p>
-                    )}
-                    <div className="form-content">
-                        <input type="submit" />
-                    </div>
-                </form>
+                </Formik>
             </div>
         </div>
     )
