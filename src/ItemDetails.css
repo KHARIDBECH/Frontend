@@ -43,6 +43,8 @@
   align-items: center;
   border-radius: 6px;
   cursor: pointer;
+  background: black;
+  color: #FFFF;
 }
 .seller-contact-number {
   width: 96%;
@@ -58,30 +60,35 @@
 .item-detail-description {
   height: 112vh;
   width: 91%;
-
 }
-.detail-attributes{
-    width: 100%;
-    height: 68%;
+.detail-attributes {
+  width: 100%;
+  height: 68%;
 }
-.description{               
-        height: 58%;
-        background: #fff;
+.description {
+  height: 58%;
+  background: #fff;
+  text-align: left;
+  width: 258px;
+  display: flex;
+  line-height: 26px;
+  margin-left: 20px;
+  font-size: 17px;
 }
-.details{
-    background: #fff;
-    height: 42%;
-    display: flex;
-    flex-direction: column;
-
+.details {
+  background: #fff;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  padding: 17px 0px 22px 0px;
 }
- .details > span{
-    padding-left: 20px;
-        line-height: 46px;
-        font-size: 26px;
-        font-weight: 700;
-        color: #bb0467;
- }
+.details > span {
+  padding-left: 20px;
+  line-height: 46px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #bb0467;
+}
 .carousel-root {
   width: 91%;
 }
@@ -92,16 +99,16 @@
   border: 1px solid rgba(0, 47, 52, 0.2);
   background-color: #fff;
 }
-.product-detail{
-    height: 88vh;
-    display: flex;
-    flex-direction: column;
+.product-detail {
+  height: 88vh;
+  display: flex;
+  flex-direction: column;
 }
-.profile-detail{
-    display: flex;
-    align-items: center;
-    margin-top: 5px;
+.profile-detail {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
 }
-.carousel{
-    background-color: #fff;
-  }
+.carousel {
+  background-color: #fff;
+}
