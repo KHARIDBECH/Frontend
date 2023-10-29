@@ -9,13 +9,11 @@ export function AuthContextProvider(props) {
 //now from cookies you have to put that cookie to setToken(token)
 const [token, setToken ] =  useState(Cookies.get('Token')); 
 const [is_Auth,setAuth]  =  useState(Cookies.get('isAuth'));
-const [userId,setuserId]  =  useState(Cookies.get('userId'));
-
 
 
 
     return (
-        <AuthContext.Provider value={[is_Auth,setAuth,token,setToken,userId,setuserId]}>
+        <AuthContext.Provider value={[is_Auth,setAuth,token,setToken]}>
             {props.children}
             
         </AuthContext.Provider>

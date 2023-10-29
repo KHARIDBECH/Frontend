@@ -31,23 +31,23 @@ const Pending = () => {
     <div className="filter-options-nav">
       <div className="filter-options">
         <div className="filter-options-list">
-          Furnitures
+          Cars
        </div>
         <div className="filter-options-list">
-          Electronic-items
+          Truck
        </div>
         <div className="filter-options-list">
-          Vehicle
+          Ambulance
        </div>
         <div className="filter-options-list">
-          StationaryItems
+          Fridge
        </div>
-        {/* <div className="filter-options-list">
+        <div className="filter-options-list">
           Bus
        </div>
         <div className="filter-options-list">
           Computer
-       </div> */}
+       </div>
         <div className="filter-options-list">
           Mobile
        </div>
