@@ -47,7 +47,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   })
 
   const [isAuth,setAuth] = useContext(AuthContext);
-  const [userId,setuserId] = useContext(AuthContext);
+  
   const handleClose = (e) => {
     setopenSignIn(false);
   };
@@ -74,13 +74,11 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   }
     )
     .then((data)=>{
-      console.log("te h data",data)
+      console.log(data)
       setopenSignIn(false);
       setisloggedin(true)
       Cookies.set("Token", data.token);
       Cookies.set("isAuth",true)
-      Cookies.set("userId",data.userId);
-      console.log("pri",userId)
       
     })
     .catch((err)=>{

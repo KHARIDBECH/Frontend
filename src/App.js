@@ -8,7 +8,6 @@ import Banner from './Banner';
 import AdsDetails from './AdsDetails';
 import {AuthContextProvider} from './AuthContext';
 import ItemDetails from "./ItemDetails"
-import Messenger from "./Messenger"
 function App() {
   const [openSignIn, setopenSignIn] = useState(false)
   const [openSignUp, setopenSignUp] = useState(false)
@@ -30,8 +29,6 @@ function App() {
       <Route exact path="/item/:productUrl">
         <ItemDetails/>
         </Route>
-        <Route exact path="/chat"><Messenger/>
-      </Route>
       </AuthContextProvider>
     </div>
     </Router>

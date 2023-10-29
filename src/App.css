@@ -25,10 +25,7 @@ a{
 .MuiCardHeader-content{
   overflow: hidden;
 }
-.carousel.carousel-slider .control-arrow {
-  height: auto;
-  width: 38px;
-}
+
 
 
 input {
