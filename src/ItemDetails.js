@@ -42,7 +42,9 @@ export default function ItemDetails() {
                         <div className="details" >
                             <span>Details</span>
                             <div className="detail-attributes">
-                             <div className="description"></div>
+                             <div className="description">
+                                 {itemDetail.description}
+                             </div>
                             </div>
                         </div>
                         

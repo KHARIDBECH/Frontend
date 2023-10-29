@@ -42,7 +42,6 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
  export default function SignUp({openSignUp,setopenSignUp}) {
   const classes = useStyles();
-  console.log("hii babu")
   const [userData, setuserData] = useState({
     firstName:"",
     lastName:"",
@@ -63,7 +62,6 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
   const postData = (e)=>{
     e.preventDefault();
-  console.log("hiii")
     fetch("http://localhost:5000/api/auth/signup",{
       method: 'POST',
       headers: {'Content-Type':'application/json'},
