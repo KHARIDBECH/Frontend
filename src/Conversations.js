@@ -2,7 +2,9 @@ import {React,useState,useEffect} from 'react'
 import './conversations.css'
 import axios from 'axios'
 import Cookies from 'js-cookie'
+import { config } from './Constants'
 export default function Conversations({conversation,userId}) {
+    const url = config.url.API_URL
     const [user, setuser] = useState(null)
     const [first, setfirst] = useState('');
 
@@ -10,7 +12,7 @@ export default function Conversations({conversation,userId}) {
         const friendId = conversation.members.find(r => r !==Cookies.get('userId'))
         console.log("friend wala",friendId)
         const getUser = () =>{
-        axios.get(`http://localhost:5000/api/auth/user?userId=${friendId}`)
+        axios.get(`${url}/api/auth/user?userId=${friendId}`)
         .then((res) => 
         {
             console.log("fetch wala",res.data)

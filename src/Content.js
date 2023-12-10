@@ -7,6 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import { Link } from 'react-router-dom';
+import { config } from './Constants'
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -37,6 +38,7 @@ function Showmore({ showMoreItems }) {
 
 
 export default function Content({ searchVal}) {
+  const url = config.url.API_URL
   const classes = useStyles();
   const [data, setdata] = useState([{}])
   const [visible, setvisible] = useState(4)
@@ -52,7 +54,7 @@ export default function Content({ searchVal}) {
   //
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/stuff/", {
+    fetch(`${url}/api/stuff/`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     })

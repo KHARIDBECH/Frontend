@@ -7,9 +7,11 @@ import Cookies from 'js-cookie'
 import { AuthContext } from './AuthContext';
 import axios from 'axios'
 import { io } from "socket.io-client";
+import { config } from './Constants'
 
 export default function Messenger() {
     // const [token,setToken] = useContext(AuthContext);
+    const url = config.url.API_URL
     const [conversations, setconversations] = useState([])
     const [userId, setuserId] = useState('')
     const [currentChat, setCurrentChat] = useState(null);
@@ -48,7 +50,7 @@ export default function Messenger() {
             try {
                 let userId = await Cookies.get('userId');
                 setuserId(userId);
-                const res = await axios.get(`http://localhost:5000/api/chatConvo/${userId}`)
+                const res = await axios.get(`${url}/api/chatConvo/${userId}`)
                 setconversations(res.data)
                 // console.log(res);
             }
@@ -64,7 +66,7 @@ export default function Messenger() {
     useEffect(() => {
         const getMessages = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/api/chatMessages/${currentChat._id}`)
+                const res = await axios.get(`${url}/api/chatMessages/${currentChat._id}`)
                 setMessages(res.data);
                 console.log("get wala", res.data)
             } catch (err) {
@@ -95,7 +97,7 @@ export default function Messenger() {
         receiverId,
         text: newMessages,
       });
-       axios.post(`http://localhost:5000/api/chatMessages/`,addMessagesFormat)
+       axios.post(`${url}/api/chatMessages/`,addMessagesFormat)
        .then(res=>{
            setMessages([...messages,res.data]);
        })

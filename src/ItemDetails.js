@@ -6,6 +6,7 @@ import Avatar from '@material-ui/core/Avatar';
 import './ItemDetails.css'
 import { makeStyles } from '@material-ui/core/styles';
 import { deepOrange } from '@material-ui/core/colors';
+import { config } from './Constants'
 const useStyles = makeStyles((theme) => ({
     button: {
         margin: theme.spacing(1),
@@ -20,12 +21,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 export default function ItemDetails() {
+    const url = config.url.API_URL
     const [itemDetail, setitemDetail] = useState({})
     const classes = useStyles();
     const { productUrl } = useParams();
     let itemId = productUrl.slice(productUrl.lastIndexOf("-") + 1)
     useEffect(() => {
-        fetch(`http://localhost:5000/api/stuff/itemdetail/${itemId}`)
+        fetch(`${url}/api/stuff/itemdetail/${itemId}`)
             .then((res) => res.json())
             .then((data) => {
                 setitemDetail(data[0])

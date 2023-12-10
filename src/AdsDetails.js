@@ -4,7 +4,9 @@ import './AdsDetails.css'
 import * as Yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import Cookies from 'js-cookie'
+import { config } from './Constants'
 export default function AddDetails() {
+    const url = config.url.API_URL
 
     const [formData, setformData] = useState({})
     // const [user,setuser] = useContext(AuthContext);
@@ -41,7 +43,7 @@ export default function AddDetails() {
         }
 
         const options = {
-            url: 'http://localhost:5000/api/stuff/postad',
+            url: `${url}/api/stuff/postad`,
             method: 'POST',
             data: finalData,
             headers: {

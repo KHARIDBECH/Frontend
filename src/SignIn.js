@@ -13,6 +13,7 @@ import Dialog from '@material-ui/core/Dialog';
 import Slide from '@material-ui/core/Slide';
 import Cookies from 'js-cookie'
 import {AuthContext} from './AuthContext';
+import { config } from './Constants'
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -40,6 +41,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
  export default function SignIn({openSignIn,setopenSignIn,setisloggedin}) {
+  const url = config.url.API_URL
   const classes = useStyles();
   const [userData, setuserData] = useState({
     email: "",
@@ -60,7 +62,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   }
   const postData = (e)=>{
     e.preventDefault();
-    fetch("http://localhost:5000/api/auth/signin",{
+    fetch(`${url}/api/auth/signin`,{
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(userData)
