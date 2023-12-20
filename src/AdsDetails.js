@@ -7,7 +7,6 @@ import Cookies from 'js-cookie'
 import { config } from './Constants'
 export default function AddDetails() {
     const url = config.url.API_URL
-
     const [formData, setformData] = useState({})
     // const [user,setuser] = useContext(AuthContext);
     const changeCurrency = (price) => {

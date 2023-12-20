@@ -15,7 +15,7 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-
+import { config } from './Constants'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,12 +35,12 @@ const useStyles = makeStyles((theme) => ({
 export default function ProductCard({data}) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
-
+  const url = config.url.API_URL
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
-  console.log("image wala",data.image)
+  console.log("image wala",url,data.image)
   return (
     
     <Card className={classes.root}>
@@ -60,7 +60,7 @@ export default function ProductCard({data}) {
       />
       <CardMedia
         className={classes.media}
-        image={data.image?data.image[0]:null}
+        image={data.image?`${url}/${data.image[0]}`:null}
         title="Paella dish"
       />
       <CardContent>

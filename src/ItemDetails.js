@@ -22,6 +22,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 export default function ItemDetails() {
     const url = config.url.API_URL
+    // const url = "http://localhost:5000"
     const [itemDetail, setitemDetail] = useState({})
     const classes = useStyles();
     const { productUrl } = useParams();
