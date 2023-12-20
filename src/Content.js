@@ -40,7 +40,7 @@ function Showmore({ showMoreItems }) {
 export default function Content({ searchVal}) {
   const url = config.url.API_URL
   // const url = "http://localhost:5000"
-  console.log(config,REACT_APP_ENV)
+  console.log(config,process.env)
   const classes = useStyles();
   const [data, setdata] = useState([{}])
   const [visible, setvisible] = useState(4)
