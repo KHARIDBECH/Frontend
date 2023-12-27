@@ -1,7 +1,10 @@
 import React from "react";
 import { Carousel } from "react-responsive-carousel";
-
-export default ({itemDetail}) => (
+import { config } from './Constants'
+export default function Slider({itemDetail}) {
+  const url = config.url.API_URL
+  return (
+    
   <Carousel infiniteLoop>
    
     {
@@ -10,7 +13,7 @@ export default ({itemDetail}) => (
         console.log("Map",data)
         return(
           <div >
-          <img alt={`image-${index}`} src={data} className="slide-image"/>
+          <img alt={`image-${index}`} src={`${url}/${data}`} className="slide-image"/>
         
         </div>
         )
@@ -18,4 +21,5 @@ export default ({itemDetail}) => (
     }
    
       </Carousel>
-);
+)
+} 
