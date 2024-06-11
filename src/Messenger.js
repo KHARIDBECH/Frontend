@@ -7,7 +7,7 @@ import Cookies from 'js-cookie'
 import { AuthContext } from './AuthContext';
 import axios from 'axios'
 import { io } from "socket.io-client";
-import { config } from './Constants'
+import { config } from './Constants.js'
 
 export default function Messenger() {
     // const [token,setToken] = useContext(AuthContext);
@@ -23,7 +23,7 @@ export default function Messenger() {
     const socket = useRef();
     const scrollRef = useRef();
     useEffect(() => {
-        socket.current = io("ws://localhost:8900");
+        socket.current = io("ws://localhost:5000");
         socket.current.on("getMessage", (data) => {
           setArrivalMessage({
             sender: data.senderId,
@@ -34,13 +34,14 @@ export default function Messenger() {
       }, []);
 
       useEffect(() => {
-        console.log("arrival",arrivalMessage)
+        console.log("arrival called",arrivalMessage)
         arrivalMessage &&
           currentChat?.members.includes(arrivalMessage.sender) &&
           setMessages((prev) => [...prev, arrivalMessage]);
       }, [arrivalMessage, currentChat]);
 
-      useEffect(() => {
+      useEffect(async () => {
+        let userId = await Cookies.get('userId');
         socket.current.emit("addUser", userId);
         socket.current.on("getUsers", (users) => {
         console.log("users",users)

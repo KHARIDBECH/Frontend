@@ -60,7 +60,7 @@ export default function ProductCard({data}) {
       />
       <CardMedia
         className={classes.media}
-        image={data.image?`${url}/${data.image[0]}`:null}
+        image={data.image?`${url}${data.image[0]}`:null}
         title="Paella dish"
       />
       <CardContent>

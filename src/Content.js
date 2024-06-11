@@ -4,6 +4,7 @@ import Box from '@material-ui/core/Box';
 import React from 'react';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import { Link } from 'react-router-dom';
@@ -22,17 +23,42 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-
+const Cardscontainer = styled(Container)(({ theme }) => ({
+  marginTop: theme.spacing(4), // Add top margin
+  padding: 0,
+}));
+const Banner = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  width: '100%',
+  height: '200px', // Set the height of the banner
+  backgroundSize: 'cover',
+  marginBottom: "50px",
+  backgroundPosition: 'center',
+  marginTop: theme.spacing(2), // Add some margin from the header
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundImage: 'url("https://statics.olx.in/external/base/img/hero-bg-in.jpg")', // Replace with your ad image URL
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    zIndex: -1, // Ensure the image stays behind any other content
+    opacity: 0.9, // Slight transparency for better visibility
+  },
+}));
 
 function Showmore({ showMoreItems }) {
   return (
+    <div style={{display:'flex',justifyContent:'center',alignItems:'center', marginTop:'20px'}}>
     <Button variant="outlined" color="primary" style={{
-      marginTop: '5%',
-      marginLeft: '42%', marginRight: '47%', paddingLeft: '59px',
-      paddingRight: '50px'
+      width:'150px'
     }}>
       <span style={{ whiteSpace: 'nowrap' }} onClick={showMoreItems}>Show More</span>
     </Button>
+      </div>
   )
 }
 
@@ -94,20 +120,16 @@ export default function Content({ searchVal}) {
     setlengthTrack((prevValue) => prevValue + 4)
   }
   return (
-    <Box pt={20} style={{
-      position: 'relative',
-      top: '288px'
-    }}>
 
-      <Container fixed >
-        <div className={classes.root}>
-
-          <Grid container spacing={2} direction="row" justify="space" alignItems="stretch">
+    <Cardscontainer >
+      <Banner/>
+    <Box sx={{ flexGrow: 1, padding: 2 }}>
+          <Grid container spacing={3} >
 
             {
               
               data.slice(0,visible).map((data, index) => (
-                  <Grid item xs={3}>
+                  <Grid item  xs={12} sm={6} md={4} lg={3} container justifyContent="center">
                     <Link to={`/item/${data.productUrl}`}>
                       <ProductCard key={index} className={classes.paper} data={data} ></ProductCard>
                     </Link>
@@ -124,12 +146,12 @@ export default function Content({ searchVal}) {
       
 
 
-        </div>
+        {/* </div> */}
 
 
-      </Container>
 
     </Box>
+      </Cardscontainer>
 
 
   );
