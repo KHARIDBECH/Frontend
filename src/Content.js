@@ -1,26 +1,14 @@
 import { useState, useEffect } from 'react'
 import ProductCard from './ProductCard'
-import Box from '@material-ui/core/Box';
+import { Box } from '@mui/material';
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import { makeStyles } from '@material-ui/core/styles';
+import { Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
 import { Link } from 'react-router-dom';
 import { config } from './Constants'
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  paper: {
-    padding: theme.spacing(8),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-    boxShadow: '0px 2px 1px'
 
-  },
-}));
 
 
 const Cardscontainer = styled(Container)(({ theme }) => ({
@@ -67,7 +55,6 @@ export default function Content({ searchVal}) {
   const url = config.url.API_URL
   // const url = "http://localhost:5000"
 
-  const classes = useStyles();
   const [data, setdata] = useState([{}])
   const [visible, setvisible] = useState(4)
   const [lengthTrack, setlengthTrack] = useState(4)
@@ -131,7 +118,7 @@ export default function Content({ searchVal}) {
               data.slice(0,visible).map((data, index) => (
                   <Grid item  xs={12} sm={6} md={4} lg={3} container justifyContent="center">
                     <Link to={`/item/${data.productUrl}`}>
-                      <ProductCard key={index} className={classes.paper} data={data} ></ProductCard>
+                      <ProductCard key={index}  data={data} sx={(theme) => ({padding: theme.spacing(8),textAlign: 'center',color: theme.palette.text.secondary, boxShadow: '0px 2px 1px'})}></ProductCard>
                     </Link>
                   </Grid>
                 ))

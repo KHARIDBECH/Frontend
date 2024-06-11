@@ -1,39 +1,22 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+
 import clsx from 'clsx';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Collapse from '@material-ui/core/Collapse';
-import Avatar from '@material-ui/core/Avatar';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import { red } from '@material-ui/core/colors';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import ShareIcon from '@material-ui/icons/Share';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
+import { Card } from '@mui/material';
+import CardHeader from '@mui/material/CardHeader';
+import CardMedia from '@mui/material/CardMedia';
+import CardContent from '@mui/material/CardContent';
+
+import Avatar from '@mui/material/Avatar';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import { red } from '@mui/material/colors';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import { config } from './Constants'
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    maxWidth: 345,
-    boxShadow:'-1px -2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)'
-  },
-  media: {
-    height: 0,
-    paddingTop: '56.25%', // 16:9
-  },
-  avatar: {
-    backgroundColor: red[500],
-  },
- 
-}));
+
 
 export default function ProductCard({data}) {
-  const classes = useStyles();
+
   const [expanded, setExpanded] = React.useState(false);
   const url = config.url.API_URL
   const handleExpandClick = () => {
@@ -43,10 +26,11 @@ export default function ProductCard({data}) {
   console.log("image wala",url,data.image)
   return (
     
-    <Card className={classes.root}>
+    <Card sx={{maxWidth: 345,
+      boxShadow:'-1px -2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)'}}>
       <CardHeader
         avatar={
-          <Avatar aria-label="recipe" className={classes.avatar}>
+          <Avatar aria-label="recipe" sx={{backgroundColor: red[500]}}>
             R
           </Avatar>
         }
@@ -59,7 +43,8 @@ export default function ProductCard({data}) {
         subheader="September 14, 2016"
       />
       <CardMedia
-        className={classes.media}
+        sx={{ height: 0,
+          paddingTop: '56.25%',}}
         image={data.image?`${url}${data.image[0]}`:null}
         title="Paella dish"
       />
