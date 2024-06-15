@@ -1,6 +1,6 @@
 const prod = {
     url: {
-     API_URL: "https://kharidbech-backend.onrender.com",
+     API_URL: "https://backend-ju9l.onrender.com",
      }
    }
    const dev = {
