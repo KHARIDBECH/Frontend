@@ -1,49 +1,34 @@
 import React,{useState,useContext,useEffect} from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Dialog from '@material-ui/core/Dialog';
-import Slide from '@material-ui/core/Slide';
+import Avatar from '@mui/material/Avatar';
+import { Button } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Link from '@mui/material/Link';
+import Grid from '@mui/material/Grid';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Typography from '@mui/material/Typography';
+import Dialog from '@mui/material/Dialog';
+import Slide from '@mui/material/Slide';
 import Cookies from 'js-cookie'
 import {AuthContext} from './AuthContext';
 import { config } from './Constants'
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding:38,
-    paddingTop:0
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(4),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
-
+import { Box } from '@mui/material';
+import { styled } from '@mui/system';
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+
+const SignInForm = styled('form')({
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-evenly",
+    height:"330px"
+});
  export default function SignIn({openSignIn,setopenSignIn,setisloggedin}) {
   const url = config.url.API_URL
   // const url = "http://localhost:5000"
-  const classes = useStyles();
   const [userData, setuserData] = useState({
     email: "",
     password: ""
@@ -103,14 +88,20 @@ const Transition = React.forwardRef(function Transition(props, ref) {
         aria-describedby="alert-dialog-slide-description"
       >
         
-              <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
+      <Box sx={(theme) => ({
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              padding:"50px",
+              })}>
+        <Avatar sx={(theme) => ({margin: theme.spacing(1),
+          backgroundColor: theme.palette.secondary.main})}>
+          {/* <LockOutlinedIcon /> */}
         </Avatar>
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} onSubmit={postData}>
+        <SignInForm  onSubmit={postData}>
           <TextField
             variant="outlined"
             margin="normal"
@@ -144,7 +135,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
             fullWidth
             variant="contained"
             color="primary"
-            className={classes.submit}
+            sx={(theme) => ({margin: theme.spacing(3, 0, 2)})}
           >
             Sign In
           </Button>
@@ -160,8 +151,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
               </Link>
             </Grid>
           </Grid>
-        </form>
-      </div>
+        </SignInForm>
+      </Box>
       </Dialog>
     </div>
   );

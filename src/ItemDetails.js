@@ -2,29 +2,15 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import Carousel from './Carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import Avatar from '@material-ui/core/Avatar';
+import Avatar from '@mui/material/Avatar';
 import './ItemDetails.css'
-import { makeStyles } from '@material-ui/core/styles';
-import { deepOrange } from '@material-ui/core/colors';
+import { deepOrange } from '@mui/material/colors';
 import { config } from './Constants'
-const useStyles = makeStyles((theme) => ({
-    button: {
-        margin: theme.spacing(1),
-        borderRadius: "34px",
-        backgroundColor: "#bb0467"
-    },
-    orange: {
-        color: theme.palette.getContrastText(deepOrange[500]),
-        backgroundColor: deepOrange[500],
-        width: theme.spacing(7),
-        height: theme.spacing(7)
-    },
-}));
+
 export default function ItemDetails() {
     const url = config.url.API_URL
     // const url = "http://localhost:5000"
     const [itemDetail, setitemDetail] = useState({})
-    const classes = useStyles();
     const { productUrl } = useParams();
     let itemId = productUrl.slice(productUrl.lastIndexOf("-") + 1)
     useEffect(() => {
@@ -32,7 +18,7 @@ export default function ItemDetails() {
             .then((res) => res.json())
             .then((data) => {
                 setitemDetail(data[0])
-                console.log("pakad betichod",data[0])
+                console.log("pakad betichod", data[0])
             })
             .catch((err) => { console.log(err) })
     }, [])
@@ -40,17 +26,17 @@ export default function ItemDetails() {
         <div className="item-detail-container">
             <div className="item-content-section">
                 <div className="item-details">
-                    <Carousel itemDetail={itemDetail.image}/>
+                    <Carousel itemDetail={itemDetail.image} />
                     <div className="item-detail-description">
                         <div className="details" >
                             <span>Details</span>
                             <div className="detail-attributes">
-                             <div className="description">
-                                 {itemDetail.description}
-                             </div>
+                                <div className="description">
+                                    {itemDetail.description}
+                                </div>
                             </div>
                         </div>
-                        
+
                     </div>
                 </div>
                 <div className="user-details">
@@ -70,7 +56,12 @@ export default function ItemDetails() {
                         <div className="seller-detail">
                             <h2 style={{ marginTop: '19px' }}>Seller description</h2>
                             <div className="profile-detail">
-                                <Avatar alt="Remy Sharp" src="/broken-image.jpg" className={classes.orange} />
+                                <Avatar alt="Remy Sharp" src="/broken-image.jpg"  sx={(theme) => ({
+                                    color: theme.palette.getContrastText(deepOrange[500]),
+                                    backgroundColor: deepOrange[500],
+                                    width: theme.spacing(7),
+                                    height: theme.spacing(7)
+                                })} />
                                 <p className="user-profile-name" style={{ display: 'flex', flexDirection: 'column', marginLeft: '12px' }}><span>Ravi Kumar-OLX auto</span>
                                     <span>Member since Feb 2017</span>
                                 </p>

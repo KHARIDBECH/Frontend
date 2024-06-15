@@ -1,47 +1,27 @@
 
 import React,{useState} from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Dialog from '@material-ui/core/Dialog';
-import Slide from '@material-ui/core/Slide';
+import Avatar from '@mui/material/Avatar';
+import { Button } from '@mui/material';
 
+import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Link from '@mui/material/Link';
+import Grid from '@mui/material/Grid';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Typography from '@mui/material/Typography';
+import Dialog from '@mui/material/Dialog';
+import Slide from '@mui/material/Slide';
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding:38,
-    paddingTop:0
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(4),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
+import { Box } from '@mui/material';
+
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
  export default function SignUp({openSignUp,setopenSignUp}) {
-  const classes = useStyles();
+
   const [userData, setuserData] = useState({
     firstName:"",
     lastName:"",
@@ -88,14 +68,21 @@ const Transition = React.forwardRef(function Transition(props, ref) {
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
       >
-         <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
+         <Box sx={(theme) => ({
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding:"50px",
+    })}>
+        <Avatar sx={(theme) => ({margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main})}>
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <form className={classes.form} noValidate onSubmit={postData}>
+        <form sx={(theme) => ({width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(4)})} noValidate onSubmit={postData}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -165,7 +152,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
             fullWidth
             variant="contained"
             color="primary"
-            className={classes.submit}
+            sx={(theme) => ({margin: theme.spacing(3, 0, 2)})}
             // onClick = {postData}
           >
             Sign Up
@@ -178,7 +165,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
             </Grid>
           </Grid>
         </form>
-      </div>
+      </Box>
 
     
       </Dialog>
