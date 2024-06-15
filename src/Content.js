@@ -40,18 +40,18 @@ const Banner = styled(Box)(({ theme }) => ({
 
 function Showmore({ showMoreItems }) {
   return (
-    <div style={{display:'flex',justifyContent:'center',alignItems:'center', marginTop:'20px'}}>
-    <Button variant="outlined" color="primary" style={{
-      width:'150px'
-    }}>
-      <span style={{ whiteSpace: 'nowrap' }} onClick={showMoreItems}>Show More</span>
-    </Button>
-      </div>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
+      <Button variant="outlined" color="primary" style={{
+        width: '150px'
+      }}>
+        <span style={{ whiteSpace: 'nowrap' }} onClick={showMoreItems}>Show More</span>
+      </Button>
+    </div>
   )
 }
 
 
-export default function Content({ searchVal}) {
+export default function Content({ searchVal }) {
   const url = config.url.API_URL
   // const url = "http://localhost:5000"
 
@@ -85,13 +85,13 @@ export default function Content({ searchVal}) {
         //url logic
         console.log(data)
         data.map((value) => {
-         
+
           let splitTitle = value.title.split(" ")
           value.title = splitTitle.join('-')
           let idValue = Object.values(value['iid'])
           let modifiedId = idValue.join('')
           value.productUrl = value.title + "id-" + modifiedId
-        
+
         })
         setdata(data)
         console.log(data)
@@ -109,36 +109,36 @@ export default function Content({ searchVal}) {
   return (
 
     <Cardscontainer >
-      <Banner/>
-    <Box sx={{ flexGrow: 1, padding: 2 }}>
-          <Grid container spacing={3} >
+      <Banner />
+      <Box sx={{ flexGrow: 1, padding: 2 }}>
+        <Grid container spacing={3} >
 
-            {
-              
-              data.slice(0,visible).map((data, index) => (
-                  <Grid item  xs={12} sm={6} md={4} lg={3} container justifyContent="center">
-                    <Link to={`/item/${data.productUrl}`}>
-                      <ProductCard key={index}  data={data} sx={(theme) => ({padding: theme.spacing(8),textAlign: 'center',color: theme.palette.text.secondary, boxShadow: '0px 2px 1px'})}></ProductCard>
-                    </Link>
-                  </Grid>
-                ))
-            }
-
-
-
-          </Grid>
           {
-        (lengthTrack<data.length)?<Showmore showMoreItems={showMoreItems}/>:null
-      }
-      
+
+            data.slice(0, visible).map((data, index) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} container justifyContent="center">
+                <Link to={`/item/${data.productUrl}`} >
+                  <ProductCard key={index} data={data} sx={(theme) => ({ padding: theme.spacing(8), textAlign: 'center', color: theme.palette.text.secondary, boxShadow: '0px 2px 1px' })}></ProductCard>
+                </Link>
+              </Grid>
+            ))
+          }
+
+
+
+        </Grid>
+        {
+          (lengthTrack < data.length) ? <Showmore showMoreItems={showMoreItems} /> : null
+        }
+
 
 
         {/* </div> */}
 
 
 
-    </Box>
-      </Cardscontainer>
+      </Box>
+    </Cardscontainer>
 
 
   );

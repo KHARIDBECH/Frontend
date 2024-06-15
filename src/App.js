@@ -8,7 +8,7 @@ import AdsDetails from './AdsDetails';
 import {AuthContextProvider} from './AuthContext';
 import ItemDetails from "./ItemDetails"
 import Messenger from "./Messenger"
-import Navbar from "./Navbar"
+import "./App.css"
 import Nav from './Nav'
 
 function App() {
