@@ -14,14 +14,14 @@ import Dialog from '@mui/material/Dialog';
 import Slide from '@mui/material/Slide';
 
 import { Box } from '@mui/material';
-
+import { config } from './Constants';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
  export default function SignUp({openSignUp,setopenSignUp}) {
-
+  const url = config.url.API_URL
   const [userData, setuserData] = useState({
     firstName:"",
     lastName:"",
@@ -42,7 +42,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
   const postData = (e)=>{
     e.preventDefault();
-    fetch("https://kharidbech-backend.onrender.com/api/auth/signup",{
+    fetch(`${url}/api/auth/signup`,{
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(userData)

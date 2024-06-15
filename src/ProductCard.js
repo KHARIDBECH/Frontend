@@ -45,7 +45,7 @@ export default function ProductCard({data}) {
       <CardMedia
         sx={{ height: 0,
           paddingTop: '56.25%',}}
-        image={data.image?`${url}${data.image[0]}`:null}
+        image={data.image?`${data.image[0]}`:null}
         title="Paella dish"
       />
       <CardContent>
