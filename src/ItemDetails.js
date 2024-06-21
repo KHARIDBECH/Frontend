@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import Carousel from './Carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import Avatar from '@mui/material/Avatar';
 import './ItemDetails.css'
 import { deepOrange } from '@mui/material/colors';
 import { config } from './Constants'
+import { Grid, Container, Typography, Avatar } from '@mui/material';
+import Paper from '@mui/material/Paper';
+import { Box } from '@mui/material';
+import { Button } from '@mui/material';
 
 export default function ItemDetails() {
     const url = config.url.API_URL
@@ -23,58 +26,57 @@ export default function ItemDetails() {
             .catch((err) => { console.log(err) })
     }, [])
     return (
-        <div className="item-detail-container">
-            <div className="item-content-section">
-                <div className="item-details">
+        <Container maxWidth="lg">
+            <Grid container spacing={2} sx={{ marginTop: "20px" }}>
+                <Grid item xs={12} md={6} sx={{
+                    alignItems: "center",
+                    display: "flex",
+                    flexDirection: "column",
+                }}>
                     <Carousel itemDetail={itemDetail.image} />
-                    <div className="item-detail-description">
-                        <div className="details" >
-                            <span>Details</span>
-                            <div className="detail-attributes">
-                                <div className="description">
-                                    {itemDetail.description}
-                                </div>
-                            </div>
-                        </div>
 
-                    </div>
-                </div>
-                <div className="user-details">
-                    <div className="product-detail">
-                        <div className="product-content">
-                            <h2 style={{ marginTop: '12px' }}>Rs {itemDetail.price}</h2>
-                            <p style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                marginTop: '18px'
+                    <Paper elevation={3} sx={{
+                        minHeight: "100px",
+                        padding: "15px",
+                        width: "100%",
+                        boxSizing: "border-box"
+                    }}>
+                        <Typography variant="h6">Details</Typography>
+                        <Typography variant="body2">{itemDetail.description}</Typography>
+                    </Paper>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                    <Grid container direction="column" spacing={2}>
+                        <Grid item xs={12}>
+                            <Paper elevation={3} sx={{ padding: "20px" }}>
+                                <Typography variant="h5">Rs {itemDetail.price}</Typography>
+                                <Typography variant="body2">{itemDetail.title}</Typography>
+                            </Paper>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <Paper elevation={3} sx={{
+                                padding: "20px", display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "space-between",
+                                height: "140px"
                             }}>
-                                {/* <span>2017 - 35,818</span> */}
-                                <span style={{ marginTop: '7px' }}>{itemDetail.title}</span>
-                            </p>
-                            {/* <span style={{ marginTop: '18px' }}>Rohini,Delhi Delhi</span> */}
-                        </div>
-                        <div className="seller-detail">
-                            <h2 style={{ marginTop: '19px' }}>Seller description</h2>
-                            <div className="profile-detail">
-                                <Avatar alt="Remy Sharp" src="/broken-image.jpg"  sx={(theme) => ({
-                                    color: theme.palette.getContrastText(deepOrange[500]),
-                                    backgroundColor: deepOrange[500],
-                                    width: theme.spacing(7),
-                                    height: theme.spacing(7)
-                                })} />
-                                <p className="user-profile-name" style={{ display: 'flex', flexDirection: 'column', marginLeft: '12px' }}><span>Ravi Kumar-OLX auto</span>
-                                    <span>Member since Feb 2017</span>
-                                </p>
-                            </div>
-                            <div className="seller-contact"><span>Chat with Seller</span></div>
-                            {/* <div className="seller-contact-number"><CallIcon /><span>6390081011</span></div> */}
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        </div >
+                                <Typography variant="h6">Seller description</Typography>
+                                <Box display="flex" gap={2}>
+                                    <Avatar alt="Remy Sharp" src="/broken-image.jpg" />
+                                    <Typography variant="body2">
+                                        <span>Ravi Kumar-OLX auto</span>
+                                        <br />
+                                        <span>Member since Feb 2017</span>
+                                    </Typography>
+                                </Box>
+                                <Button variant="outlined" color="primary" fullWidth={true}>Chat with Seller</Button>
+                            </Paper>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Container>
 
     )
 };

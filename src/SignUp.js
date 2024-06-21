@@ -81,8 +81,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <form sx={(theme) => ({width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(4)})} noValidate onSubmit={postData}>
+        <form noValidate onSubmit={postData}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField

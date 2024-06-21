@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useContext,AuthContext} from 'react'
+import React, { useState, useEffect, useContext, AuthContext } from 'react'
 import axios from 'axios';
 import './AdsDetails.css'
 import * as Yup from 'yup';

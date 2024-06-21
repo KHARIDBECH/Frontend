@@ -19,10 +19,10 @@ export default function ProductCard({ data }) {
     setExpanded(!expanded);
   };
 
-    // const date = new Date(data.postedAt);
-    // const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(date);
+  // const date = new Date(data.postedAt);
+  // const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(date);
 
-//  console.log(typeof(data.postedAt))
+  //  console.log(typeof(data.postedAt))
 
   return (
 
@@ -50,11 +50,11 @@ export default function ProductCard({ data }) {
           height: 0,
           paddingTop: '56.25%', marginTop: "6px"
         }}
-        image={data.image ? `${data.image[0]}` : null}
+        image={data.image ? `${url}${data.image[0]}` : null}
         title="Paella dish"
 
       />
-      <CardContent sx={{padding:"16px 16px 0px 16px"}}>
+      <CardContent sx={{ padding: "16px 16px 0px 16px" }}>
         <Box >
 
           <Typography variant="h6" color="textSecondary" component="p">
@@ -69,18 +69,18 @@ export default function ProductCard({ data }) {
             {data.description}
           </Typography>
         </Box>
-       
+
       </CardContent>
-      <Box sx={{ display: "flex", justifyContent: "space-between",margin: "0px 16px 0px 16px" }}>
-          <Typography variant="caption" display="flex" sx={{
-            letterSpacing: "0.002em"
-          }}>
-            NewDelhi, India
-          </Typography>
-          <Typography variant="caption" >
-            {data?.postedAt && new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(new Date(Number(data.postedAt)))}
-          </Typography>
-        </Box>
+      <Box sx={{ display: "flex", justifyContent: "space-between", margin: "0px 16px 0px 16px" }}>
+        <Typography variant="caption" display="flex" sx={{
+          letterSpacing: "0.002em"
+        }}>
+          NewDelhi, India
+        </Typography>
+        <Typography variant="caption" >
+          {data?.postedAt && new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(new Date(Number(data.postedAt)))}
+        </Typography>
+      </Box>
     </Card>
 
   );
