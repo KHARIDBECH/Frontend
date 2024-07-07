@@ -31,31 +31,30 @@ export default function ProductCard({ data }) {
       position: "relative",
       maxWidth: "270px",
       minWidth: '260px',
-      maxHeight: '280px',
+      maxHeight: '330px',
       boxShadow: '-1px -2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)'
     }}>
-      <CardHeader
-        sx={{ position: "absolute", right: "6px" }}
-
+       <CardHeader
+        sx={{ position:"absolute",right:"0px" }} // Shorter way to set right position (optional)
         action={
-          <IconButton aria-label="add to favorites" sx={{ background: "white", width: "100%" }}>
+          <IconButton aria-label="add to favorites" sx={{ background: "white" }}>
             <FavoriteIcon />
           </IconButton>
         }
-      // title={data.title}
-      // subheader="May 14"
       />
       <CardMedia
+      component="img"
         sx={{
-          height: 0,
-          paddingTop: '56.25%', marginTop: "6px"
+          height: '170px',
+          marginTop: "10px"
+         
         }}
-        image={data.image ? `${url}${data.image[0]}` : null}
-        title="Paella dish"
+        image={data.images ? `${data.images[0]?.url}` : null}
+       
 
       />
       <CardContent sx={{ padding: "16px 16px 0px 16px" }}>
-        <Box >
+        <Typography variant='body2' >
 
           <Typography variant="h6" color="textSecondary" component="p">
             ₹ {data.price}
@@ -66,16 +65,16 @@ export default function ProductCard({ data }) {
             textOverflow: "ellipsis",
             marginTop: "5px"
           }}>
-            {data.description}
+            {data.title}
           </Typography>
-        </Box>
+        </Typography>
 
       </CardContent>
       <Box sx={{ display: "flex", justifyContent: "space-between", margin: "0px 16px 0px 16px" }}>
         <Typography variant="caption" display="flex" sx={{
           letterSpacing: "0.002em"
         }}>
-          NewDelhi, India
+          {data.location?.city},{data.location?.state} 
         </Typography>
         <Typography variant="caption" >
           {data?.postedAt && new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(new Date(Number(data.postedAt)))}

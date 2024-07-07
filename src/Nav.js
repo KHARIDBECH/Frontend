@@ -98,7 +98,6 @@ export default function PrimarySearchAppBar({openSignIn, setopenSignIn, openSign
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   useEffect(() => {
-    console.log("type", typeof (isAuth))
     if (is_Auth == "true") {
       setisloggedin(true)
     }
@@ -275,7 +274,7 @@ export default function PrimarySearchAppBar({openSignIn, setopenSignIn, openSign
             </IconButton>
             
           </Box>
-          <Link to="/postad" style={classes.link}>
+          <Link to="/ad" style={classes.link}>
           <Box sx={classes.headerOption}>
             <Button
               variant="contained"

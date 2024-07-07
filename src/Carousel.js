@@ -13,7 +13,7 @@ export default function Slider({ itemDetail }) {
             console.log("Map", data)
             return (
               <div >
-                <img alt={`image-${index}`} src={`${url}${data}`} className="slide-image" />
+                <img alt={`image-${index}`} src={`${data.url}`} className="slide-image" />
               </div>
             )
           }) : null

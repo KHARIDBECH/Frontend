@@ -107,7 +107,7 @@ const SignInForm = styled('form')({
             margin="normal"
             required
             fullWidth
-            id="email"
+            id="signinEmail"
             label="Email Address"
             name="email"
             autoComplete="email"
@@ -122,7 +122,7 @@ const SignInForm = styled('form')({
             name="password"
             label="Password"
             type="password"
-            id="password"
+            id="signinPassword"
             autoComplete="current-password"
             onChange={handleChange}
           />
