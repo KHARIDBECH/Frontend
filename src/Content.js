@@ -59,17 +59,9 @@ export default function Content({ searchVal }) {
   const [visible, setvisible] = useState(4)
   const [lengthTrack, setlengthTrack] = useState(4)
 
-  //url logic
-  // let splitTitle = productUrl.title.split(" ")
-  // productUrl.title = splitTitle.join('-')
-  // let dataValue = Object.values(productUrl)
-  // let formatedProductUrl = dataValue.join('-')
-  // console.log("Formatted",formatedProductUrl)
-
-  //
-
+ 
   useEffect(() => {
-    fetch(`${url}/api/stuff/`, {
+    fetch(`${url}/api/stuff/ad`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     })
@@ -82,20 +74,10 @@ export default function Content({ searchVal }) {
       }
       )
       .then((data) => {
-        //url logic
-        console.log(data)
         data.map((value) => {
-
-          let splitTitle = value.title.split(" ")
-          value.title = splitTitle.join('-')
-          let idValue = Object.values(value['iid'])
-          let modifiedId = idValue.join('')
-          value.productUrl = value.title + "id-" + modifiedId
-
+          value.productUrl = value._id
         })
         setdata(data)
-        console.log(data)
-
       })
       .catch((err) => {
         console.log("err", err)
@@ -116,7 +98,7 @@ export default function Content({ searchVal }) {
           {
 
             data.slice(0, visible).map((data, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} container justifyContent="center">
+              <Grid item xs={12} sm={6} md={4} lg={3} container justifyContent="center" key={index}>
                 <Link to={`/item/${data.productUrl}`} >
                   <ProductCard key={index} data={data} sx={(theme) => ({ padding: theme.spacing(8), textAlign: 'center', color: theme.palette.text.secondary, boxShadow: '0px 2px 1px' })}></ProductCard>
                 </Link>

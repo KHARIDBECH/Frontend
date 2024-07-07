@@ -116,7 +116,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
                 variant="outlined"
                 required
                 fullWidth
-                id="email"
+                id="signupEmail"
                 label="Email Address"
                 name="email"
                 type="email"
@@ -133,7 +133,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
                 name="password"
                 label="Password"
                 type="password"
-                id="password"
+                id="signupPassword"
                 autoComplete="current-password"
                 value={userData.password}
                 onChange={handleInputs}

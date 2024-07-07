@@ -28,7 +28,7 @@ function App() {
           <Content/>
         </Route> 
       </Switch>
-      <Route exact path="/postad"><AdsDetails/>
+      <Route exact path="/ad"><AdsDetails/>
       </Route>
       <Route exact path="/item/:productUrl">
         <ItemDetails/>

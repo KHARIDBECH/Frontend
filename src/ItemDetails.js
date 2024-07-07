@@ -3,28 +3,43 @@ import { useParams } from 'react-router-dom';
 import Carousel from './Carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import './ItemDetails.css'
-import { deepOrange } from '@mui/material/colors';
 import { config } from './Constants'
 import { Grid, Container, Typography, Avatar } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { Box } from '@mui/material';
 import { Button } from '@mui/material';
 
+
+
+
+
+function LineByLineDescription({lines}) {
+   
+    return (
+      <div className="line-by-line">
+        {lines?.map((line, index) => (
+          <p key={index}>{line}</p>
+        ))}
+      </div>
+    );
+  }
 export default function ItemDetails() {
     const url = config.url.API_URL
-    // const url = "http://localhost:5000"
+  
     const [itemDetail, setitemDetail] = useState({})
     const { productUrl } = useParams();
-    let itemId = productUrl.slice(productUrl.lastIndexOf("-") + 1)
+    
     useEffect(() => {
-        fetch(`${url}/api/stuff/itemdetail/${itemId}`)
+        fetch(`${url}/api/stuff/itemdetail/${productUrl}`)
             .then((res) => res.json())
             .then((data) => {
-                setitemDetail(data[0])
-                console.log("pakad betichod", data[0])
+                console.log("Item details", data)
+                setitemDetail(data)
             })
             .catch((err) => { console.log(err) })
     }, [])
+
+    const lines = itemDetail?.description?.split('\n');
     return (
         <Container maxWidth="lg">
             <Grid container spacing={2} sx={{ marginTop: "20px" }}>
@@ -33,7 +48,7 @@ export default function ItemDetails() {
                     display: "flex",
                     flexDirection: "column",
                 }}>
-                    <Carousel itemDetail={itemDetail.image} />
+                    <Carousel itemDetail={itemDetail.images} />
 
                     <Paper elevation={3} sx={{
                         minHeight: "100px",
@@ -42,7 +57,7 @@ export default function ItemDetails() {
                         boxSizing: "border-box"
                     }}>
                         <Typography variant="h6">Details</Typography>
-                        <Typography variant="body2">{itemDetail.description}</Typography>
+                        <Typography variant="body2"><LineByLineDescription lines={lines}/></Typography>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -65,7 +80,7 @@ export default function ItemDetails() {
                                 <Box display="flex" gap={2}>
                                     <Avatar alt="Remy Sharp" src="/broken-image.jpg" />
                                     <Typography variant="body2">
-                                        <span>Ravi Kumar-OLX auto</span>
+                                        <span>{itemDetail["postedBy"]?.firstName}&nbsp;{itemDetail["postedBy"]?.lastName}</span>
                                         <br />
                                         <span>Member since Feb 2017</span>
                                     </Typography>
