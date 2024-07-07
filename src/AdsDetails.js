@@ -11,6 +11,7 @@ import { useDropzone } from 'react-dropzone';
 import { styled } from '@mui/system';
 import ClearIcon from '@mui/icons-material/Clear';
 import SellIcon from '@mui/icons-material/Sell';
+import Container from '@mui/material/Container';
 
 const ThumbnailContainer = styled('div')({
     display: 'flex',
@@ -177,8 +178,8 @@ export default function AddDetails() {
     }, [selectedCountry]);
 
     return (
-        <div className="details-container">
-            <div className="form-section" style={{ width: '57%' }}>
+        <Container maxWidth="sm">
+            <Grid xs={12} >
                 <form onSubmit={formik.handleSubmit}>
                     <TextField
                         fullWidth
@@ -237,7 +238,7 @@ export default function AddDetails() {
                         </TextField>
                     </Box>
 
-                    <Box display="flex" gap={2} width="100%">
+                    <Box gap={1} width="100%" sx={{justifyContent:"space-between", display:"flex"}}>
                         <Autocomplete
                             options={Country.getAllCountries()}
                             getOptionLabel={(option) => option.name}
@@ -305,7 +306,7 @@ export default function AddDetails() {
                         Sell
                     </Button>
                 </form>
-            </div>
-        </div>
+            </Grid>
+        </Container>
     )
 }
