@@ -100,8 +100,6 @@ export default function AddDetails() {
     ));
 
     const handleFormSubmit = (values) => {
-
-        console.log(values)
         let finalData = new FormData();
         finalData.append('title', values.title);
         finalData.append('description', values.description);
@@ -111,16 +109,9 @@ export default function AddDetails() {
             finalData.append('images', file);
         });
 
-        console.log(selectedCity);
         finalData.append('location[city]', selectedCity.name);
         finalData.append('location[state]', selectedState.name);
         finalData.append('location[country]', selectedCountry.name);
-        // finalData.append('state', selectedState.name);
-        // finalData.append('city', selectedCity.name);
-
-        for (const [key, value] of finalData) {
-            console.log(value);
-        }
         axios.post(`${url}/api/stuff/ad`, finalData, {
             headers: {
                 Accept: 'application/json',
@@ -171,11 +162,11 @@ export default function AddDetails() {
         { value: 'Services', label: 'Services' },
     ];
 
-    useEffect(() => {
-        console.log(selectedCountry);
-        console.log(selectedCountry?.isoCode);
-        console.log(State?.getStatesOfCountry(selectedCountry?.isoCode));
-    }, [selectedCountry]);
+    // useEffect(() => {
+    //     console.log(selectedCountry);
+    //     console.log(selectedCountry?.isoCode);
+    //     console.log(State?.getStatesOfCountry(selectedCountry?.isoCode));
+    // }, [selectedCountry]);
 
     return (
         <Container maxWidth="sm">
