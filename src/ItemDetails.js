@@ -33,7 +33,6 @@ export default function ItemDetails() {
         fetch(`${url}/api/stuff/itemdetail/${productUrl}`)
             .then((res) => res.json())
             .then((data) => {
-                console.log("Item details", data)
                 setitemDetail(data)
             })
             .catch((err) => { console.log(err) })
@@ -42,7 +41,7 @@ export default function ItemDetails() {
     const lines = itemDetail?.description?.split('\n');
     return (
         <Container maxWidth="lg">
-            <Grid container spacing={2} sx={{ marginTop: "20px" }}>
+            <Grid container spacing={2} sx={{ marginTop: "20px" ,padding:"12px"}}>
                 <Grid item xs={12} md={6} sx={{
                     alignItems: "center",
                     display: "flex",
