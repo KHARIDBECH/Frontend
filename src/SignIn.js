@@ -14,7 +14,7 @@ import { AuthContext } from './AuthContext';
 import { config } from './Constants'
 import { Box } from '@mui/material';
 import { styled } from '@mui/system';
-
+import { useAuth } from '../src/AuthContext';
 import Stack from '@mui/material/Stack';
 import SnackbarContent from '@mui/material/SnackbarContent';
 
@@ -32,6 +32,7 @@ const SignInForm = styled('form')({
 });
 export default function SignIn({ openSignIn, setopenSignIn, setisloggedin }) {
   const url = config.url.API_URL
+  const { setToken } = useAuth()
   const [userData, setuserData] = useState({
     email: "",
     password: ""
@@ -70,6 +71,7 @@ export default function SignIn({ openSignIn, setopenSignIn, setisloggedin }) {
         setisloggedin(true)
         setError(false)
         Cookies.set("Token", data.token);
+        setToken(data.token)
         Cookies.set("isAuth", true)
         Cookies.set("userId", data.userId);
 
