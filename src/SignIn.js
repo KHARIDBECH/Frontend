@@ -67,11 +67,11 @@ export default function SignIn({ openSignIn, setopenSignIn, setisloggedin }) {
       }
       )
       .then((data) => {
+        Cookies.set("Token", data.token);
+        setToken(data.token)
         setopenSignIn(false);
         setisloggedin(true)
         setError(false)
-        Cookies.set("Token", data.token);
-        setToken(data.token)
         Cookies.set("isAuth", true)
         Cookies.set("userId", data.userId);
 
