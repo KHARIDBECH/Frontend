@@ -18,12 +18,6 @@ export default function ProductCard({ data }) {
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
-
-  // const date = new Date(data.postedAt);
-  // const formattedDate = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(date);
-
-  //  console.log(typeof(data.postedAt))
-
   return (
 
     <Card sx={{

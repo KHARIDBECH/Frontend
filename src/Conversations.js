@@ -11,14 +11,11 @@ export default function Conversations({conversation,userId}) {
 
     useEffect(() => {
         const friendId = conversation.members.find(r => r !==Cookies.get('userId'))
-        console.log("friend wala",friendId)
         const getUser = () =>{
-        axios.get(`${url}/api/auth/user?userId=${friendId}`)
+        axios.get(`${url}/api/users/user?userId=${friendId}`)
         .then((res) => 
         {
-            console.log("fetch wala",res.data)
             setuser(res.data)
-            console.log(user[0],'use wala')
         }
         )
         .catch(err=>{

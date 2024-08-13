@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import ProductCard from './ProductCard'
+import ProductCard from '../../ProductCard'
 import { Box } from '@mui/material';
 import React from 'react';
 import { Button } from '@mui/material';
@@ -7,7 +7,8 @@ import { styled } from '@mui/material/styles';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import { Link } from 'react-router-dom';
-import { config } from './Constants'
+import { config } from '../../Constants'
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 
@@ -51,16 +52,17 @@ function Showmore({ showMoreItems }) {
 }
 
 
-export default function Content({ searchVal }) {
+export default function Home({ searchVal }) {
   const url = config.url.API_URL
-  // const url = "http://localhost:5000"
 
   const [data, setdata] = useState([{}])
   const [visible, setvisible] = useState(4)
+  const [loading, setloading] = useState(false)
   const [lengthTrack, setlengthTrack] = useState(4)
 
- 
+
   useEffect(() => {
+    setloading(true)
     fetch(`${url}/api/product/ad`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
@@ -78,9 +80,11 @@ export default function Content({ searchVal }) {
           value.productUrl = value._id
         })
         setdata(data)
+        setloading(false)
       })
       .catch((err) => {
         console.log("err", err)
+        setloading(false)
       })
   }, [])
 
@@ -94,31 +98,19 @@ export default function Content({ searchVal }) {
       <Banner />
       <Box sx={{ flexGrow: 1, padding: 2 }}>
         <Grid container spacing={3} >
-
-          {
-
-            data.slice(0, visible).map((data, index) => (
+          {loading ? <CircularProgress disableShrink sx={{ position: 'absolute', left: '50%', top: '70%' }} />
+            : (data.slice(0, visible).map((data, index) => (
               <Grid item xs={12} sm={6} md={4} lg={3} container justifyContent="center" key={index}>
                 <Link to={`/item/${data.productUrl}`} >
                   <ProductCard key={index} data={data} sx={(theme) => ({ padding: theme.spacing(8), textAlign: 'center', color: theme.palette.text.secondary, boxShadow: '0px 2px 1px' })}></ProductCard>
                 </Link>
               </Grid>
-            ))
+            )))
           }
-
-
-
         </Grid>
         {
           (lengthTrack < data.length) ? <Showmore showMoreItems={showMoreItems} /> : null
         }
-
-
-
-        {/* </div> */}
-
-
-
       </Box>
     </Cardscontainer>
 

@@ -15,7 +15,8 @@ import Slide from '@mui/material/Slide';
 import { styled } from '@mui/system';
 import { Box } from '@mui/material';
 import { config } from './Constants';
-
+import Stack from '@mui/material/Stack';
+import SnackbarContent from '@mui/material/SnackbarContent';
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -25,7 +26,7 @@ const SignUpForm = styled('form')({
   flexDirection: "column",
   justifyContent: "space-evenly",
   minHeight: "330px",
-  minWidth:"240px"
+  minWidth: "240px"
 
 });
 export default function SignUp({ openSignUp, setopenSignUp }) {
@@ -36,6 +37,8 @@ export default function SignUp({ openSignUp, setopenSignUp }) {
     email: "",
     password: ""
   })
+
+  const [error, setError] = useState(false)
   const handleClose = () => {
     setopenSignUp(false);
   };
@@ -49,19 +52,28 @@ export default function SignUp({ openSignUp, setopenSignUp }) {
 
   const postData = (e) => {
     e.preventDefault();
-    fetch(`${url}/api/auth/signup`, {
+    fetch(`${url}/api/users/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData)
     })
-      .then(res => res.json())
+      .then(res => {
+        if (res.status === 400) {
+          setError(true)
+          throw Error(res.statusText);
+        }
+
+        res.json()
+
+      })
       .then((data) => {
+
         setopenSignUp(false);
+        setError(false)
       })
       .catch((err) => {
         console.log(err)
       })
-
 
   }
   return (
@@ -73,14 +85,14 @@ export default function SignUp({ openSignUp, setopenSignUp }) {
         onClose={handleClose}
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
-        
+
       >
         <Box sx={(theme) => ({
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           padding: "50px",
-          maxWidth:"600px"
+          maxWidth: "600px"
         })}>
           <Avatar sx={(theme) => ({
             margin: theme.spacing(1),
@@ -91,7 +103,7 @@ export default function SignUp({ openSignUp, setopenSignUp }) {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
-          <SignUpForm noValidate onSubmit={postData}>
+          <SignUpForm  onSubmit={postData}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -133,6 +145,7 @@ export default function SignUp({ openSignUp, setopenSignUp }) {
                   autoComplete="email"
                   value={userData.email}
                   onChange={handleInputs}
+                  error={error}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -149,13 +162,28 @@ export default function SignUp({ openSignUp, setopenSignUp }) {
                   onChange={handleInputs}
                 />
               </Grid>
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 <FormControlLabel
                   control={<Checkbox value="allowExtraEmails" color="primary" />}
                   label="I want to receive inspiration, marketing promotions and updates via email."
                 />
-              </Grid>
+              </Grid> */}
+
             </Grid>
+            {
+              error && (<Stack spacing={2} sx={{
+                width: "100%",
+                marginTop: "10px"
+              }}>
+
+                <SnackbarContent
+                  sx={{ backgroundColor: "#e74c3c" }}
+                  message={
+                    'This email address is already registered.'
+                  }
+                />
+              </Stack>)
+            }
             <Button
               type="submit"
               fullWidth
@@ -166,7 +194,7 @@ export default function SignUp({ openSignUp, setopenSignUp }) {
             >
               Sign Up
             </Button>
-            <Grid container justify="flex-end">
+            <Grid container sx={{justifyContent:"center"}}>
               <Grid item>
                 <Link href="#" variant="body2">
                   Already have an account? Sign in

@@ -1,9 +1,11 @@
-import React,{useState, createContext} from 'react';
+import React,{useState, createContext,useContext} from 'react';
 import Cookies from 'js-cookie';
 
-export const AuthContext = createContext() ;
+const AuthContext = createContext() ;
 
-export function AuthContextProvider(props) {
+export const useAuth = () => useContext(AuthContext)
+
+export function AuthContextProvider({children}) {
 
 //here you have to useEffect and fetch the token from Cookies 
 //now from cookies you have to put that cookie to setToken(token)
@@ -13,11 +15,9 @@ const [userId,setuserId]  =  useState(Cookies.get('userId'));
 
 
 
-
     return (
-        <AuthContext.Provider value={[is_Auth,setAuth,token,setToken,userId,setuserId]}>
-            {props.children}
-            
+        <AuthContext.Provider value={{ is_Auth,setAuth,token,setToken,userId,setuserId }}>
+            {children}
         </AuthContext.Provider>
     );
 }

@@ -1,7 +1,6 @@
 import React from 'react'
 import './message.css'
 export default function Message({message,own}) {
-    // console.log("message wala",message)
     return (
         <div className={own?"message own":"message"}>
             <div className="messageTop">

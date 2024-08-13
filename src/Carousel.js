@@ -10,7 +10,6 @@ export default function Slider({ itemDetail }) {
       {
         itemDetail ?
           itemDetail.map((data, index) => {
-            console.log("Map", data)
             return (
               <div >
                 <img alt={`image-${index}`} src={`${data.url}`} className="slide-image" />
