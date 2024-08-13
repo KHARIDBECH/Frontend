@@ -62,7 +62,7 @@ export default function Messenger() {
 
     }, [])
    
-    console.log("new messages",newMessages)
+
     useEffect(() => {
         const getMessages = async () => {
             try {

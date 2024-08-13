@@ -134,7 +134,6 @@ export default function Navbar({ openSignIn, setopenSignIn, openSignUp, setopenS
   const [is_Auth, setAuth] = useContext(AuthContext);
   const [isloggedin, setisloggedin] = useState(false)
 
-  console.log("Auth",is_Auth)
 
   useEffect(() => {
     if (is_Auth == "true") {

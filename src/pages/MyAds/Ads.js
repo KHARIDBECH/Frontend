@@ -105,6 +105,7 @@ export default function Ads() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const { userId, token } = useAuth()
+  
 
   const url = config.url.API_URL
   useEffect(() => {
