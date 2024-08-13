@@ -4,28 +4,28 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
-import Badge from '@mui/material/Badge';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
+import PropTypes from 'prop-types';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+import { CssTransition } from '@mui/base/Transitions';
+import { PopupContext } from '@mui/base/Unstable_Popup';
 import Button from '@mui/material/Button';
-import { AuthContext } from './AuthContext';
+import { useAuth } from './AuthContext';
 import AddIcon from '@mui/icons-material/Add';
 import { Link } from "react-router-dom";
 import Cookies from 'js-cookie';
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
-
+import { Typography } from '@mui/material';
+import { Dropdown } from '@mui/base/Dropdown';
+import { Menu } from '@mui/base/Menu';
+import { MenuButton as BaseMenuButton } from '@mui/base/MenuButton';
+import { MenuItem as BaseMenuItem, menuItemClasses } from '@mui/base/MenuItem';
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -42,25 +42,25 @@ const Search = styled('div')(({ theme }) => ({
   },
 }));
 const useStyles = {
-    headerNav: {
-      display: 'flex',
-      alignItems: 'center',
-    },
-    headerOption: {
-      margin: '0 10px',
-      cursor: 'pointer'
-    },
-    button: {
-      fontFamily: 'sans-serif',
-      background: "#32cb86e0",
-      fontWeight: "600",
-      borderRadius: "20px 20px 20px 20px"
-    },
-    link: {
-      textDecoration: 'none',
-    },
-  };
-  
+  headerNav: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  headerOption: {
+    margin: '0 10px',
+    cursor: 'pointer'
+  },
+  button: {
+    fontFamily: 'sans-serif',
+    background: "#32cb86e0",
+    fontWeight: "600",
+    borderRadius: "20px 20px 20px 20px"
+  },
+  link: {
+    textDecoration: 'none',
+  },
+};
+
 const SearchIconWrapper = styled('div')(({ theme }) => ({
   padding: theme.spacing(0, 2),
   height: '100%',
@@ -84,19 +84,41 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
   },
 }));
+const grey = {
+  50: '#F3F6F9',
+  100: '#E5EAF2',
+  200: '#DAE2ED',
+  300: '#C7D0DD',
+  400: '#B0B8C4',
+  500: '#9DA8B7',
+  600: '#6B7A90',
+  700: '#434D5B',
+  800: '#303740',
+  900: '#1C2025',
+};
 
 
-
-export default function PrimarySearchAppBar({openSignIn, setopenSignIn, openSignUp,setopenSignUp }) {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+export default function PrimarySearchAppBar({ openSignIn, setopenSignIn, openSignUp, setopenSignUp }) {
   const classes = useStyles;
-  const [is_Auth, setAuth] = useContext(AuthContext);
+  const {is_Auth, setAuth} =useAuth();
   const [isloggedin, setisloggedin] = useState(false)
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const theme = useTheme();
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  let history = useNavigate();
+  const createHandleMenuClick = (menuItem) => {
+    return () => {
+      if (menuItem === "Logout") {
+        logout()
+      }
+      else if (menuItem === "Ads") {
+        history('/myads')
+      }
+    };
+
+  };
+
+  
   useEffect(() => {
     if (is_Auth == "true") {
       setisloggedin(true)
@@ -107,13 +129,11 @@ export default function PrimarySearchAppBar({openSignIn, setopenSignIn, openSign
 
   }
 
-  let history = useHistory();
   const logout = () => {
-    handleMenuClose()
     Cookies.remove('isAuth');
     Cookies.remove('Token');
     setisloggedin(false)
-    history.push('/')
+    history('/')
 
 
   }
@@ -122,126 +142,15 @@ export default function PrimarySearchAppBar({openSignIn, setopenSignIn, openSign
     setopenSignUp(true)
   }
 
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    handleMobileMenuClose();
-  };
-
-  const handleMobileMenuOpen = (event) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
-
-  const menuId = 'primary-search-account-menu';
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      {/* <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem> */}
-      {isloggedin?<MenuItem onClick={logout}>Logout</MenuItem>:<MenuItem onClick={setModalSignIn} >Login</MenuItem>}
-      
-      
-    </Menu>
-  );
-
-  const mobileMenuId = 'primary-search-account-menu-mobile';
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      {/* <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton
-          size="large"
-          aria-label="show 17 new notifications"
-          color="inherit"
-        >
-          <Badge badgeContent={17} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem> */}
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-        <p>Profile</p>
-      </MenuItem>
-    </Menu>
-  );
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          {/* <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
-          > */}
-            {/* <MenuIcon />
-          </IconButton> */}
           <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, height: '100%' }}>
-          <Link to="/">
-
-            <img className="header-logo" src="../appLogo.png" alt="logo" style={{ height: '80px',  minWidth: '60px' }} />
-          </Link>
-        </Box>
-          {/* <Typography
-            variant="h6"
-            component="div"
-            // sx={{ display: { xs: 'none', sm: 'block' } }}
-          >
-            MUI
-          </Typography> */}
+            <Link to="/">
+              <img className="header-logo" src="../appLogo.png" alt="logo" style={{ height: '80px', minWidth: '60px' }} />
+            </Link>
+          </Box>
           {!isMobile && <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -251,73 +160,198 @@ export default function PrimarySearchAppBar({openSignIn, setopenSignIn, openSign
               inputProps={{ 'aria-label': 'search' }}
             />
           </Search>
-}
+          }
           <Box sx={{ flexGrow: 1 }} />
-          {isloggedin?
-          <>
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            {/* <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton> */}
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
-            
-          </Box>
-          <Link to="/ad" style={classes.link}>
-          <Box sx={classes.headerOption}>
-            <Button
-              variant="contained"
-              color="secondary"
-              startIcon={<AddIcon />}
-              sx={classes.button}
-            >
-              SELL
-            </Button>
-          </Box>
-        </Link>
-        </>
-          :<>
-          {!isMobile &&<MenuItem onClick={setModalSignIn}>Login</MenuItem>}
-            <Button
-              color="secondary"
-              onClick={setModalSignUp}
-              variant="contained"
-              startIcon={<AddIcon />}
-              sx={{fontFamily: 'sans-serif',
-              background: "#32cb86e0",
-              fontWeight: "600",
-              borderRadius: "20px 20px 20px 20px",marginLeft:{xs:'25px'}}}
-            >Sell</Button></>
-}
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
-          </Box>
+          {isloggedin ?
+            <>
+              <Dropdown>
+                <MenuButton sx={{ backgroundColor: 'primary.main', color: 'white', border: "none", '&:hover': { backgroundColor: 'primary.dark' } }}><AccountCircle /></MenuButton>
+                <Menu slots={{ listbox: AnimatedListbox }}>
+                  <MenuItem onClick={createHandleMenuClick('Profile')}>Profile</MenuItem>
+                  <MenuItem onClick={createHandleMenuClick('Ads')}>
+                    My Ads
+                  </MenuItem>
+                  <MenuItem onClick={createHandleMenuClick('Logout')}>Log out</MenuItem>
+                </Menu>
+              </Dropdown>
+              <Link to="/ad" style={classes.link}>
+                <Box sx={classes.headerOption}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    startIcon={<AddIcon />}
+                    sx={classes.button}
+                  >
+                    SELL
+                  </Button>
+                </Box>
+              </Link>
+            </>
+            : <>
+              <Typography onClick={setModalSignIn} sx={{cursor:"pointer"}}>
+                Login
+              </Typography>
+              <Button
+                color="secondary"
+                onClick={setModalSignUp}
+                variant="contained"
+                startIcon={<AddIcon />}
+                sx={{
+                  fontFamily: 'sans-serif',
+                  background: "#32cb86e0",
+                  fontWeight: "600",
+                  borderRadius: "20px 20px 20px 20px", marginLeft: { xs: '25px' }
+                }}
+              >Sell</Button></>
+          }
+
         </Toolbar>
       </AppBar>
-      {renderMobileMenu}
-      {renderMenu}
-        <SignIn openSignIn={openSignIn} setopenSignIn={setopenSignIn} setisloggedin={setisloggedin} />
+      <SignIn openSignIn={openSignIn} setopenSignIn={setopenSignIn} setisloggedin={setisloggedin} />
       <SignUp openSignUp={openSignUp} setopenSignUp={setopenSignUp} />
     </Box>
   );
 }
+
+
+const blue = {
+  50: '#F0F7FF',
+  100: '#C2E0FF',
+  200: '#99CCF3',
+  300: '#66B2FF',
+  400: '#3399FF',
+  500: '#007FFF',
+  600: '#0072E6',
+  700: '#0059B3',
+  800: '#004C99',
+  900: '#003A75',
+};
+
+
+
+const Listbox = styled('ul')(
+  ({ theme }) => `
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.875rem;
+  box-sizing: border-box;
+  padding: 6px;
+  margin: 12px 0;
+  min-width: 200px;
+  border-radius: 12px;
+  overflow: auto;
+  outline: 0px;
+  background: ${theme.palette.mode === 'dark' ? grey[900] : '#fff'};
+  border: 1px solid ${theme.palette.mode === 'dark' ? grey[700] : grey[200]};
+  color: ${theme.palette.mode === 'dark' ? grey[300] : grey[900]};
+  box-shadow: 0px 4px 30px ${theme.palette.mode === 'dark' ? grey[900] : grey[200]};
+  z-index: 1;
+
+  .closed & {
+    opacity: 0;
+    transform: scale(0.95, 0.8);
+    transition: opacity 200ms ease-in, transform 200ms ease-in;
+  }
+  
+  .open & {
+    opacity: 1;
+    transform: scale(1, 1);
+    transition: opacity 100ms ease-out, transform 100ms cubic-bezier(0.43, 0.29, 0.37, 1.48);
+  }
+
+  .placement-top & {
+    transform-origin: bottom;
+  }
+
+  .placement-bottom & {
+    transform-origin: top;
+  }
+  `,
+);
+
+const AnimatedListbox = React.forwardRef(function AnimatedListbox(props, ref) {
+  const { ownerState, ...other } = props;
+  const popupContext = React.useContext(PopupContext);
+
+  if (popupContext == null) {
+    throw new Error(
+      'The `AnimatedListbox` component cannot be rendered outside a `Popup` component',
+    );
+  }
+
+  const verticalPlacement = popupContext.placement.split('-')[0];
+
+  return (
+    <CssTransition
+      className={`placement-${verticalPlacement}`}
+      enterClassName="open"
+      exitClassName="closed"
+    >
+      <Listbox {...other} ref={ref} />
+    </CssTransition>
+  );
+});
+
+AnimatedListbox.propTypes = {
+  ownerState: PropTypes.object.isRequired,
+};
+
+const MenuItem = styled(BaseMenuItem)(
+  ({ theme }) => `
+  list-style: none;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: default;
+  user-select: none;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+
+  &.${menuItemClasses.focusVisible} {
+    outline: 3px solid ${theme.palette.mode === 'dark' ? blue[600] : blue[200]};
+    background-color: ${theme.palette.mode === 'dark' ? grey[800] : grey[100]};
+    color: ${theme.palette.mode === 'dark' ? grey[300] : grey[900]};
+  }
+
+  &.${menuItemClasses.disabled} {
+    color: ${theme.palette.mode === 'dark' ? grey[700] : grey[400]};
+  }
+
+  &:hover:not(.${menuItemClasses.disabled}) {
+    background-color: ${theme.palette.mode === 'dark' ? blue[900] : blue[50]};
+    color: ${theme.palette.mode === 'dark' ? blue[100] : blue[900]};
+  }
+  `,
+);
+
+const MenuButton = styled(BaseMenuButton)(
+  ({ theme }) => `
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: white;
+  transition: all 150ms ease;
+  cursor: pointer;
+  background: ${theme.palette.mode === 'dark' ? grey[900] : '#fff'};
+  border: 1px solid ${theme.palette.mode === 'dark' ? grey[700] : grey[200]};
+  color: ${theme.palette.mode === 'dark' ? grey[200] : grey[900]};
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+  &:hover {
+    background: ${theme.palette.mode === 'dark' ? grey[800] : grey[50]};
+    border-color: ${theme.palette.mode === 'dark' ? grey[600] : grey[300]};
+  }
+
+  &:active {
+    background: ${theme.palette.mode === 'dark' ? grey[700] : grey[100]};
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 4px ${theme.palette.mode === 'dark' ? blue[300] : blue[200]};
+    outline: none;
+  }
+  `,
+);

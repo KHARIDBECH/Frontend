@@ -4,7 +4,7 @@ import './AdsDetails.css';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import Cookies from 'js-cookie';
-import { config } from './Constants';
+import { config } from '../../Constants';
 import { Box, MenuItem, Autocomplete, TextField, Typography, Grid, Button, IconButton } from '@mui/material';
 import { Country, State, City } from 'country-state-city';
 import { useDropzone } from 'react-dropzone';
@@ -112,7 +112,7 @@ export default function AddDetails() {
         finalData.append('location[city]', selectedCity.name);
         finalData.append('location[state]', selectedState.name);
         finalData.append('location[country]', selectedCountry.name);
-        axios.post(`${url}/api/stuff/ad`, finalData, {
+        axios.post(`${url}/api/product/ad`, finalData, {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'multipart/form-data',
@@ -162,11 +162,6 @@ export default function AddDetails() {
         { value: 'Services', label: 'Services' },
     ];
 
-    // useEffect(() => {
-    //     console.log(selectedCountry);
-    //     console.log(selectedCountry?.isoCode);
-    //     console.log(State?.getStatesOfCountry(selectedCountry?.isoCode));
-    // }, [selectedCountry]);
 
     return (
         <Container maxWidth="sm">

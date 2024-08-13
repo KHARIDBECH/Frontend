@@ -14,6 +14,10 @@ import { AuthContext } from './AuthContext';
 import { config } from './Constants'
 import { Box } from '@mui/material';
 import { styled } from '@mui/system';
+
+import Stack from '@mui/material/Stack';
+import SnackbarContent from '@mui/material/SnackbarContent';
+
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -24,18 +28,18 @@ const SignInForm = styled('form')({
   flexDirection: "column",
   justifyContent: "space-evenly",
   minHeight: "330px",
-  
+
 });
 export default function SignIn({ openSignIn, setopenSignIn, setisloggedin }) {
   const url = config.url.API_URL
-  // const url = "http://localhost:5000"
   const [userData, setuserData] = useState({
     email: "",
     password: ""
   })
 
-  const [isAuth, setAuth] = useContext(AuthContext);
-  const [userId, setuserId] = useContext(AuthContext);
+  // const [isAuth, setAuth] = useContext(AuthContext);
+  // const [userId, setuserId] = useContext(AuthContext);
+  const [error, setError] = useState(false)
   const handleClose = (e) => {
     setopenSignIn(false);
   };
@@ -47,13 +51,14 @@ export default function SignIn({ openSignIn, setopenSignIn, setisloggedin }) {
   }
   const postData = (e) => {
     e.preventDefault();
-    fetch(`${url}/api/auth/signin`, {
+    fetch(`${url}/api/users/signin`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData)
     })
       .then(response => {
         if (response.status === 401) {
+          setError(true)
           throw Error(response.statusText);
         }
 
@@ -63,6 +68,7 @@ export default function SignIn({ openSignIn, setopenSignIn, setisloggedin }) {
       .then((data) => {
         setopenSignIn(false);
         setisloggedin(true)
+        setError(false)
         Cookies.set("Token", data.token);
         Cookies.set("isAuth", true)
         Cookies.set("userId", data.userId);
@@ -100,7 +106,7 @@ export default function SignIn({ openSignIn, setopenSignIn, setisloggedin }) {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <SignInForm onSubmit={postData} sx={{  minWidth: { xs: '230px', md: '300px' },}}>
+          <SignInForm onSubmit={postData} sx={{ minWidth: { xs: '230px', md: '300px' }, }}>
             <TextField
               variant="outlined"
               margin="normal"
@@ -112,6 +118,7 @@ export default function SignIn({ openSignIn, setopenSignIn, setisloggedin }) {
               autoComplete="email"
               autoFocus
               onChange={handleChange}
+              error={error}
             />
             <TextField
               variant="outlined"
@@ -124,11 +131,23 @@ export default function SignIn({ openSignIn, setopenSignIn, setisloggedin }) {
               id="signinPassword"
               autoComplete="current-password"
               onChange={handleChange}
+              error={error}
             />
-            <FormControlLabel
+            {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
-            />
+            /> */}
+            {
+              error && (<Stack spacing={2} sx={{ maxWidth: 600 }}>
+
+                <SnackbarContent
+                  sx={{ backgroundColor: "#e74c3c" }}
+                  message={
+                    'Incorrect email or password'
+                  }
+                />
+              </Stack>)
+            }
             <Button
               type="submit"
               fullWidth
@@ -147,7 +166,7 @@ export default function SignIn({ openSignIn, setopenSignIn, setisloggedin }) {
                   Forgot password?&nbsp;
                 </Link>
               </Grid>
-              <Grid item xs>
+              <Grid item xs >
                 <Link href="#" variant="body2" onClick={() => { console.log("I am emptyy lol........") }}>
                   Don't have an account? Sign Up
                 </Link>

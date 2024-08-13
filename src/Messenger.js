@@ -34,7 +34,6 @@ export default function Messenger() {
       }, []);
 
       useEffect(() => {
-        console.log("arrival called",arrivalMessage)
         arrivalMessage &&
           currentChat?.members.includes(arrivalMessage.sender) &&
           setMessages((prev) => [...prev, arrivalMessage]);
@@ -44,7 +43,6 @@ export default function Messenger() {
         let userId = await Cookies.get('userId');
         socket.current.emit("addUser", userId);
         socket.current.on("getUsers", (users) => {
-        console.log("users",users)
         });
       }, [userId]);
 
@@ -55,7 +53,6 @@ export default function Messenger() {
                 setuserId(userId);
                 const res = await axios.get(`${url}/api/chatConvo/${userId}`)
                 setconversations(res.data)
-                // console.log(res);
             }
             catch (err) {
                 console.log(err);
@@ -71,7 +68,7 @@ export default function Messenger() {
             try {
                 const res = await axios.get(`${url}/api/chatMessages/${currentChat._id}`)
                 setMessages(res.data);
-                console.log("get wala", res.data)
+             
             } catch (err) {
                 console.log(err)
             }
@@ -84,7 +81,6 @@ export default function Messenger() {
       }, [messages]);
 
     const sendMessage = ()=>{
-        console.log(newMessages)
         const addMessagesFormat = {
             conversationId: `${currentChat._id}`,
           sender:`${userId}`,

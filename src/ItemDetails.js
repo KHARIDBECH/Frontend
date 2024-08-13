@@ -9,39 +9,44 @@ import Paper from '@mui/material/Paper';
 import { Box } from '@mui/material';
 import { Button } from '@mui/material';
 
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 
+function LineByLineDescription({ lines }) {
 
-function LineByLineDescription({lines}) {
-   
     return (
-      <div className="line-by-line">
-        {lines?.map((line, index) => (
-          <p key={index}>{line}</p>
-        ))}
-      </div>
+        <div className="line-by-line">
+            {lines?.map((line, index) => (
+                <p key={index}>{line}</p>
+            ))}
+        </div>
     );
-  }
+}
 export default function ItemDetails() {
     const url = config.url.API_URL
-  
+
     const [itemDetail, setitemDetail] = useState({})
+    const [loading, setloading] = useState(false)
     const { productUrl } = useParams();
-    
+
     useEffect(() => {
-        fetch(`${url}/api/stuff/itemdetail/${productUrl}`)
+        setloading(true);
+        fetch(`${url}/api/product/itemdetail/${productUrl}`)
             .then((res) => res.json())
             .then((data) => {
                 setitemDetail(data)
+                setloading(false);
             })
             .catch((err) => { console.log(err) })
+            setloading(false)
     }, [])
 
     const lines = itemDetail?.description?.split('\n');
     return (
         <Container maxWidth="lg">
-            <Grid container spacing={2} sx={{ marginTop: "20px" ,padding:"12px"}}>
+            {loading?<CircularProgress disableShrink sx={{ position: 'absolute', left: '50%', top: '50%' }} />:(
+            <Grid container spacing={2} sx={{ marginTop: "20px", padding: "12px" }}>
                 <Grid item xs={12} md={6} sx={{
                     alignItems: "center",
                     display: "flex",
@@ -56,7 +61,7 @@ export default function ItemDetails() {
                         boxSizing: "border-box"
                     }}>
                         <Typography variant="h6">Details</Typography>
-                        <Typography variant="body2"><LineByLineDescription lines={lines}/></Typography>
+                        <Typography variant="body2"><LineByLineDescription lines={lines} /></Typography>
                     </Paper>
                 </Grid>
                 <Grid item xs={12} md={6}>
@@ -89,7 +94,8 @@ export default function ItemDetails() {
                         </Grid>
                     </Grid>
                 </Grid>
-            </Grid>
+            </Grid>)
+}
         </Container>
 
     )
