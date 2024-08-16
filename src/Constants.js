@@ -1,6 +1,6 @@
 const prod = {
     url: {
-     API_URL: "https://backend-8qoa.onrender.com",
+     API_URL: "https://backend-xstc.onrender.com"
      }
    }
    const dev = {
@@ -9,5 +9,5 @@ const prod = {
     }
    };
 
-
+  //  https://backend-8qoa.onrender.com
    export const config = process.env.REACT_APP_ENV === "development" ? dev : prod
