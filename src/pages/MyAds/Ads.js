@@ -104,14 +104,14 @@ export default function Ads() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const { userId, token } = useAuth()
+  const { authHeader,userId} = useAuth()
   
 
   const url = config.url.API_URL
   useEffect(() => {
 
     const config = {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: {...authHeader()}
     }
     const fetchAds = async () => {
       try {

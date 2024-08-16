@@ -100,7 +100,7 @@ const grey = {
 
 export default function PrimarySearchAppBar({ openSignIn, setopenSignIn, openSignUp, setopenSignUp }) {
   const classes = useStyles;
-  const {is_Auth, setAuth} =useAuth();
+  const {is_Auth, logout} =useAuth();
   const [isloggedin, setisloggedin] = useState(false)
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -110,6 +110,8 @@ export default function PrimarySearchAppBar({ openSignIn, setopenSignIn, openSig
     return () => {
       if (menuItem === "Logout") {
         logout()
+        setisloggedin(false)
+        history('/')
       }
       else if (menuItem === "Ads") {
         history('/myads')
@@ -126,17 +128,8 @@ export default function PrimarySearchAppBar({ openSignIn, setopenSignIn, openSig
   }, [])
   const setModalSignIn = () => {
     setopenSignIn(true)
-
   }
 
-  const logout = () => {
-    Cookies.remove('isAuth');
-    Cookies.remove('Token');
-    setisloggedin(false)
-    history('/')
-
-
-  }
 
   const setModalSignUp = () => {
     setopenSignUp(true)
