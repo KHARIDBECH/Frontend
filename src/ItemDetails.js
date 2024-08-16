@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
-import Carousel from './Carousel';
+import Carousel from '../src/components/Carousel';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import './ItemDetails.css'
 import { config } from './Constants'
