@@ -3,12 +3,10 @@ import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import PropTypes from 'prop-types';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import MoreIcon from '@mui/icons-material/MoreVert';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import { CssTransition } from '@mui/base/Transitions';
@@ -17,7 +15,6 @@ import Button from '@mui/material/Button';
 import { useAuth } from './AuthContext';
 import AddIcon from '@mui/icons-material/Add';
 import { Link } from "react-router-dom";
-import Cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
@@ -26,6 +23,7 @@ import { Dropdown } from '@mui/base/Dropdown';
 import { Menu } from '@mui/base/Menu';
 import { MenuButton as BaseMenuButton } from '@mui/base/MenuButton';
 import { MenuItem as BaseMenuItem, menuItemClasses } from '@mui/base/MenuItem';
+import CategoriesMenu from './components/CategoriesMenu';
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
@@ -96,15 +94,12 @@ const grey = {
   800: '#303740',
   900: '#1C2025',
 };
-
-
 export default function PrimarySearchAppBar({ openSignIn, setopenSignIn, openSignUp, setopenSignUp }) {
   const classes = useStyles;
-  const {is_Auth, logout} =useAuth();
+  const { is_Auth, logout } = useAuth();
   const [isloggedin, setisloggedin] = useState(false)
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
   let history = useNavigate();
   const createHandleMenuClick = (menuItem) => {
     return () => {
@@ -120,7 +115,7 @@ export default function PrimarySearchAppBar({ openSignIn, setopenSignIn, openSig
 
   };
 
-  
+
   useEffect(() => {
     if (is_Auth == "true") {
       setisloggedin(true)
@@ -181,7 +176,7 @@ export default function PrimarySearchAppBar({ openSignIn, setopenSignIn, openSig
               </Link>
             </>
             : <>
-              <Typography onClick={setModalSignIn} sx={{cursor:"pointer"}}>
+              <Typography onClick={setModalSignIn} sx={{ cursor: "pointer" }}>
                 Login
               </Typography>
               <Button
@@ -197,9 +192,9 @@ export default function PrimarySearchAppBar({ openSignIn, setopenSignIn, openSig
                 }}
               >Sell</Button></>
           }
-
         </Toolbar>
       </AppBar>
+        <CategoriesMenu/>
       <SignIn openSignIn={openSignIn} setopenSignIn={setopenSignIn} setisloggedin={setisloggedin} />
       <SignUp openSignUp={openSignUp} setopenSignUp={setopenSignUp} />
     </Box>
