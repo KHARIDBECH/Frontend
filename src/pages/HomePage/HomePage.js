@@ -1,119 +1,60 @@
 import { useState, useEffect } from 'react'
-import ProductCard from '../../ProductCard'
-import { Box } from '@mui/material';
+import Banner from '../../components/Banner';
 import React from 'react';
-import { Button } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import { Link } from 'react-router-dom';
+import Cards from '../../components/Cards';
 import { config } from '../../Constants'
-import CircularProgress from '@mui/material/CircularProgress';
-
-
-
-const Cardscontainer = styled(Container)(({ theme }) => ({
-  marginTop: theme.spacing(4), // Add top margin
-  padding: 0,
-}));
-const Banner = styled(Box)(({ theme }) => ({
-  position: 'relative',
-  width: '100%',
-  height: '200px', // Set the height of the banner
-  backgroundSize: 'cover',
-  marginBottom: "50px",
-  backgroundPosition: 'center',
-  marginTop: theme.spacing(2), // Add some margin from the header
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundImage: 'url("https://statics.olx.in/external/base/img/hero-bg-in.jpg")', // Replace with your ad image URL
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    zIndex: -1, // Ensure the image stays behind any other content
-    opacity: 0.9, // Slight transparency for better visibility
-  },
-}));
-
-function Showmore({ showMoreItems }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
-      <Button variant="outlined" color="primary" style={{
-        width: '150px'
-      }}>
-        <span style={{ whiteSpace: 'nowrap' }} onClick={showMoreItems}>Show More</span>
-      </Button>
-    </div>
-  )
-}
-
-
+import ShowMore from '../../components/ShowMore';
 export default function Home({ searchVal }) {
   const url = config.url.API_URL
 
-  const [data, setdata] = useState([{}])
+  const [data, setData] = useState(null)
+  const [error, setError] = useState([{}])
   const [visible, setvisible] = useState(4)
-  const [loading, setloading] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [lengthTrack, setlengthTrack] = useState(4)
 
 
-  useEffect(() => {
-    setloading(true)
-    fetch(`${url}/api/product/ad`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    })
-      .then(response => {
-        if (response.status === 400) {
-          throw Error(response.statusText);
-        }
-
-        return response.json();
-      }
-      )
-      .then((data) => {
-        data.map((value) => {
-          value.productUrl = value._id
-        })
-        setdata(data)
-        setloading(false)
-      })
-      .catch((err) => {
-        console.log("err", err)
-        setloading(false)
-      })
-  }, [])
+  useEffect(()=> {
+     const fetchData = async () => {
+       try {
+         const response = await fetch(`${url}/api/product/ad`,   
+  {
+           method: 'GET',
+           headers: { 'Content-Type': 'application/json' }
+         });
+ 
+         if (!response.ok) {
+           throw new Error(`Error fetching data: ${response.statusText}`);
+         }
+ 
+         const data = await response.json();
+         setData(data);
+       } catch (error) {
+         setError(error);
+       } finally {
+         setLoading(false);
+       }
+     };
+ 
+     fetchData();   
+ 
+   }, []);
 
   const showMoreItems = () => {
     setvisible((prevValue) => prevValue + 4)
     setlengthTrack((prevValue) => prevValue + 4)
   }
   return (
-
-    <Cardscontainer >
+    <>
+    <Container >
       <Banner />
-      <Box sx={{ flexGrow: 1, padding: 2 }}>
-        <Grid container spacing={3} >
-          {loading ? <CircularProgress disableShrink sx={{ position: 'absolute', left: '50%', top: '70%' }} />
-            : (data.slice(0, visible).map((data, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} container justifyContent="center" key={index}>
-                <Link to={`/item/${data.productUrl}`} >
-                  <ProductCard key={index} data={data} sx={(theme) => ({ padding: theme.spacing(8), textAlign: 'center', color: theme.palette.text.secondary, boxShadow: '0px 2px 1px' })}></ProductCard>
-                </Link>
-              </Grid>
-            )))
-          }
-        </Grid>
-        {
-          (lengthTrack < data.length) ? <Showmore showMoreItems={showMoreItems} /> : null
-        }
-      </Box>
-    </Cardscontainer>
+      <Cards data={data} visible={visible} loading={loading} />
+      {
+        (lengthTrack < data?.length) ? <ShowMore showMoreItems={showMoreItems} /> : null
+      }
+    </Container>
 
-
+        </>
   );
 }

@@ -116,7 +116,7 @@ export default function AddDetails() {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'multipart/form-data',
-                authorization: 'Bearer ' + Cookies.get('Token'),
+                authorization: 'Bearer ' + Cookies.get('token'),
             },
         })
             .then((response) => {
@@ -151,17 +151,16 @@ export default function AddDetails() {
     const categories = [
         { value: 'Cars', label: 'Cars' },
         { value: 'Mobiles', label: 'Mobiles' },
-        { value: 'Jobs', label: 'Jobs' },
         { value: 'Bikes', label: 'Bikes' },
         { value: 'Electronics & Appliances', label: 'Electronics & Appliances' },
-        { value: 'Commercial Vehicles & Spares', label: 'Commercial Vehicles & Spares' },
         { value: 'Furniture', label: 'Furniture' },
         { value: 'Fashion', label: 'Fashion' },
-        { value: 'Books, Sports & Hobbies', label: 'Books, Sports & Hobbies' },
-        { value: 'Pets', label: 'Pets' },
-        { value: 'Services', label: 'Services' },
+        { value: 'Books', label: 'Books' },
+        { value: 'Sports Equipment', label: 'Sports Equipment' },
     ];
 
+
+    
 
     return (
         <Container maxWidth="sm">

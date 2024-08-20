@@ -58,7 +58,7 @@ function MyTabs() {
   return (
     <Tabs value={currentTab} sx={{
       width: '100%', position: "absolute",
-      top: "15%"
+      top: "20%"
     }}>
       <Tab label="Ads" value="/myads" to="/myads" component={Link} />
       <Tab label="favourites" value="/favourites" to="/favourites" component={Link} />
@@ -68,7 +68,6 @@ function MyTabs() {
 
 function CurrentRoute() {
   const location = useLocation();
-  console.log(location.pathname)
 
   return (
     <>
