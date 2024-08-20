@@ -4,6 +4,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { Box, Button, Divider } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
+import {  Link } from 'react-router-dom';
 const CategoriesPaper = styled(Paper)(({ theme }) => ({
     width: "100%",
     padding: theme.spacing(2),
@@ -11,40 +12,50 @@ const CategoriesPaper = styled(Paper)(({ theme }) => ({
     textAlign: 'center',
     display: 'flex',
     justifyContent: 'space-around',
-    borderRadius:0,
-    padding:'2px'
-  }));
+    borderRadius: 0,
+    padding: '2px'
+}));
 const CategoriesMenu = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      {isMobile ? (
-        <Button variant="text">All Categories</Button>
-      ) : (
-        <>
-        <CategoriesPaper elevation={3}>
-          <Button variant="text">Cars</Button>
-          <Divider orientation="vertical" flexItem />
-          <Button variant="text">Bikes</Button>
-          <Divider orientation="vertical" flexItem />
-          <Button variant="text">Mobiles</Button>
-          <Divider orientation="vertical" flexItem />
-          <Button variant="text">Electronics</Button>
-          <Divider orientation="vertical" flexItem />
-          <Button variant="text">Home Appliances</Button>
-          </CategoriesPaper>
-        </>
-      )}
-    </Box>
-  );
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const categories = [
+        'Cars',
+        'Bikes',
+        'Mobiles',
+        'Electronics & Appliances',
+        'Home Appliances',
+        'Furniture',
+        'Watches',
+        'Books',
+        'Clothing',
+        'Sports Equipment'
+    ];
+    return (
+        <Box
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
+        >
+            {isMobile ? (
+                <Button variant="text">All Categories</Button>
+            ) : (
+                <>
+                    <CategoriesPaper elevation={3}>
+                        {categories.map((value, index) => (
+                            <Link to={`/${value}`} key={index}>
+                            <div  >
+                                <Button variant="text">{value}</Button>
+                                <Divider orientation="vertical" flexItem />
+                            </div>
+                            </Link>
+                        ))}
+                    </CategoriesPaper>
+                </>
+            )}
+        </Box>
+    );
 };
 
 export default CategoriesMenu;

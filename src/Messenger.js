@@ -13,7 +13,7 @@ export default function Messenger() {
     // const [token,setToken] = useContext(AuthContext);
     const url = config.url.API_URL
     // const url = "http://localhost:5000"
-    // console.log()
+    
     const [conversations, setconversations] = useState([])
     const [userId, setuserId] = useState('')
     const [currentChat, setCurrentChat] = useState(null);

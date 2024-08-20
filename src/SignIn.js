@@ -32,14 +32,13 @@ const SignInForm = styled('form')({
 });
 export default function SignIn({ openSignIn, setopenSignIn, setisloggedin }) {
   const url = config.url.API_URL
-  // const { setToken } = useAuth()
   const [userData, setuserData] = useState({
     email: "",
     password: ""
   })
 
   const { login } = useAuth()
-  // const [userId, setuserId] = useContext(AuthContext);
+
   const [error, setError] = useState(false)
   const handleClose = (e) => {
     setopenSignIn(false);
@@ -67,18 +66,14 @@ export default function SignIn({ openSignIn, setopenSignIn, setisloggedin }) {
       }
       )
       .then((data) => {
-        login(data.token,data.userId)
+        login(data.token, data.userId)
         setopenSignIn(false);
         setisloggedin(true)
         setError(false)
-    
-
       })
       .catch((err) => {
         console.log("err", err)
       })
-
-
   }
   return (
     <Box>
