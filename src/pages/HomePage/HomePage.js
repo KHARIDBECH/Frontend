@@ -11,36 +11,36 @@ export default function Home({ searchVal }) {
   const [data, setData] = useState([])
   const [error, setError] = useState([{}])
   const [visible, setvisible] = useState(4)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [lengthTrack, setlengthTrack] = useState(4)
 
 
-  useEffect(()=> {
-     const fetchData = async () => {
-      setLoading(true);
-       try {
-         const response = await fetch(`${url}/api/product/ad`,   
-  {
-           method: 'GET',
-           headers: { 'Content-Type': 'application/json' }
-         });
+  // useEffect(()=> {
+  //    const fetchData = async () => {
+  //     setLoading(true);
+  //      try {
+  //        const response = await fetch(`${url}/api/product/ad`,   
+  // {
+  //          method: 'GET',
+  //          headers: { 'Content-Type': 'application/json' }
+  //        });
  
-         if (!response.ok) {
-           throw new Error(`Error fetching data: ${response.statusText}`);
-         }
+  //        if (!response.ok) {
+  //          throw new Error(`Error fetching data: ${response.statusText}`);
+  //        }
  
-         const data = await response.json();
-         setData(data);
-       } catch (error) {
-         setError(error);
-       } finally {
-         setLoading(false);
-       }
-     };
+  //        const data = await response.json();
+  //        setData(data);
+  //      } catch (error) {
+  //        setError(error);
+  //      } finally {
+  //        setLoading(false);
+  //      }
+  //    };
  
-     fetchData(); 
+  //    fetchData(); 
  
-   }, []);
+  //  }, []);
 
   const showMoreItems = () => {
     setvisible((prevValue) => prevValue + 4)

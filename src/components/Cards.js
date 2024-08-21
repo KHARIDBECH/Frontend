@@ -10,7 +10,7 @@ export default function Cards({ data, visible, loading }) {
       <Box sx={{ flexGrow: 1, padding: 2 }}>
         <Grid container spacing={3} >
           {(loading ? Array.from(new Array(4)) : data?.slice(0, visible)).map((item, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} container justifyContent="center" key={index}>
+            <Grid item xs={12} sm={6} md={4} lg={3} container justifyContent="center" flexDirection="column" alignItems="center" key={index}>
               {item ? (
                 <Link to={`/item/${item._id}`} >
                   <ProductCard key={index} data={item} sx={(theme) => ({ padding: theme.spacing(8), textAlign: 'center', color: theme.palette.text.secondary, boxShadow: '0px 2px 1px' })}></ProductCard>
@@ -22,7 +22,12 @@ export default function Cards({ data, visible, loading }) {
                     minWidth: '260px',
                     maxHeight: '330px',
                   }} />
-                  <Box sx={{ pt: 0.5 }} width="100%">
+                  <Box sx={{
+                    pt: 0.5,
+                    maxWidth: "270px",
+                    minWidth: '260px',
+                    maxHeight: '330px',
+                  }}>
                     <Skeleton width="40%"/>
                     <Skeleton width="100%" />
                     <Skeleton width="60%" />
@@ -31,21 +36,6 @@ export default function Cards({ data, visible, loading }) {
               )}
             </Grid>
           ))}
-          {/* {
-                data ? (data?.slice(0, visible).map((data, index) => (
-                  <Grid item xs={12} sm={6} md={4} lg={3} container justifyContent="center" key={index}>
-                    <Link to={`/item/${data._id}`} >
-                      <ProductCard key={index} data={data} sx={(theme) => ({ padding: theme.spacing(8), textAlign: 'center', color: theme.palette.text.secondary, boxShadow: '0px 2px 1px' })}></ProductCard>
-                    </Link>
-                  </Grid>
-                )))
-                  : (
-                    <Box sx={{ pt: 0.5 }}>
-                      <Skeleton />
-                      <Skeleton width="60%" />
-                    </Box>
-                  )}
-           */}
         </Grid>
       </Box>
     </>
