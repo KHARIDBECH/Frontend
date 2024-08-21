@@ -8,7 +8,7 @@ import ShowMore from '../../components/ShowMore';
 export default function Home({ searchVal }) {
   const url = config.url.API_URL
 
-  const [data, setData] = useState(null)
+  const [data, setData] = useState([])
   const [error, setError] = useState([{}])
   const [visible, setvisible] = useState(4)
   const [loading, setLoading] = useState(false)
@@ -17,6 +17,7 @@ export default function Home({ searchVal }) {
 
   useEffect(()=> {
      const fetchData = async () => {
+      setLoading(true);
        try {
          const response = await fetch(`${url}/api/product/ad`,   
   {
@@ -37,7 +38,7 @@ export default function Home({ searchVal }) {
        }
      };
  
-     fetchData();   
+     fetchData(); 
  
    }, []);
 
