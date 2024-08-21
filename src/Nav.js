@@ -96,7 +96,7 @@ const grey = {
 };
 export default function PrimarySearchAppBar({ openSignIn, setopenSignIn, openSignUp, setopenSignUp }) {
   const classes = useStyles;
-  const { is_Auth, logout } = useAuth();
+  const { isAuth, logout } = useAuth();
   const [isloggedin, setisloggedin] = useState(false)
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -117,10 +117,10 @@ export default function PrimarySearchAppBar({ openSignIn, setopenSignIn, openSig
 
 
   useEffect(() => {
-    if (is_Auth == "true") {
+    if (isAuth == "true") {
       setisloggedin(true)
     }
-  }, [])
+  }, [isloggedin])
   const setModalSignIn = () => {
     setopenSignIn(true)
   }
@@ -130,6 +130,7 @@ export default function PrimarySearchAppBar({ openSignIn, setopenSignIn, openSig
     setopenSignUp(true)
   }
 
+  console.log(isloggedin)
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">

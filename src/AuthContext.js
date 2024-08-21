@@ -10,13 +10,14 @@ export function AuthContextProvider({ children }) {
     //here you have to useEffect and fetch the token from Cookies 
     //now from cookies you have to put that cookie to setToken(token)
   const [token, setToken] = useState(Cookies.get('token'));
-  const [isAuth, setIsAuth] = useState(Cookies.get('isAuth') === 'true');
+  const [isAuth, setIsAuth] = useState(Cookies.get('isAuth'));
   const [userId, setUserId] = useState(Cookies.get('userId'));
 
   useEffect(() => {
     const storedToken = Cookies.get('token');
     if (storedToken) {
       setToken(storedToken);
+      setIsAuth(true);
       setIsAuth(true);
     }
   }, []);
