@@ -45,7 +45,7 @@ export default function Category() {
     <>
       <Container>
         <Banner/>
-        {!data.length && <h1 style={{textAlign:"center"}}>No item in this category</h1>}
+        {!data.length && !loading && <h1 style={{textAlign:"center"}}>No item in this category</h1>}
       <Cards data={data} visible={visible} loading={loading} />
       {
         (lengthTrack < data.length) ? <ShowMore showMoreItems={showMoreItems} /> : null
