@@ -7,7 +7,6 @@ import { useAuth } from '../../AuthContext';
 import Container from '@mui/material/Container';
 import { Paper, Typography, Box, Skeleton } from '@mui/material';
 import { styled } from '@mui/material/styles';
-// import Button from '@mui/material/Button';
 import CustomButton from '../../components/CustomButton';
 import CustomDialog from '../../components/CustomDialog';
 
@@ -17,23 +16,24 @@ const DemoPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
   ...theme.typography.body2,
   textAlign: 'center',
+  display:"flex",
   borderLeft: "6px solid #1976d294",
   [theme.breakpoints.down('sm')]: {
-    height: 200, // Increase height on small screens and above
+    height: 200,
+    flexDirection: "column",
+   // Increase height on small screens and above
   },
 }));
 
 function SquareCorners({ ad,setAdId,setOpen }) {
-
-
   const handleRemoveClick = () => {
     setAdId(ad._id); // Set the ad ID to be deleted
     setOpen(true); // Open the dialog
   };
   return (
-    <DemoPaper square={false} sx={{ display: 'flex' }}>
+    <DemoPaper square={false} >
       <Box sx={{
-        flex: "1", borderRight: "1px solid black", display: "flex",
+        flex: "1", borderRight: { xs: 'none', sm: "1px solid black" } , display: "flex",
         justifyContent: "center",
         alignItems: "center",
       }}>
@@ -106,7 +106,8 @@ function SquareCorners({ ad,setAdId,setOpen }) {
           <CustomButton onClick={()=>handleRemoveClick()} text="Remove" style={{
             height: "100%",
             display: "flex",
-            alignItems: "flex-end"
+            alignItems: "flex-end",
+            justifyContent:"center"
           }}/>
     </DemoPaper >
   );
@@ -121,11 +122,8 @@ export default function Ads() {
   const [adId,setAdId] = useState(null)
   const { authHeader, userId } = useAuth()
   const [open, setOpen] = useState(false);
-
-    // const handleOpen = () => {
-    //     setOpen(true);
-    // };
-
+  const url = config.url.API_URL
+  
     const handleClose = () => {
         setOpen(false);
     };
@@ -137,7 +135,6 @@ export default function Ads() {
       try {
        const response =  await axios.delete(`${url}/api/product/${adId}`,config);
         setAds(ads.filter(ad => ad._id !== adId));
-        console.log(response);
         handleClose()
       } catch (err) {
         setError(err.message);
@@ -157,7 +154,6 @@ export default function Ads() {
         },
     ];
 
-  const url = config.url.API_URL
   useEffect(() => {
     const config = {
       headers: { ...authHeader() }
@@ -213,8 +209,7 @@ export default function Ads() {
                 onClose={handleClose}
                 title="Confirm"
                 content="Deleting this ad is irreversible. Please confirm if you want to proceed."
-                actions={actions}
-                
+                actions={actions} 
             />
         </div>
     </Container>
