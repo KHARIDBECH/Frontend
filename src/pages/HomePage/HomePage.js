@@ -4,7 +4,7 @@ import React from 'react';
 import Container from '@mui/material/Container';
 import Cards from '../../components/Cards';
 import { config } from '../../Constants'
-import ShowMore from '../../components/ShowMore';
+import CustomButton from '../../components/CustomButton';
 export default function Home({ searchVal }) {
   const url = config.url.API_URL
 
@@ -15,32 +15,32 @@ export default function Home({ searchVal }) {
   const [lengthTrack, setlengthTrack] = useState(4)
 
 
-  useEffect(()=> {
-     const fetchData = async () => {
+  useEffect(() => {
+    const fetchData = async () => {
       setLoading(true);
-       try {
-         const response = await fetch(`${url}/api/product/ad`,   
-  {
-           method: 'GET',
-           headers: { 'Content-Type': 'application/json' }
-         });
- 
-         if (!response.ok) {
-           throw new Error(`Error fetching data: ${response.statusText}`);
-         }
- 
-         const data = await response.json();
-         setData(data);
-       } catch (error) {
-         setError(error);
-       } finally {
-         setLoading(false);
-       }
-     };
- 
-     fetchData(); 
- 
-   }, []);
+      try {
+        const response = await fetch(`${url}/api/product/ad`,
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+          });
+
+        if (!response.ok) {
+          throw new Error(`Error fetching data: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setData(data);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+
+  }, []);
 
   const showMoreItems = () => {
     setvisible((prevValue) => prevValue + 4)
@@ -48,14 +48,16 @@ export default function Home({ searchVal }) {
   }
   return (
     <>
-    <Container >
-      <Banner />
-      <Cards data={data} visible={visible} loading={loading} />
-      {
-        (lengthTrack < data?.length) ? <ShowMore showMoreItems={showMoreItems} /> : null
-      }
-    </Container>
+      <Container >
+        <Banner />
+        <Cards data={data} visible={visible} loading={loading} />
+        {
+          (lengthTrack < data?.length) ? 
+            <CustomButton onClick={showMoreItems} text="Show more" style={{display:"flex",justifyContent:"center"}}/> : null
 
-        </>
+        }
+      </Container>
+
+    </>
   );
 }

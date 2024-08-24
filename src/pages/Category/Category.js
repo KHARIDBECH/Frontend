@@ -3,7 +3,7 @@ import { config } from '../../Constants'
 import Container from '@mui/material/Container';
 import Cards from '../../components/Cards';
 import {  useParams } from 'react-router-dom';
-import ShowMore from '../../components/ShowMore';
+import Button from '../../components/CustomButton';
 import Banner from '../../components/Banner';
 export default function Category() {
 
@@ -48,7 +48,7 @@ export default function Category() {
         {!data.length && !loading && <h1 style={{textAlign:"center"}}>No item in this category</h1>}
       <Cards data={data} visible={visible} loading={loading} />
       {
-        (lengthTrack < data.length) ? <ShowMore showMoreItems={showMoreItems} /> : null
+        (lengthTrack < data.length) ? <Button showMoreItems={showMoreItems} /> : null
       }
       </Container>
     </>
