@@ -30,7 +30,7 @@ const Banner = styled(Box)(({ theme }) => ({
     left: 0,
     width: '100%',
     height: '100%',
-    backgroundImage: 'url("https://statics.olx.in/external/base/img/hero-bg-in.jpg")', // Replace with your ad image URL
+    backgroundImage: 'url("https://statics.olx.in/external/base/img/hero-bg-in.jpg")', // Replace with your Product image URL
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     zIndex: -1, // Ensure the image stays behind any other content
@@ -54,16 +54,16 @@ function Showmore({ showMoreItems }) {
 export default function Content({ searchVal }) {
   const url = config.url.API_URL
   // const url = "http://localhost:5000"
-
+  const token = Cookies.get('token')
   const [data, setdata] = useState([{}])
   const [visible, setvisible] = useState(4)
   const [lengthTrack, setlengthTrack] = useState(4)
 
  
   useEffect(() => {
-    fetch(`${url}/api/product/ad`, {
+    fetch(`${url}/api/product`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
     })
       .then(response => {
         if (response.status === 400) {

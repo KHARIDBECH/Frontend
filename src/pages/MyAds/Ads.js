@@ -25,9 +25,9 @@ const DemoPaper = styled(Paper)(({ theme }) => ({
   },
 }));
 
-function SquareCorners({ ad,setAdId,setOpen }) {
+function SquareCorners({ Product,setAdId,setOpen }) {
   const handleRemoveClick = () => {
-    setAdId(ad._id); // Set the ad ID to be deleted
+    setAdId(Product._id); // Set the Product ID to be deleted
     setOpen(true); // Open the dialog
   };
   return (
@@ -38,21 +38,21 @@ function SquareCorners({ ad,setAdId,setOpen }) {
         alignItems: "center",
       }}>
         <Typography sx={{ fontSize: { xs: '.7rem', sm: '1rem' } }}>
-          {ad ? new Date(ad.postedDate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : <Skeleton width={120} />}
+          {Product ? new Date(Product.postedDate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : <Skeleton width={120} />}
         </Typography>
       </Box>
       <Link style={{
         display: 'flex', flex: '4', color: 'inherit',
         textDecoration: 'none', flexDirection: 'column'
-      }} to={ad ? `/item/${ad._id}` : '#'}>
+      }} to={Product ? `/item/${Product._id}` : '#'}>
         <Box sx={{
           flex: "4", display: "flex",
           justifyContent: "space-around",
           alignItems: "center",
           flexDirection: { xs: 'column', sm: 'row' },
         }}>
-          {ad ? (
-            <img src={ad.images[0].url} alt="ad-image" style={{ maxWidth: "90px" }} />
+          {Product ? (
+            <img src={Product.images[0].url} alt="Product-image" style={{ maxWidth: "90px" }} />
           ) : (
             <Skeleton variant="rectangular" width={120} height={80} />
           )}
@@ -65,7 +65,7 @@ function SquareCorners({ ad,setAdId,setOpen }) {
               width: '100%',
             }}
           >
-            {ad ? (
+            {Product ? (
               <>
                 <Typography
                   variant="body1"
@@ -80,7 +80,7 @@ function SquareCorners({ ad,setAdId,setOpen }) {
                     fontSize: { xs: '.8rem', md: '1rem' }
                   }}
                 >
-                  {ad.title}
+                  {Product.title}
                 </Typography>
                 <Typography
                   variant="body1"
@@ -90,7 +90,7 @@ function SquareCorners({ ad,setAdId,setOpen }) {
                     fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
                   }}
                 >
-                  {ad.price}
+                  {Product.price}
                 </Typography>
 
               </>
@@ -133,8 +133,8 @@ export default function Ads() {
         headers: { ...authHeader() }
       }
       try {
-       const response =  await axios.delete(`${url}/api/product/${adId}`,config);
-        setAds(ads.filter(ad => ad._id !== adId));
+        await axios.delete(`${url}/api/product/${adId}`,config);
+        setAds(ads.filter(Product => Product._id !== adId));
         handleClose()
       } catch (err) {
         setError(err.message);
@@ -186,7 +186,7 @@ export default function Ads() {
     <Container sx={{ marginTop: "200px" }}>
       <Box className="my-ads">
         {[...Array(3)].map((_, index) => (
-          <SquareCorners key={index} ad={null} />
+          <SquareCorners key={index} Product={null} />
         ))}
       </Box>
     </Container>
@@ -196,8 +196,8 @@ export default function Ads() {
   return (
     <Container sx={{ marginTop: "200px" }}>
       <Box className="my-ads">
-        {ads.map((ad, index) => (
-          <SquareCorners ad={ad} key={index} setAdId = {setAdId} setOpen={setOpen}/>
+        {ads.map((Product, index) => (
+          <SquareCorners Product={Product} key={index} setAdId = {setAdId} setOpen={setOpen}/>
         ))}
         {currentPage < totalPages && (
           <CustomButton onClick={handleShowMore} text="Show more" style={{display:"flex",justifyContent:"center"}}/>
@@ -208,7 +208,7 @@ export default function Ads() {
                 open={open}
                 onClose={handleClose}
                 title="Confirm"
-                content="Deleting this ad is irreversible. Please confirm if you want to proceed."
+                content="Deleting this Product is irreversible. Please confirm if you want to proceed."
                 actions={actions} 
             />
         </div>

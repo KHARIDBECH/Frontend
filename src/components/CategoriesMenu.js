@@ -2,7 +2,7 @@
 import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { Box, Button, Divider, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Box, Button, Divider } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import { styled } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
@@ -16,7 +16,6 @@ const CategoriesPaper = styled(Paper)(({ theme }) => ({
     display: 'flex',
     justifyContent: 'space-around',
     borderRadius: 0,
-    padding: '2px'
 }));
 
 const CategoriesMenu = () => {

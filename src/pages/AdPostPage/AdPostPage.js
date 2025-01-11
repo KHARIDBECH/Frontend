@@ -112,7 +112,7 @@ export default function AddDetails() {
         finalData.append('location[city]', selectedCity.name);
         finalData.append('location[state]', selectedState.name);
         finalData.append('location[country]', selectedCountry.name);
-        axios.post(`${url}/api/product/ad`, finalData, {
+        axios.post(`${url}/api/product/Product`, finalData, {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'multipart/form-data',
@@ -120,10 +120,10 @@ export default function AddDetails() {
             },
         })
             .then((response) => {
-                alert('Your Ad posted successfully');
+                alert('Your Product posted successfully');
             })
             .catch((error) => {
-                console.error('Error posting ad:', error);
+                console.error('Error posting Product:', error);
             });
     };
 

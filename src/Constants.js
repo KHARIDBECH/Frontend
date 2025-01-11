@@ -10,4 +10,6 @@ const prod = {
    };
 
   //  https://backend-8qoa.onrender.com
-   export const config = process.env.REACT_APP_ENV === "development" ? dev : prod
+  //  export const config = process.env.REACT_APP_ENV === "development" ? dev : prod
+
+   export const config = dev;

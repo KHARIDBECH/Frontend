@@ -9,7 +9,9 @@ import Paper from '@mui/material/Paper';
 import { Box } from '@mui/material';
 import { Button } from '@mui/material';
 import AdDetailSkeletonLoader from './components/AdDetailSkeletonLoader';
-
+import Cookies from 'js-cookie';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 function LineByLineDescription({ lines }) {
     return (
         <div className="line-by-line">
@@ -27,6 +29,7 @@ export default function ItemDetails() {
     const [loading, setloading] = useState(false);
     const [notFound, setNotFound] = useState(false); // State to track if item is not found
     const { productUrl } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         setloading(true);
@@ -40,9 +43,7 @@ export default function ItemDetails() {
                 return res.json();
             })
             .then((data) => {
-                if (data) {
-                    setitemDetail(data);
-                }
+                setitemDetail(data);
                 setloading(false);
             })
             .catch((err) => {
@@ -50,6 +51,25 @@ export default function ItemDetails() {
                 setloading(false);
             });
     }, [productUrl, url]);
+
+    const handleChatWithSeller = async () => {
+        console.log(itemDetail)
+        const senderId = Cookies.get('userId'); // Get the sender ID from cookies or context
+        const receiverId = itemDetail?.postedBy?._id// Assuming item.sellerId contains the seller's ID
+
+        try {
+            const response = await axios.post(`${config.url.API_URL}/api/chatConvo`, {
+                senderId,
+                receiverId,
+                productId: itemDetail?._id
+            });
+            console.log('Conversation created:', response.data);
+            navigate(`/chat`);
+            // Optionally, navigate to the chat or update the UI
+        } catch (error) {
+            console.error('Error creating conversation:', error);
+        }
+    };
 
     const lines = itemDetail?.description?.split('\n');
 
@@ -76,7 +96,13 @@ export default function ItemDetails() {
                             boxSizing: "border-box"
                         }}>
                             <Typography variant="h6">Details</Typography>
-                            <Typography variant="body2"><LineByLineDescription lines={lines} /></Typography>
+                            <Typography variant="body2">
+                                <div className="line-by-line">
+                                    {lines?.map((line, index) => (
+                                        <p key={index}>{line}</p>
+                                    ))}
+                                </div>
+                            </Typography>
                         </Paper>
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -103,7 +129,11 @@ export default function ItemDetails() {
                                             <span>Member since Feb 2017</span>
                                         </Typography>
                                     </Box>
-                                    <Button variant="outlined" color="primary" fullWidth={true}>Chat with Seller</Button>
+                                    {itemDetail?.postedBy?._id !== Cookies.get('userId') && (
+                                        <Button variant="outlined" color="primary" fullWidth={true} onClick={handleChatWithSeller}>
+                                            Chat with Seller
+                                        </Button>
+                                    )}
                                 </Paper>
                             </Grid>
                         </Grid>

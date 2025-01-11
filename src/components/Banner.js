@@ -16,7 +16,7 @@ const AdBanner = styled(Box)(({ theme }) => ({
       left: 0,
       width: '100%',
       height: '100%',
-      backgroundImage: 'url("https://statics.olx.in/external/base/img/hero-bg-in.jpg")', // Replace with your ad image URL
+      backgroundImage: 'url("https://statics.olx.in/external/base/img/hero-bg-in.jpg")', // Replace with your Product image URL
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       zIndex: -1, // Ensure the image stays behind any other content

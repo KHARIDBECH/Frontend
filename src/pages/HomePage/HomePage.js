@@ -5,8 +5,10 @@ import Container from '@mui/material/Container';
 import Cards from '../../components/Cards';
 import { config } from '../../Constants'
 import CustomButton from '../../components/CustomButton';
+import Cookies from 'js-cookie';
 export default function Home({ searchVal }) {
   const url = config.url.API_URL
+  const token = Cookies.get('token')
 
   const [data, setData] = useState([])
   const [error, setError] = useState([{}])
@@ -19,10 +21,10 @@ export default function Home({ searchVal }) {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${url}/api/product/ad`,
+        const response = await fetch(`${url}/api/product`,
           {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
           });
 
         if (!response.ok) {

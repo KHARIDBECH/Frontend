@@ -7,7 +7,7 @@ import HomePage from './pages/HomePage/HomePage';
 import AdsDetails from './pages/AdPostPage/AdPostPage';
 import { AuthContextProvider } from './AuthContext';
 import ItemDetails from "./ItemDetails"
-import Messenger from "./Messenger"
+import Messenger from "./pages/Chat/Messenger"
 import Favourites from "../src/components/Favourites"
 import "./App.css"
 import Nav from './Nav'
@@ -26,7 +26,7 @@ function App() {
           <Routes>
             <Route exact path="/" element={<HomePage />}/>
           <Route exact path="/:category"  element={<Category />} />
-          <Route exact path="/ad"  element={<AdsDetails />}/>
+          <Route exact path="/Product"  element={<AdsDetails />}/>
           <Route exact path="/item/:productUrl"  element={<ItemDetails />} />
 
         
