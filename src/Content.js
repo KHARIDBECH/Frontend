@@ -9,7 +9,7 @@ import Grid from '@mui/material/Grid';
 import { Link } from 'react-router-dom';
 import { config } from './Constants'
 
-
+import Cookies from 'js-cookie';
 
 const Cardscontainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4), // Add top margin

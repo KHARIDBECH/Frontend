@@ -38,7 +38,7 @@ export default function Messenger() {
 
     useEffect(() => {
         const fetchUserId = async () => {
-            const userId = await Cookies.get('userId');
+            const userId =  Cookies.get('userId');
             setUserId(userId);
             socket.current.emit("addUser", userId);
         };
@@ -126,7 +126,7 @@ export default function Messenger() {
                                     <div className="chatBoxTop">
                                         {messages.map((m) => (
                                             <div key={m._id} ref={scrollRef}>
-                                                <Message message={m} own={m.sender === userId} />
+                                                <Message message={m} own={m.senderId === userId} />
                                             </div>
                                         ))}
                                     </div>

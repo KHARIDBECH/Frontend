@@ -1,6 +1,6 @@
 const prod = {
     url: {
-     API_URL: "https://backend-xstc.onrender.com"
+     API_URL: "https://backend-1-q12v.onrender.com"
      }
    }
    const dev = {
