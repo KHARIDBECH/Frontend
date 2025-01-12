@@ -35,7 +35,7 @@ export default function Category() {
       .catch((err) => {
         setloading(false)
       })
-  }, [category])
+  }, [category, url])
 
   const showMoreItems = () => {
     setvisible((prevValue) => prevValue + 4)

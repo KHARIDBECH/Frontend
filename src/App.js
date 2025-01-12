@@ -1,5 +1,3 @@
-
-
 import React, { useState } from "react";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -13,6 +11,7 @@ import "./App.css"
 import Nav from './Nav'
 import AdTabs from "../src/components/AdTabs"
 import Category from "./pages/Category/Category";
+import ProtectedRoute from "./ProtectedRoute";
 function App() {
   const [openSignIn, setopenSignIn] = useState(false)
   const [openSignUp, setopenSignUp] = useState(false)
@@ -25,14 +24,14 @@ function App() {
           <Nav openSignIn={openSignIn} setopenSignIn={setopenSignIn} openSignUp={openSignUp} setopenSignUp={setopenSignUp} />
           <Routes>
             <Route exact path="/" element={<HomePage />}/>
-          <Route exact path="/:category"  element={<Category />} />
-          <Route exact path="/Product"  element={<AdsDetails />}/>
-          <Route exact path="/item/:productUrl"  element={<ItemDetails />} />
+          <Route exact path="/:category"  element={<ProtectedRoute element={<Category />} setOpenSignIn={setopenSignIn}/>} />
+          <Route exact path="/Product"  element={<ProtectedRoute element={<AdsDetails />} setOpenSignIn={setopenSignIn}/>}/>
+          <Route exact path="/item/:productUrl"  element={<ProtectedRoute element={<ItemDetails />} setOpenSignIn={setopenSignIn}/>} />
 
         
-          <Route exact path="/myads/*"  element={<AdTabs />}/> 
-          <Route exact path="/favourites"  element={<Favourites />}/> 
-          <Route exact path="/chat" element={<Messenger/>}/>
+          <Route exact path="/myads/*"  element={<ProtectedRoute element={<AdTabs />} setOpenSignIn={setopenSignIn}/>}/> 
+          <Route exact path="/favourites"  element={<ProtectedRoute element={<Favourites />} setOpenSignIn={setopenSignIn}/>}/> 
+          <Route exact path="/chat" element={<ProtectedRoute element={<Messenger/>} setOpenSignIn={setopenSignIn}/>}/>
           </Routes>  
         </AuthContextProvider>
       </div>

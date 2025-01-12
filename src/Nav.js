@@ -146,8 +146,8 @@ const PrimarySearchAppBar = ({ openSignIn, setopenSignIn, openSignUp, setopenSig
         </Toolbar>
       </AppBar>
       <CategoriesMenu />
-      <SignIn openSignIn={openSignIn} setopenSignIn={setopenSignIn} setIsLoggedIn={setIsLoggedIn} />
-      <SignUp openSignUp={openSignUp} setopenSignUp={setopenSignUp} />
+      <SignIn openSignIn={openSignIn} setopenSignIn={setopenSignIn} setIsLoggedIn={setIsLoggedIn} setopenSignUp={setopenSignUp}/>
+      <SignUp openSignUp={openSignUp} setopenSignUp={setopenSignUp} setopenSignIn={setopenSignIn}/>
     </Box>
   );
 };

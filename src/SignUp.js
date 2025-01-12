@@ -29,7 +29,7 @@ const SignUpForm = styled('form')(({ theme }) => ({
   padding: theme.spacing(3),
 }));
 
-const SignUp = ({ openSignUp, setopenSignUp }) => {
+const SignUp = ({ openSignUp, setopenSignUp, setopenSignIn}) => {
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
@@ -210,7 +210,10 @@ const SignUp = ({ openSignUp, setopenSignUp }) => {
             </Button>
             <Grid container justifyContent="center">
               <Grid item>
-                <Link href="#" variant="body2" onClick={() => { console.log("Sign In clicked") }}>
+                <Link href="#" variant="body2" onClick={() => { 
+                  setopenSignIn(true)
+                  setopenSignUp(false)
+                  }}>
                   Already have an account? Sign in
                 </Link>
               </Grid>

@@ -31,7 +31,7 @@ const SignInForm = styled('form')(({ theme }) => ({
   padding: theme.spacing(3),
 }));
 
-const SignIn = ({ openSignIn, setopenSignIn, setIsLoggedIn }) => {
+const SignIn = ({ openSignIn, setopenSignIn, setIsLoggedIn, setopenSignUp }) => {
   const [userData, setUserData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState('');
@@ -172,7 +172,10 @@ const SignIn = ({ openSignIn, setopenSignIn, setIsLoggedIn }) => {
                 </Link>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <Link href="#" variant="body2" onClick={() => { console.log("Sign Up clicked") }}>
+                <Link href="#" variant="body2" onClick={() => { 
+                  setopenSignUp(true)
+                  setopenSignIn(false)
+                  }}>
                   Don't have an account? Sign Up
                 </Link>
               </Grid>
