@@ -45,7 +45,7 @@ function AdItem({ Product, setAdId, setOpen }) {
       </Box>
       <Box sx={{ flex: 1 }}>
         <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontWeight: 600 }}>
-          {new Date(Number(Product.postedAt)).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+          {Product.postedAt && new Date(Product.postedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
         </Typography>
         <Link to={`/item/${Product._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
           <Typography variant="h6" sx={{ fontWeight: 700, mt: 0.5, mb: 1 }}>{Product.title}</Typography>

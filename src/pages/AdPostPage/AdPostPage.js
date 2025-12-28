@@ -84,7 +84,7 @@ export default function AdPostPage() {
             if (selectedCountry) finalData.append('location[country]', selectedCountry.name);
 
             try {
-                await axios.post(`${url}/api/product/Product`, finalData, {
+                await axios.post(`${url}/api/product`, finalData, {
                     headers: { ...authHeader(), 'Content-Type': 'multipart/form-data' }
                 });
                 alert('Success! Your ad is live.');

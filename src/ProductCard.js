@@ -103,7 +103,7 @@ export default function ProductCard({ data }) {
             {data.category}
           </Typography>
           <Typography variant="caption" sx={{ color: 'var(--text-muted)' }}>
-            {data?.postedAt && new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(Number(data.postedAt)))}
+            {data?.postedAt && new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(data.postedAt))}
           </Typography>
         </Box>
       </CardContent>

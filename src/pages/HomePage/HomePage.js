@@ -34,7 +34,7 @@ export default function Home() {
         }
 
         const result = await response.json();
-        setData(result);
+        setData(result.data || []);
       } catch (err) {
         setError(err.message);
       } finally {

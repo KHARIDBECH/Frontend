@@ -32,8 +32,8 @@ export default function ItemDetails() {
                 }
                 return res.json();
             })
-            .then((data) => {
-                if (data) setItemDetail(data);
+            .then((result) => {
+                if (result?.data) setItemDetail(result.data);
                 setLoading(false);
             })
             .catch((err) => {
@@ -110,7 +110,7 @@ export default function ItemDetails() {
                             <Typography variant="body2" sx={{ color: 'var(--text-muted)', display: 'flex', gap: 1 }}>
                                 {itemDetail.location?.city}, {itemDetail.location?.state}
                                 <span>•</span>
-                                {itemDetail?.postedAt && new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(new Date(Number(itemDetail.postedAt)))}
+                                {itemDetail?.postedAt && new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(new Date(itemDetail.postedAt))}
                             </Typography>
                         </Box>
 

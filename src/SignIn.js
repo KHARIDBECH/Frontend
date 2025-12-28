@@ -70,7 +70,8 @@ const SignIn = () => {
       });
 
       if (!response.ok) {
-        throw new Error(response.status === 401 ? 'Incorrect email or password' : 'An error occurred');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Incorrect email or password');
       }
 
       const data = await response.json();

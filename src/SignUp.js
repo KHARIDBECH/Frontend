@@ -77,11 +77,8 @@ const SignUp = () => {
       });
 
       if (!response.ok) {
-        if (response.status === 400) {
-          throw new Error('This email address is already registered.');
-        } else {
-          throw new Error('An error occurred during sign up.');
-        }
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'An error occurred during sign up.');
       }
 
       await response.json();

@@ -1,14 +1,14 @@
-import React,{useState,useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import { config } from '../../Constants'
 import Container from '@mui/material/Container';
 import Cards from '../../components/Cards';
-import {  useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Button from '../../components/CustomButton';
 import Banner from '../../components/Banner';
 export default function Category() {
 
-    const url = config.url.API_URL
-    let { category } = useParams();
+  const url = config.url.API_URL
+  let { category } = useParams();
   const [data, setdata] = useState([{}])
   const [visible, setvisible] = useState(4)
   const [loading, setloading] = useState(false)
@@ -28,8 +28,8 @@ export default function Category() {
         return response.json();
       }
       )
-      .then((data) => {
-        setdata(data)
+      .then((result) => {
+        setdata(result.data || [])
         setloading(false)
       })
       .catch((err) => {
@@ -44,12 +44,12 @@ export default function Category() {
   return (
     <>
       <Container>
-        <Banner/>
-        {!data.length && !loading && <h1 style={{textAlign:"center"}}>No item in this category</h1>}
-      <Cards data={data} visible={visible} loading={loading} />
-      {
-        (lengthTrack < data.length) ? <Button showMoreItems={showMoreItems} /> : null
-      }
+        <Banner />
+        {!data.length && !loading && <h1 style={{ textAlign: "center" }}>No item in this category</h1>}
+        <Cards data={data} visible={visible} loading={loading} />
+        {
+          (lengthTrack < data.length) ? <Button showMoreItems={showMoreItems} /> : null
+        }
       </Container>
     </>
   )

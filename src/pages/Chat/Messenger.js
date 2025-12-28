@@ -50,7 +50,7 @@ export default function Messenger() {
         const getConversation = async () => {
             try {
                 const res = await axios.get(`${url}/api/chatConvo/${userId}`, { headers: authHeader() });
-                setConversations(res.data);
+                setConversations(res.data.data || []);
             } catch (err) {
                 console.error(err);
             }
@@ -63,7 +63,7 @@ export default function Messenger() {
             if (currentChat) {
                 try {
                     const res = await axios.get(`${url}/api/chatMessages/${currentChat._id}`, { headers: authHeader() });
-                    setMessages(res.data);
+                    setMessages(res.data.data || []);
                 } catch (err) {
                     console.error(err);
                 }
@@ -95,7 +95,7 @@ export default function Messenger() {
 
         try {
             const res = await axios.post(`${url}/api/chatMessages/`, addMessagesFormat, { headers: authHeader() });
-            setMessages([...messages, res.data]);
+            setMessages([...messages, res.data.data]);
             setNewMessages('');
         } catch (err) {
             console.error(err);
