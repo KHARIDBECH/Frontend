@@ -67,7 +67,6 @@ function AdItem({ Product, setAdId, setOpen }) {
 export default function Ads() {
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [adId, setAdId] = useState(null);
@@ -81,7 +80,7 @@ export default function Ads() {
       setAds(ads.filter(p => p._id !== adId));
       setOpen(false);
     } catch (err) {
-      setError(err.message);
+      console.error("Remove failed:", err.message);
       setOpen(false);
     }
   };
@@ -94,7 +93,7 @@ export default function Ads() {
         setTotalPages(response.data.pagination.totalPages);
         setLoading(false);
       } catch (err) {
-        setError(err.message);
+        console.error("Fetch ads failed:", err.message);
         setLoading(false);
       }
     };
@@ -113,7 +112,7 @@ export default function Ads() {
       {ads.length === 0 && !loading ? (
         <Box sx={{ textAlign: 'center', py: 10, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: '24px' }}>
           <Typography variant="h6" color="textSecondary">You haven't posted any ads yet.</Typography>
-          <Link to="/Product" style={{ textDecoration: 'none' }}>
+          <Link to="/post-ad" style={{ textDecoration: 'none' }}>
             <Button variant="contained" className="btn-primary" sx={{ mt: 3 }}>Start Selling</Button>
           </Link>
         </Box>
