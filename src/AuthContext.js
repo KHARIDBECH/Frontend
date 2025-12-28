@@ -40,12 +40,19 @@ export function AuthContextProvider({ children }) {
         Cookies.remove('userId');
     };
 
-    const authHeader = () => {
+    const [openSignIn, setOpenSignIn] = useState(false);
+    const [openSignUp, setOpenSignUp] = useState(false);
+
+    const authHeader = React.useCallback(() => {
         return token ? { Authorization: `Bearer ${token}` } : {};
-    };
+    }, [token]);
 
     return (
-        <AuthContext.Provider value={{ isAuth, token, userId, login, logout, authHeader }}>
+        <AuthContext.Provider value={{
+            isAuth, token, userId, login, logout, authHeader,
+            openSignIn, setOpenSignIn,
+            openSignUp, setOpenSignUp
+        }}>
             {children}
         </AuthContext.Provider>
     );

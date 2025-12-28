@@ -31,13 +31,13 @@ const SignInForm = styled('form')(({ theme }) => ({
   padding: theme.spacing(3),
 }));
 
-const SignIn = ({ openSignIn, setopenSignIn, setIsLoggedIn, setopenSignUp }) => {
+const SignIn = () => {
+  const { openSignIn, setOpenSignIn, setOpenSignUp, login } = useAuth();
   const [userData, setUserData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-  const { login } = useAuth();
   const url = config.url.API_URL;
 
   const validateForm = () => {
@@ -45,12 +45,12 @@ const SignIn = ({ openSignIn, setopenSignIn, setIsLoggedIn, setopenSignUp }) => 
     if (!userData.email) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(userData.email)) newErrors.email = 'Email is invalid';
     if (!userData.password) newErrors.password = 'Password is required';
-    else if (userData.password.length < 4) newErrors.password = 'Password must be at least 6 characters';
+    else if (userData.password.length < 4) newErrors.password = 'Password must be at least 4 characters';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleClose = () => setopenSignIn(false);
+  const handleClose = () => setOpenSignIn(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -75,8 +75,7 @@ const SignIn = ({ openSignIn, setopenSignIn, setIsLoggedIn, setopenSignUp }) => 
 
       const data = await response.json();
       login(data.token, data.userId);
-      setopenSignIn(false);
-      setIsLoggedIn(true);
+      setOpenSignIn(false);
       setApiError('');
       setSuccessMessage('Sign in successful!');
       setSnackbarSeverity('success');
@@ -89,9 +88,7 @@ const SignIn = ({ openSignIn, setopenSignIn, setIsLoggedIn, setopenSignUp }) => 
   };
 
   const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
+    if (reason === 'clickaway') return;
     setSuccessMessage('');
     setApiError('');
   };
@@ -103,7 +100,13 @@ const SignIn = ({ openSignIn, setopenSignIn, setIsLoggedIn, setopenSignUp }) => 
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
-        aria-labelledby="sign-in-dialog-title"
+        PaperProps={{
+          sx: {
+            borderRadius: '24px',
+            padding: '12px',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)'
+          }
+        }}
       >
         <Box sx={{
           display: 'flex',
@@ -112,13 +115,18 @@ const SignIn = ({ openSignIn, setopenSignIn, setIsLoggedIn, setopenSignUp }) => 
           padding: (theme) => theme.spacing(3),
         }}>
           <Avatar sx={(theme) => ({
-            margin: theme.spacing(1),
-            backgroundColor: theme.palette.secondary.main,
+            margin: theme.spacing(2),
+            backgroundColor: 'var(--primary)',
+            width: 56,
+            height: 56
           })}>
-            <LockOutlinedIcon />
+            <LockOutlinedIcon fontSize="large" />
           </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign in
+          <Typography component="h1" variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+            Welcome Back
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'var(--text-muted)', mb: 3 }}>
+            Sign in to continue to KharidBech
           </Typography>
           <SignInForm onSubmit={handleSubmit}>
             <TextField
@@ -135,6 +143,7 @@ const SignIn = ({ openSignIn, setopenSignIn, setIsLoggedIn, setopenSignUp }) => 
               onChange={handleChange}
               error={!!errors.email}
               helperText={errors.email}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
             />
             <TextField
               variant="outlined"
@@ -150,9 +159,10 @@ const SignIn = ({ openSignIn, setopenSignIn, setIsLoggedIn, setopenSignUp }) => 
               onChange={handleChange}
               error={!!errors.password}
               helperText={errors.password}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
             />
             {apiError && (
-              <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+              <Alert severity="error" sx={{ mt: 2, mb: 2, borderRadius: '12px' }}>
                 {apiError}
               </Alert>
             )}
@@ -160,23 +170,23 @@ const SignIn = ({ openSignIn, setopenSignIn, setIsLoggedIn, setopenSignUp }) => 
               type="submit"
               fullWidth
               variant="contained"
-              color="primary"
-              sx={(theme) => ({ margin: theme.spacing(3, 0, 2) })}
+              className="btn-primary"
+              sx={{ mt: 3, mb: 2, py: 1.5, fontSize: '1rem' }}
             >
               Sign In
             </Button>
-            <Grid container spacing={2} sx={{ mt: 2 }}>
-              <Grid item xs={12} sm={6}>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Link href="#" variant="body2" onClick={() => { 
-                  setopenSignUp(true)
-                  setopenSignIn(false)
-                  }}>
-                  Don't have an account? Sign Up
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12} sx={{ textAlign: 'center' }}>
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={() => {
+                    setOpenSignUp(true);
+                    setOpenSignIn(false);
+                  }}
+                  sx={{ fontWeight: 600, color: 'var(--primary)' }}
+                >
+                  Don't have an account? Create one
                 </Link>
               </Grid>
             </Grid>
@@ -188,7 +198,7 @@ const SignIn = ({ openSignIn, setopenSignIn, setIsLoggedIn, setopenSignUp }) => 
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
       >
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }} variant="filled">
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%', borderRadius: '12px' }} variant="filled">
           {successMessage || apiError}
         </Alert>
       </Snackbar>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { styled, alpha, useTheme } from '@mui/material/styles';
 import {
   AppBar,
@@ -14,7 +14,6 @@ import {
 } from '@mui/material';
 import { Search as SearchIcon, AccountCircle, Add as AddIcon } from '@mui/icons-material';
 import { Link, useNavigate } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import CategoriesMenu from './components/CategoriesMenu';
@@ -51,16 +50,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const PrimarySearchAppBar = ({ openSignIn, setopenSignIn, openSignUp, setopenSignUp }) => {
-  const { isAuth, logout } = useAuth();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+const PrimarySearchAppBar = () => {
+  const { isAuth, logout, setOpenSignIn, setOpenSignUp } = useAuth();
   const [menuAnchor, setMenuAnchor] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
-  useEffect(() => {
-    setIsLoggedIn(isAuth === true);
-  }, [isAuth]);
 
   const handleMenuOpen = (event) => setMenuAnchor(event.currentTarget);
   const handleMenuClose = () => setMenuAnchor(null);
@@ -69,7 +64,6 @@ const PrimarySearchAppBar = ({ openSignIn, setopenSignIn, openSignUp, setopenSig
     handleMenuClose();
     if (menuItem === 'Logout') {
       logout();
-      setIsLoggedIn(false);
       navigate('/');
     } else if (menuItem === 'My Ads') {
       navigate('/myads');
@@ -77,86 +71,93 @@ const PrimarySearchAppBar = ({ openSignIn, setopenSignIn, openSignUp, setopenSig
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Link to="/">
-            <img src="../appLogo.png" alt="Logo" style={{ height: '50px' }} />
-          </Link>
+    <Box sx={{ flexGrow: 1 }} className="glass-nav">
+      <AppBar position="static" sx={{ background: 'transparent', boxShadow: 'none', color: 'var(--text-main)' }}>
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', marginRight: '24px' }}>
+              <Typography variant="h5" sx={{ fontWeight: 800, color: 'var(--primary)', letterSpacing: '-1px' }}>
+                KHARID<span style={{ color: 'var(--secondary)' }}>BECH</span>
+              </Typography>
+            </Link>
+          </Box>
+
           {!isMobile && (
-            <Search>
+            <Search sx={{
+              backgroundColor: 'rgba(0,0,0,0.04)',
+              borderRadius: '12px',
+              border: '1px solid rgba(0,0,0,0.05)',
+              transition: 'all 0.2s ease',
+              '&:hover': { backgroundColor: 'rgba(0,0,0,0.07)' }
+            }}>
               <SearchIconWrapper>
-                <SearchIcon />
+                <SearchIcon sx={{ color: 'var(--text-muted)' }} />
               </SearchIconWrapper>
-              <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} />
+              <StyledInputBase
+                placeholder="Search products..."
+                inputProps={{ 'aria-label': 'search' }}
+                sx={{ width: '400px' }}
+              />
             </Search>
           )}
-          <Box sx={{ flexGrow: 1 }} />
-          {isLoggedIn ? (
-            <>
-              <IconButton color="inherit" onClick={handleMenuOpen}>
-                <AccountCircle />
-              </IconButton>
-              <Menu
-                anchorEl={menuAnchor}
-                open={Boolean(menuAnchor)}
-                onClose={handleMenuClose}
-              >
-                <MenuItem onClick={() => handleMenuClick('Profile')}>Profile</MenuItem>
-                <MenuItem onClick={() => handleMenuClick('My Ads')}>My Ads</MenuItem>
-                <MenuItem onClick={() => handleMenuClick('Logout')}>Logout</MenuItem>
-              </Menu>
-              <Link to="/Product" style={{ textDecoration: 'none' }}>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  startIcon={<AddIcon />}
-                  sx={{
-                    fontWeight: 600,
-                    borderRadius: '20px',
-                    marginLeft: theme.spacing(2),
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {isAuth ? (
+              <>
+                <IconButton color="inherit" onClick={handleMenuOpen} sx={{ p: 0.5, border: '2px solid transparent', '&:hover': { borderColor: 'var(--primary)' } }}>
+                  <AccountCircle fontSize="large" sx={{ color: 'var(--text-muted)' }} />
+                </IconButton>
+                <Menu
+                  anchorEl={menuAnchor}
+                  open={Boolean(menuAnchor)}
+                  onClose={handleMenuClose}
+                  PaperProps={{
+                    sx: {
+                      mt: 1.5,
+                      borderRadius: '12px',
+                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                      border: '1px solid rgba(0,0,0,0.05)'
+                    }
                   }}
+                >
+                  <MenuItem onClick={() => handleMenuClick('Profile')}>Profile</MenuItem>
+                  <MenuItem onClick={() => handleMenuClick('My Ads')}>My Ads</MenuItem>
+                  <MenuItem onClick={() => handleMenuClick('Logout')}>Logout</MenuItem>
+                </Menu>
+                <Link to="/Product" style={{ textDecoration: 'none' }}>
+                  <Button
+                    className="btn-primary"
+                    startIcon={<AddIcon />}
+                  >
+                    Sell
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Button
+                  onClick={() => setOpenSignIn(true)}
+                  sx={{ color: 'var(--text-main)', fontWeight: 600, textTransform: 'none' }}
+                >
+                  Login
+                </Button>
+                <Button
+                  className="btn-primary"
+                  startIcon={<AddIcon />}
+                  onClick={() => setOpenSignUp(true)}
                 >
                   Sell
                 </Button>
-              </Link>
-            </>
-          ) : (
-            <>
-              <Typography
-                sx={{ cursor: 'pointer', marginRight: theme.spacing(2) }}
-                onClick={() => setopenSignIn(true)}
-              >
-                Login
-              </Typography>
-              <Button
-                variant="contained"
-                color="secondary"
-                startIcon={<AddIcon />}
-                onClick={() => setopenSignUp(true)}
-                sx={{
-                  fontWeight: 600,
-                  borderRadius: '20px',
-                }}
-              >
-                Sell
-              </Button>
-            </>
-          )}
+              </>
+            )}
+          </Box>
         </Toolbar>
       </AppBar>
       <CategoriesMenu />
-      <SignIn openSignIn={openSignIn} setopenSignIn={setopenSignIn} setIsLoggedIn={setIsLoggedIn} setopenSignUp={setopenSignUp}/>
-      <SignUp openSignUp={openSignUp} setopenSignUp={setopenSignUp} setopenSignIn={setopenSignIn}/>
+      <SignIn />
+      <SignUp />
     </Box>
   );
-};
-
-PrimarySearchAppBar.propTypes = {
-  openSignIn: PropTypes.bool.isRequired,
-  setopenSignIn: PropTypes.func.isRequired,
-  openSignUp: PropTypes.bool.isRequired,
-  setopenSignUp: PropTypes.func.isRequired,
 };
 
 export default PrimarySearchAppBar;

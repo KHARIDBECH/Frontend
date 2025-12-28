@@ -15,6 +15,7 @@ import {
 import { styled } from '@mui/system';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { config } from './Constants';
+import { useAuth } from './AuthContext';
 
 const Transition = React.forwardRef((props, ref) => (
   <Slide direction="up" ref={ref} {...props} />
@@ -29,7 +30,9 @@ const SignUpForm = styled('form')(({ theme }) => ({
   padding: theme.spacing(3),
 }));
 
-const SignUp = ({ openSignUp, setopenSignUp, setopenSignIn}) => {
+
+const SignUp = () => {
+  const { openSignUp, setOpenSignUp, setOpenSignIn } = useAuth();
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
@@ -49,12 +52,12 @@ const SignUp = ({ openSignUp, setopenSignUp, setopenSignIn}) => {
     if (!userData.email) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(userData.email)) newErrors.email = 'Email is invalid';
     if (!userData.password) newErrors.password = 'Password is required';
-    else if (userData.password.length < 4) newErrors.password = 'Password must be at least 6 characters';
+    else if (userData.password.length < 4) newErrors.password = 'Password must be at least 4 characters';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleClose = () => setopenSignUp(false);
+  const handleClose = () => setOpenSignUp(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -85,9 +88,10 @@ const SignUp = ({ openSignUp, setopenSignUp, setopenSignIn}) => {
       setSuccessMessage('Sign up successful! You can now log in.');
       setSnackbarSeverity('success');
       setTimeout(() => {
-        setopenSignUp(false);
+        setOpenSignUp(false);
         setSuccessMessage('');
-      }, 3000);
+        setOpenSignIn(true);
+      }, 2000);
       setApiError('');
     } catch (err) {
       console.error('Sign up error:', err);
@@ -97,9 +101,7 @@ const SignUp = ({ openSignUp, setopenSignUp, setopenSignIn}) => {
   };
 
   const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
+    if (reason === 'clickaway') return;
     setSuccessMessage('');
     setApiError('');
   };
@@ -111,22 +113,33 @@ const SignUp = ({ openSignUp, setopenSignUp, setopenSignIn}) => {
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
-        aria-labelledby="sign-up-dialog-title"
+        PaperProps={{
+          sx: {
+            borderRadius: '24px',
+            padding: '12px',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)'
+          }
+        }}
       >
         <Box sx={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          padding: (theme) => theme.spacing(4),
+          padding: (theme) => theme.spacing(3),
         }}>
           <Avatar sx={(theme) => ({
-            margin: theme.spacing(1),
-            backgroundColor: theme.palette.secondary.main,
+            margin: theme.spacing(2),
+            backgroundColor: 'var(--secondary)',
+            width: 56,
+            height: 56
           })}>
-            <LockOutlinedIcon />
+            <LockOutlinedIcon fontSize="large" />
           </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign up
+          <Typography component="h1" variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+            Create Account
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'var(--text-muted)', mb: 3 }}>
+            Join KharidBech and start selling today
           </Typography>
           <SignUpForm onSubmit={handleSubmit}>
             <Grid container spacing={2}>
@@ -144,6 +157,7 @@ const SignUp = ({ openSignUp, setopenSignUp, setopenSignIn}) => {
                   onChange={handleChange}
                   error={!!errors.firstName}
                   helperText={errors.firstName}
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -159,6 +173,7 @@ const SignUp = ({ openSignUp, setopenSignUp, setopenSignIn}) => {
                   onChange={handleChange}
                   error={!!errors.lastName}
                   helperText={errors.lastName}
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -175,6 +190,7 @@ const SignUp = ({ openSignUp, setopenSignUp, setopenSignIn}) => {
                   onChange={handleChange}
                   error={!!errors.email}
                   helperText={errors.email}
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -191,11 +207,12 @@ const SignUp = ({ openSignUp, setopenSignUp, setopenSignIn}) => {
                   onChange={handleChange}
                   error={!!errors.password}
                   helperText={errors.password}
+                  sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                 />
               </Grid>
             </Grid>
             {apiError && (
-              <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+              <Alert severity="error" sx={{ mt: 2, mb: 2, borderRadius: '12px' }}>
                 {apiError}
               </Alert>
             )}
@@ -203,17 +220,17 @@ const SignUp = ({ openSignUp, setopenSignUp, setopenSignIn}) => {
               type="submit"
               fullWidth
               variant="contained"
-              color="primary"
-              sx={(theme) => ({ margin: theme.spacing(3, 0, 2) })}
+              className="btn-primary"
+              sx={{ mt: 3, mb: 2, py: 1.5, fontSize: '1rem', backgroundColor: 'var(--secondary)' }}
             >
               Sign Up
             </Button>
-            <Grid container justifyContent="center">
+            <Grid container justifyContent="center" sx={{ mt: 1 }}>
               <Grid item>
-                <Link href="#" variant="body2" onClick={() => { 
-                  setopenSignIn(true)
-                  setopenSignUp(false)
-                  }}>
+                <Link component="button" variant="body2" onClick={() => {
+                  setOpenSignIn(true);
+                  setOpenSignUp(false);
+                }} sx={{ fontWeight: 600, color: 'var(--primary)' }}>
                   Already have an account? Sign in
                 </Link>
               </Grid>
@@ -226,7 +243,7 @@ const SignUp = ({ openSignUp, setopenSignUp, setopenSignIn}) => {
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
       >
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%', borderRadius: '12px' }} variant="filled">
           {successMessage || apiError}
         </Alert>
       </Snackbar>

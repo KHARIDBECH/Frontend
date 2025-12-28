@@ -1,16 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from './AuthContext'; // Import the useAuth hook
+import { useAuth } from './AuthContext';
 
-const ProtectedRoute = ({ element, setOpenSignIn }) => {
-    const { isAuth } = useAuth(); // Access the isAuth state from AuthContext
+const ProtectedRoute = ({ element }) => {
+    const { isAuth, setOpenSignIn } = useAuth();
+
+    useEffect(() => {
+        if (!isAuth) {
+            setOpenSignIn(true);
+        }
+    }, [isAuth, setOpenSignIn]);
 
     if (!isAuth) {
-        setOpenSignIn(true); // Open the login modal if not authenticated
-        return <Navigate to="/" />; // Optionally redirect to home or stay on the same page
+        return <Navigate to="/" replace />;
     }
 
-    return element; // Render the protected element if authenticated
+    return element;
 };
 
 export default ProtectedRoute;

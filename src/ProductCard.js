@@ -12,70 +12,102 @@ import { config } from './Constants'
 
 
 export default function ProductCard({ data }) {
+  const url = config.url.API_URL;
 
-  const [expanded, setExpanded] = React.useState(false);
-  const url = config.url.API_URL
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
   return (
-
     <Card sx={{
-      maxWidth: 345,
-      position: "relative",
-      maxWidth: "270px",
-      minWidth: '260px',
-      maxHeight: '330px',
-      boxShadow: '-1px -2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)'
+      width: '100%',
+      maxWidth: '300px',
+      borderRadius: '20px',
+      overflow: 'hidden',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      border: '1px solid rgba(0,0,0,0.05)',
+      boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+      '&:hover': {
+        transform: 'translateY(-8px)',
+        boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
+        '& .card-media': { transform: 'scale(1.05)' }
+      }
     }}>
-       <CardHeader
-        sx={{ position:"absolute",right:"0px" }} // Shorter way to set right position (optional)
-        action={
-          <IconButton aria-label="add to favorites" sx={{ background: "white" }}>
-            <FavoriteIcon />
-          </IconButton>
-        }
-      />
-      <CardMedia
-      component="img"
-        sx={{
-          height: '170px',
-          marginTop: "10px"
-         
-        }}
-        image={data.images ? `${data.images[0]?.url}` : null}
-       
-
-      />
-      <CardContent sx={{ padding: "16px 16px 0px 16px" }}>
-        <Typography variant='body2' >
-
-          <Typography variant="h6" color="textSecondary" component="p">
-            ₹ {data.price}
-          </Typography>
-          <Typography variant="body1" sx={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            marginTop: "5px"
-          }}>
-            {data.title}
-          </Typography>
-        </Typography>
-
-      </CardContent>
-      <Box sx={{ display: "flex", justifyContent: "space-between", margin: "0px 16px 0px 16px" }}>
-        <Typography variant="caption" display="flex" sx={{
-          letterSpacing: "0.002em"
+      <Box sx={{ position: 'relative', overflow: 'hidden', height: '180px' }}>
+        <CardMedia
+          component="img"
+          className="card-media"
+          sx={{
+            height: '100%',
+            transition: 'transform 0.5s ease',
+            objectFit: 'cover'
+          }}
+          image={data.images ? `${data.images[0]?.url}` : 'https://via.placeholder.com/300x200?text=No+Image'}
+          alt={data.title}
+        />
+        <IconButton
+          sx={{
+            position: 'absolute',
+            top: '12px',
+            right: '12px',
+            bgcolor: 'rgba(255,255,255,0.8)',
+            backdropFilter: 'blur(4px)',
+            '&:hover': { bgcolor: 'white', color: '#ef4444' }
+          }}
+        >
+          <FavoriteIcon fontSize="small" />
+        </IconButton>
+        <Box sx={{
+          position: 'absolute',
+          bottom: '12px',
+          left: '12px',
+          bgcolor: 'var(--primary)',
+          color: 'white',
+          px: 1.5,
+          py: 0.5,
+          borderRadius: '8px',
+          fontWeight: 700,
+          fontSize: '0.875rem',
+          boxShadow: '0 4px 6px rgba(99,102,241,0.3)'
         }}>
-          {data.location?.city},{data.location?.state} 
-        </Typography>
-        <Typography variant="caption" >
-          {data?.postedAt && new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(new Date(Number(data.postedAt)))}
-        </Typography>
+          ₹{data.price?.toLocaleString()}
+        </Box>
       </Box>
-    </Card>
 
+      <CardContent sx={{ p: 2, pb: '12px !important' }}>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontWeight: 700,
+            color: 'var(--text-main)',
+            mb: 0.5,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          {data.title}
+        </Typography>
+
+        <Typography
+          variant="caption"
+          sx={{
+            color: 'var(--text-muted)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            mb: 1
+          }}
+        >
+          {data.location?.city && `${data.location.city}, `}{data.location?.state}
+        </Typography>
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1, pt: 1, borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+          <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontWeight: 500 }}>
+            {data.category}
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'var(--text-muted)' }}>
+            {data?.postedAt && new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(Number(data.postedAt)))}
+          </Typography>
+        </Box>
+      </CardContent>
+    </Card>
   );
 }
 

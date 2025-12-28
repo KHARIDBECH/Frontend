@@ -1,89 +1,76 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
-import {
-  MemoryRouter,
-  Route,
-  Routes,
-  Link,
-  matchPath,
-  useLocation,
-} from 'react-router-dom';
-import { StaticRouter } from 'react-router-dom/server';
+import { Box, Tabs, Tab, Container, Typography, Paper } from '@mui/material';
+import { Link, useLocation } from 'react-router-dom';
+import Ads from '../pages/MyAds/Ads';
+import Favourites from './Favourites';
 
-import Ads from '../pages/MyAds/Ads'
-
-function Router(props) {
-  const { children } = props;
-  if (typeof window === 'undefined') {
-    return <StaticRouter location="/drafts">{children}</StaticRouter>;
-  }
-
-  return (
-    <MemoryRouter initialEntries={['/drafts']} initialIndex={0}>
-      {children}
-    </MemoryRouter>
-  );
-}
-
-Router.propTypes = {
-  children: PropTypes.node,
-};
-
-function useRouteMatch(patterns) {
-  const { pathname } = useLocation();
-
-  for (let i = 0; i < patterns.length; i += 1) {
-    const pattern = patterns[i];
-    const possibleMatch = matchPath(pattern, pathname);
-    if (possibleMatch !== null) {
-      return possibleMatch;
-    }
-  }
-
-  return null;
-}
-
-function MyTabs() {
-  // You need to provide the routes in descendant order.
-  // This means that if you have nested routes like:
-  // users, users/new, users/edit.
-  // Then the order should be ['users/add', 'users/edit', 'users'].
-  const routeMatch = useRouteMatch(['/myads', '/favourites']);
-  const currentTab = routeMatch?.pattern?.path;
-
-  return (
-    <Tabs value={currentTab} sx={{
-      width: '100%', position: "absolute",
-      top: "20%"
-    }}>
-      <Tab label="Ads" value="/myads" to="/myads" component={Link} />
-      <Tab label="favourites" value="/favourites" to="/favourites" component={Link} />
-    </Tabs>
-  );
-}
-
-function CurrentRoute() {
+export default function UserDashboard() {
   const location = useLocation();
 
+  // Determine active tab based on path
+  const currentTab = location.pathname.includes('/favourites') ? '/favourites' : '/myads';
+
   return (
-    <>
-      {location.pathname === "/myads" && <Ads />}
-    </>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h3" sx={{ fontWeight: 800, mb: 1, letterSpacing: '-1px' }}>
+          User <span style={{ color: 'var(--primary)' }}>Dashboard</span>
+        </Typography>
+        <Typography variant="body1" sx={{ color: 'var(--text-muted)' }}>
+          Manage your listings and saved items in one place.
+        </Typography>
+      </Box>
+
+      <Paper
+        className="glass"
+        sx={{
+          borderRadius: '24px',
+          overflow: 'hidden',
+          mb: 4
+        }}
+      >
+        <Tabs
+          value={currentTab}
+          sx={{
+            px: 2,
+            pt: 1,
+            '& .MuiTabs-indicator': {
+              height: 3,
+              borderRadius: '3px 3px 0 0',
+              bgcolor: 'var(--primary)'
+            }
+          }}
+        >
+          <Tab
+            label="My Ads"
+            value="/myads"
+            component={Link}
+            to="/myads"
+            sx={{
+              fontWeight: 700,
+              textTransform: 'none',
+              fontSize: '1rem',
+              py: 2
+            }}
+          />
+          <Tab
+            label="Favorites"
+            value="/favourites"
+            component={Link}
+            to="/favourites"
+            sx={{
+              fontWeight: 700,
+              textTransform: 'none',
+              fontSize: '1rem',
+              py: 2
+            }}
+          />
+        </Tabs>
+      </Paper>
+
+      <Box>
+        {currentTab === '/myads' ? <Ads /> : <Favourites />}
+      </Box>
+    </Container>
   );
 }
-
-export default function TabsRouter() {
-  return (
-    <Box  >
-      <Routes>
-        <Route path="*" element={<CurrentRoute />} />
-      </Routes>
-      <MyTabs />
-    </Box>
-  );
-}
-

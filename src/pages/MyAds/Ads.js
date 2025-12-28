@@ -1,115 +1,66 @@
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { config } from '../../Constants'
+import { config } from '../../Constants';
 import { useAuth } from '../../AuthContext';
-import Container from '@mui/material/Container';
-import { Paper, Typography, Box, Skeleton } from '@mui/material';
+import { Paper, Typography, Box, Skeleton, Button, Container } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import CustomButton from '../../components/CustomButton';
 import CustomDialog from '../../components/CustomDialog';
 
-const DemoPaper = styled(Paper)(({ theme }) => ({
-  height: 120,
-  margin: theme.spacing(2),
-  padding: theme.spacing(2),
-  ...theme.typography.body2,
-  textAlign: 'center',
-  display:"flex",
-  borderLeft: "6px solid #1976d294",
-  [theme.breakpoints.down('sm')]: {
-    height: 200,
-    flexDirection: "column",
-   // Increase height on small screens and above
-  },
+const StyledAdCard = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(3),
+  borderRadius: '24px',
+  transition: 'all 0.3s ease',
+  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(0,0,0,0.05)',
+  display: 'flex',
+  alignItems: 'center',
+  marginBottom: theme.spacing(2),
+  '&:hover': {
+    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+    transform: 'translateY(-2px)'
+  }
 }));
 
-function SquareCorners({ Product,setAdId,setOpen }) {
-  const handleRemoveClick = () => {
-    setAdId(Product._id); // Set the Product ID to be deleted
-    setOpen(true); // Open the dialog
-  };
-  return (
-    <DemoPaper square={false} >
-      <Box sx={{
-        flex: "1", borderRight: { xs: 'none', sm: "1px solid black" } , display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}>
-        <Typography sx={{ fontSize: { xs: '.7rem', sm: '1rem' } }}>
-          {Product ? new Date(Product.postedDate).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : <Skeleton width={120} />}
-        </Typography>
+function AdItem({ Product, setAdId, setOpen }) {
+  if (!Product) return (
+    <StyledAdCard>
+      <Skeleton variant="rectangular" width={100} height={100} sx={{ borderRadius: '16px', mr: 3 }} />
+      <Box sx={{ flex: 1 }}>
+        <Skeleton width="60%" height={24} sx={{ mb: 1 }} />
+        <Skeleton width="30%" height={20} />
       </Box>
-      <Link style={{
-        display: 'flex', flex: '4', color: 'inherit',
-        textDecoration: 'none', flexDirection: 'column'
-      }} to={Product ? `/item/${Product._id}` : '#'}>
-        <Box sx={{
-          flex: "4", display: "flex",
-          justifyContent: "space-around",
-          alignItems: "center",
-          flexDirection: { xs: 'column', sm: 'row' },
-        }}>
-          {Product ? (
-            <img src={Product.images[0].url} alt="Product-image" style={{ maxWidth: "90px" }} />
-          ) : (
-            <Skeleton variant="rectangular" width={120} height={80} />
-          )}
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', sm: 'row' },
-              alignItems: { xs: 'center', sm: 'center' },
-              justifyContent: 'space-around',
-              width: '100%',
-            }}
-          >
-            {Product ? (
-              <>
-                <Typography
-                  variant="body1"
-                  sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    width: { xs: '150px', sm: '230px' },
-                    whiteSpace: "nowrap",
-                    maxWidth: '100%',
-                    lineHeight: '1.5em',
-                    height: { xs: '3em', sm: '1.5em' },
-                    fontSize: { xs: '.8rem', md: '1rem' }
-                  }}
-                >
-                  {Product.title}
-                </Typography>
-                <Typography
-                  variant="body1"
-                  sx={{
-                    fontWeight: 'bold',
-                    whiteSpace: 'nowrap',
-                    fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
-                  }}
-                >
-                  {Product.price}
-                </Typography>
+    </StyledAdCard>
+  );
 
-              </>
-            ) : (
-              <>
-                <Skeleton width={200} />
-                <Skeleton width={100} />
-              </>
-            )}
-          </Box>
-        </Box>
-      </Link>
-          <CustomButton onClick={()=>handleRemoveClick()} text="Remove" style={{
-            height: "100%",
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent:"center"
-          }}/>
-    </DemoPaper >
+  return (
+    <StyledAdCard>
+      <Box sx={{ width: 100, height: 100, borderRadius: '16px', overflow: 'hidden', mr: 3 }}>
+        <img
+          src={Product.images?.[0]?.url || 'https://via.placeholder.com/100'}
+          alt={Product.title}
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+      </Box>
+      <Box sx={{ flex: 1 }}>
+        <Typography variant="caption" sx={{ color: 'var(--text-muted)', fontWeight: 600 }}>
+          {new Date(Number(Product.postedAt)).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+        </Typography>
+        <Link to={`/item/${Product._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, mt: 0.5, mb: 1 }}>{Product.title}</Typography>
+        </Link>
+        <Typography variant="h6" color="primary" sx={{ fontWeight: 800 }}>₹{Product.price?.toLocaleString()}</Typography>
+      </Box>
+      <Button
+        variant="outlined"
+        color="error"
+        onClick={() => { setAdId(Product._id); setOpen(true); }}
+        sx={{ borderRadius: '12px', textTransform: 'none', px: 3 }}
+      >
+        Remove
+      </Button>
+    </StyledAdCard>
   );
 }
 
@@ -119,50 +70,27 @@ export default function Ads() {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [adId,setAdId] = useState(null)
-  const { authHeader, userId } = useAuth()
+  const [adId, setAdId] = useState(null);
+  const { authHeader, userId } = useAuth();
   const [open, setOpen] = useState(false);
-  const url = config.url.API_URL
-  
-    const handleClose = () => {
-        setOpen(false);
-    };
+  const url = config.url.API_URL;
 
-    const handleRemove = async () => {
-      const config = {
-        headers: { ...authHeader() }
-      }
-      try {
-        await axios.delete(`${url}/api/product/${adId}`,config);
-        setAds(ads.filter(Product => Product._id !== adId));
-        handleClose()
-      } catch (err) {
-        setError(err.message);
-        handleClose()
-      }
-    };
-
-    const actions = [
-        {
-            label: 'Cancel',
-            onClick: handleClose,
-            autoFocus: true,
-        },
-        {
-            label: 'Remove',
-            onClick: handleRemove,
-        },
-    ];
+  const handleRemove = async () => {
+    try {
+      await axios.delete(`${url}/api/product/${adId}`, { headers: authHeader() });
+      setAds(ads.filter(p => p._id !== adId));
+      setOpen(false);
+    } catch (err) {
+      setError(err.message);
+      setOpen(false);
+    }
+  };
 
   useEffect(() => {
-    const config = {
-      headers: { ...authHeader() }
-    }
     const fetchAds = async () => {
       try {
-        const response = await axios.get(`${url}/api/users/user/items/${userId}?page=${currentPage}`, config);
-        setAds(prevAds => [...prevAds, ...response.data.ads]);
-        setCurrentPage(response.data.pagination.currentPage);
+        const response = await axios.get(`${url}/api/users/user/items/${userId}?page=${currentPage}`, { headers: authHeader() });
+        setAds(prev => currentPage === 1 ? response.data.ads : [...prev, ...response.data.ads]);
         setTotalPages(response.data.pagination.totalPages);
         setLoading(false);
       } catch (err) {
@@ -170,49 +98,48 @@ export default function Ads() {
         setLoading(false);
       }
     };
-    fetchAds();
-  }, [currentPage]);
-
-
-
-  const handleShowMore = () => {
-    setLoading(true);
-    setCurrentPage(currentPage + 1);
-  };
-
- 
-
-  if (loading && currentPage === 1) return (
-    <Container sx={{ marginTop: "200px" }}>
-      <Box className="my-ads">
-        {[...Array(3)].map((_, index) => (
-          <SquareCorners key={index} Product={null} />
-        ))}
-      </Box>
-    </Container>
-  );
-  if (error) return <p>Error: {error}</p>;
+    if (userId) fetchAds();
+  }, [userId, currentPage, url, authHeader]);
 
   return (
-    <Container sx={{ marginTop: "200px" }}>
-      <Box className="my-ads">
-        {ads.map((Product, index) => (
-          <SquareCorners Product={Product} key={index} setAdId = {setAdId} setOpen={setOpen}/>
-        ))}
-        {currentPage < totalPages && (
-          <CustomButton onClick={handleShowMore} text="Show more" style={{display:"flex",justifyContent:"center"}}/>
-        )}
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800 }}>My Advertisements</Typography>
+        <Typography variant="body2" sx={{ color: 'var(--text-muted)' }}>
+          Showing {ads.length} listings
+        </Typography>
       </Box>
-      <div>
-            <CustomDialog
-                open={open}
-                onClose={handleClose}
-                title="Confirm"
-                content="Deleting this Product is irreversible. Please confirm if you want to proceed."
-                actions={actions} 
-            />
-        </div>
+
+      {ads.length === 0 && !loading ? (
+        <Box sx={{ textAlign: 'center', py: 10, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: '24px' }}>
+          <Typography variant="h6" color="textSecondary">You haven't posted any ads yet.</Typography>
+          <Link to="/Product" style={{ textDecoration: 'none' }}>
+            <Button variant="contained" className="btn-primary" sx={{ mt: 3 }}>Start Selling</Button>
+          </Link>
+        </Box>
+      ) : (
+        <Box>
+          {ads.map((p, i) => <AdItem key={p?._id || i} Product={p} setAdId={setAdId} setOpen={setOpen} />)}
+          {currentPage < totalPages && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+              <Button onClick={() => setCurrentPage(p => p + 1)} variant="outlined" sx={{ borderRadius: '12px', px: 4 }}>
+                {loading ? 'Loading...' : 'Load More'}
+              </Button>
+            </Box>
+          )}
+        </Box>
+      )}
+
+      <CustomDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Delete Advertisement?"
+        content="This action cannot be undone. Are you sure you want to remove this listing?"
+        actions={[
+          { label: 'Cancel', onClick: () => setOpen(false) },
+          { label: 'Delete', onClick: handleRemove, color: 'error' }
+        ]}
+      />
     </Container>
   );
-};
-
+}

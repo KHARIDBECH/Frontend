@@ -1,43 +1,35 @@
-import React from 'react'
-import Grid from '@mui/material/Grid';
+import React from 'react';
+import { Grid, Box, Typography, Skeleton } from '@mui/material';
 import { Link } from 'react-router-dom';
-import ProductCard from '../ProductCard'
-import { Box } from '@mui/material';
-import Skeleton from '@mui/material/Skeleton';
+import ProductCard from '../ProductCard';
+
 export default function Cards({ data, visible, loading }) {
   return (
-    <>
-      <Box sx={{ flexGrow: 1, padding: 2 }}>
-        <Grid container spacing={3} >
-          {(loading ? Array.from(new Array(4)) : data?.slice(0, visible)).map((item, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} container justifyContent="center" flexDirection="column" alignItems="center" key={index}>
-              {item ? (
-                <Link to={`/item/${item._id}`} >
-                  <ProductCard key={index} data={item} sx={(theme) => ({ padding: theme.spacing(8), textAlign: 'center', color: theme.palette.text.secondary, boxShadow: '0px 2px 1px' })}></ProductCard>
-                </Link>
-              ) : (
-                <>
-                  <Skeleton variant="rectangular" width={210} height={118} sx={{
-                    maxWidth: "270px",
-                    minWidth: '260px',
-                    maxHeight: '330px',
-                  }} />
-                  <Box sx={{
-                    pt: 0.5,
-                    maxWidth: "270px",
-                    minWidth: '260px',
-                    maxHeight: '330px',
-                  }}>
-                    <Skeleton width="40%"/>
-                    <Skeleton width="100%" />
-                    <Skeleton width="60%" />
-                  </Box>
-                </>
-              )}
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-    </>
-  )
+    <Box sx={{ flexGrow: 1, py: 4 }}>
+      <Typography variant="h4" sx={{ fontWeight: 800, mb: 4, color: 'var(--text-main)' }}>
+        Fresh Recommendations
+      </Typography>
+      <Grid container spacing={4}>
+        {(loading ? Array.from(new Array(8)) : data?.slice(0, visible)).map((item, index) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={index} sx={{ display: 'flex', justifyContent: 'center' }}>
+            {item ? (
+              <Link to={`/item/${item._id}`} style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                <ProductCard data={item} />
+              </Link>
+            ) : (
+              <Box sx={{ width: '100%', maxWidth: '300px' }}>
+                <Skeleton
+                  variant="rectangular"
+                  height={180}
+                  sx={{ borderRadius: '20px', mb: 2 }}
+                />
+                <Skeleton width="60%" height={24} sx={{ mb: 1 }} />
+                <Skeleton width="40%" height={20} />
+              </Box>
+            )}
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+  );
 }

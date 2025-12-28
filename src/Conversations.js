@@ -1,40 +1,69 @@
-import {React,useState,useEffect} from 'react'
-import './conversations.css'
-import axios from 'axios'
-import Cookies from 'js-cookie'
-import { config } from './Constants'
-export default function Conversations({conversation,userId}) {
-    const url = config.url.API_URL
-    
-    const [user, setuser] = useState(null)
-    const [first, setfirst] = useState('');
-    const token = Cookies.get('token')
-    useEffect(() => {
-        const friendId = conversation.members.find(r => r !==userId)
-        console.log(friendId,conversation.members)
-        const getUser = () =>{
-        axios.get(`${url}/api/users/user/${friendId}`,{headers: {
-            Authorization: `Bearer ${token}`, // Add Bearer token to headers
-        }})
-        .then((res) => 
-        {
-            setuser(res.data)
-        }
-        )
-        .catch(err=>{
-            console.log(err)
-        })
-        }
-        getUser();
-    }, [first])
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useAuth } from './AuthContext';
+import { ListItem, ListItemAvatar, Avatar, ListItemText, Typography, Skeleton } from '@mui/material';
+import { config } from './Constants';
 
-    console.log(user)
-   
+export default function Conversations({ conversation, userId, active }) {
+    const { authHeader } = useAuth();
+    const url = config.url.API_URL;
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const friendId = conversation.members.find(m => m !== userId);
+        const getUser = async () => {
+            try {
+                setLoading(true);
+                const res = await axios.get(`${url}/api/users/user/${friendId}`, { headers: authHeader() });
+                setUser(res.data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        if (friendId) getUser();
+    }, [conversation, userId, url, authHeader]);
+
+    if (loading) return (
+        <ListItem alignItems="flex-start" sx={{ px: 2, py: 1.5 }}>
+            <ListItemAvatar>
+                <Skeleton variant="circular" width={48} height={48} />
+            </ListItemAvatar>
+            <ListItemText
+                primary={<Skeleton width="60%" />}
+                secondary={<Skeleton width="40%" />}
+            />
+        </ListItem>
+    );
+
     return (
-        <div className="conversation">
-            <img className="conversationImg" src = "https://cdn.ponly.com/wp-content/uploads/Random-Thoughts-768x512.jpg" alt = "" />
-            <span className="conversationName">{user==null ? '':user.firstName}</span>
-            
-        </div>
-    )
+        <ListItem alignItems="flex-start" sx={{ px: 2, py: 1.5 }}>
+            <ListItemAvatar>
+                <Avatar
+                    sx={{
+                        width: 48,
+                        height: 48,
+                        bgcolor: active ? 'var(--primary)' : 'rgba(0,0,0,0.1)',
+                        fontWeight: 700
+                    }}
+                >
+                    {user?.firstName?.[0]}
+                </Avatar>
+            </ListItemAvatar>
+            <ListItemText
+                primary={
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'var(--text-main)' }}>
+                        {user ? `${user.firstName} ${user.lastName}` : 'User'}
+                    </Typography>
+                }
+                secondary={
+                    <Typography variant="body2" sx={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                        Member since 2023
+                    </Typography>
+                }
+            />
+        </ListItem>
+    );
 }
