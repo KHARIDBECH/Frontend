@@ -21,6 +21,7 @@ export function AuthContextProvider({ children }) {
     // Auth state
     const [token, setToken] = useState(null);
     const [isAuth, setIsAuth] = useState(false);
+    const [user, setUser] = useState(null);
     const [userId, setUserId] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -38,12 +39,15 @@ export function AuthContextProvider({ children }) {
             });
 
             if (response.data.success && response.data.data) {
+                setUser(response.data.data);
                 setUserId(response.data.data._id);
             } else {
+                setUser(null);
                 setUserId(null);
             }
         } catch (error) {
             console.error('Failed to sync user with DB:', error.message);
+            setUser(null);
             setUserId(null);
         }
     };
@@ -61,6 +65,7 @@ export function AuthContextProvider({ children }) {
             } else {
                 setToken(null);
                 setUserId(null);
+                setUser(null);
                 setIsAuth(false);
             }
 
@@ -76,6 +81,7 @@ export function AuthContextProvider({ children }) {
             await signOut(auth);
             setToken(null);
             setUserId(null);
+            setUser(null);
             setIsAuth(false);
         } catch (error) {
             console.error('Logout failed:', error.message);
@@ -88,11 +94,12 @@ export function AuthContextProvider({ children }) {
     }, [token]);
 
     // Context value
-    const value = {
+    const value = React.useMemo(() => ({
         // Auth state
         isAuth,
         token,
         userId,
+        user,
         loading,
 
         // Auth actions
@@ -104,7 +111,7 @@ export function AuthContextProvider({ children }) {
         setOpenSignIn,
         openSignUp,
         setOpenSignUp
-    };
+    }), [isAuth, token, userId, user, loading, logout, authHeader, openSignIn, openSignUp]);
 
     return (
         <AuthContext.Provider value={value}>

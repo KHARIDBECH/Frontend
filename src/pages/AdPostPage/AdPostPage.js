@@ -30,17 +30,7 @@ import { config } from '../../Constants';
 const MAX_IMAGES = 5;
 const ACCEPTED_IMAGE_TYPES = { 'image/png': [], 'image/jpeg': [], 'image/webp': [] };
 
-const CATEGORIES = [
-    'Cars',
-    'Bikes',
-    'Mobiles',
-    'Electronics',
-    'Appliances',
-    'Furniture',
-    'Fashion',
-    'Books',
-    'Sports'
-];
+const CATEGORIES = config.CATEGORIES;
 
 // Styled Components
 const StyledDropzone = styled(Box)(({ theme }) => ({

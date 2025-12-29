@@ -88,7 +88,13 @@ export default function Ads() {
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const response = await axios.get(`${url}/api/users/user/items/${userId}?page=${currentPage}`, { headers: authHeader() });
+        const headers = authHeader();
+        if (!headers.Authorization) {
+          setLoading(false);
+          return;
+        }
+
+        const response = await axios.get(`${url}/api/users/my-listing?page=${currentPage}`, { headers });
         setAds(prev => currentPage === 1 ? response.data.ads : [...prev, ...response.data.ads]);
         setTotalPages(response.data.pagination.totalPages);
         setLoading(false);
@@ -97,8 +103,8 @@ export default function Ads() {
         setLoading(false);
       }
     };
-    if (userId) fetchAds();
-  }, [userId, currentPage, url, authHeader]);
+    fetchAds();
+  }, [currentPage, authHeader, url]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>

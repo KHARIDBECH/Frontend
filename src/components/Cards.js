@@ -16,6 +16,21 @@ import TuneIcon from '@mui/icons-material/Tune';
  * @param {boolean} props.showHeader - Whether to show section header (default: true)
  * @param {boolean} props.showEmptyState - Whether to show empty state (default: true)
  */
+import { useAuth } from '../AuthContext';
+
+/**
+ * Cards Component
+ * Displays a grid of product cards
+ * 
+ * @param {Object} props
+ * @param {Array} props.data - Array of product data
+ * @param {number} props.visible - Number of items to show
+ * @param {boolean} props.loading - Loading state
+ * @param {boolean} props.showHeader - Whether to show section header (default: true)
+ * @param {boolean} props.showEmptyState - Whether to show empty state (default: true)
+ */
+import { config } from '../Constants';
+
 export default function Cards({
   data,
   visible,
@@ -23,7 +38,80 @@ export default function Cards({
   showHeader = true,
   showEmptyState = true
 }) {
-  const hasData = data && data.length > 0;
+  const { userId, user } = useAuth();
+  const [activeFilter, setActiveFilter] = React.useState('All');
+  const [nearbyData, setNearbyData] = React.useState([]);
+  const [nearbyLoading, setNearbyLoading] = React.useState(false);
+
+  const handleNearbyClick = async () => {
+    if (activeFilter === 'Nearby') {
+      setActiveFilter('All');
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setActiveFilter('Nearby');
+
+    // Only fetch if we don't have data or want to refresh
+    setNearbyLoading(true);
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      try {
+        // 1. Reverse geocoding using Nominatim
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`);
+        const geoData = await geoRes.json();
+
+        // Extract city and state
+        const city = geoData.address.city ||
+          geoData.address.town ||
+          geoData.address.village ||
+          geoData.address.suburb;
+        const state = geoData.address.state;
+
+        console.log("Detected location:", { city, state });
+
+        // Fetch products from backend
+        const response = await fetch(`${config.url.API_URL}/api/product?city=${city || ''}&state=${state || ''}`);
+        const result = await response.json();
+
+        setNearbyData(result.data || []);
+      } catch (err) {
+        console.error("Nearby fetch error:", err);
+        setNearbyData([]);
+      } finally {
+        setNearbyLoading(false);
+      }
+    }, (error) => {
+      setNearbyLoading(false);
+      setActiveFilter('All');
+
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          alert("Location access was denied. Please enable location permissions in your browser settings to use this feature.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Location information is currently unavailable.");
+          break;
+        case error.TIMEOUT:
+          alert("The request to get your location timed out.");
+          break;
+        default:
+          alert("An unknown error occurred while getting your location.");
+      }
+    }, {
+      timeout: 10000,
+      enableHighAccuracy: false // Faster and usually enough for city detection
+    });
+  };
+
+  // Determine which data/loading state to use
+  const displayData = activeFilter === 'Nearby' ? nearbyData : data;
+  const isDisplayLoading = activeFilter === 'Nearby' ? nearbyLoading : loading;
+  const hasData = displayData && displayData.length > 0;
 
   return (
     <Box sx={{ py: 4 }}>
@@ -62,31 +150,26 @@ export default function Cards({
             <Chip
               icon={<TuneIcon sx={{ fontSize: 16 }} />}
               label="All"
+              onClick={() => setActiveFilter('All')}
               sx={{
-                bgcolor: 'var(--primary)',
-                color: 'white',
+                bgcolor: activeFilter === 'All' ? 'var(--primary)' : 'transparent',
+                color: activeFilter === 'All' ? 'white' : '#64748b',
                 fontWeight: 600,
-                '&:hover': { bgcolor: 'var(--primary-hover)' }
+                border: activeFilter === 'All' ? 'none' : '1.5px solid rgba(0,0,0,0.08)',
+                '&:hover': { bgcolor: activeFilter === 'All' ? 'var(--primary-hover)' : 'rgba(0,0,0,0.04)' }
               }}
             />
             <Chip
               label="Nearby"
-              variant="outlined"
+              onClick={handleNearbyClick}
+              variant={activeFilter === 'Nearby' ? 'filled' : 'outlined'}
               sx={{
+                bgcolor: activeFilter === 'Nearby' ? 'var(--primary)' : 'transparent',
+                color: activeFilter === 'Nearby' ? 'white' : '#64748b',
                 borderColor: 'rgba(0,0,0,0.1)',
-                color: '#64748b',
-                fontWeight: 500,
-                '&:hover': { borderColor: 'var(--primary)', color: 'var(--primary)' }
-              }}
-            />
-            <Chip
-              label="Latest"
-              variant="outlined"
-              sx={{
-                borderColor: 'rgba(0,0,0,0.1)',
-                color: '#64748b',
-                fontWeight: 500,
-                '&:hover': { borderColor: 'var(--primary)', color: 'var(--primary)' }
+                fontWeight: 600,
+                border: activeFilter === 'Nearby' ? 'none' : '1.5px solid rgba(0,0,0,0.08)',
+                '&:hover': { bgcolor: activeFilter === 'Nearby' ? 'var(--primary-hover)' : 'rgba(0,0,0,0.04)' }
               }}
             />
           </Box>
@@ -94,9 +177,9 @@ export default function Cards({
       )}
 
       {/* Products Grid */}
-      {(loading || hasData) && (
+      {(isDisplayLoading || hasData) && (
         <Grid container spacing={3}>
-          {(loading ? Array.from(new Array(8)) : data?.slice(0, visible))?.map((item, index) => (
+          {(isDisplayLoading ? Array.from(new Array(8)) : displayData?.slice(0, visible))?.map((item, index) => (
             <Grid
               item
               xs={12}
@@ -114,7 +197,7 @@ export default function Cards({
             >
               {item ? (
                 <Link to={`/item/${item._id}`} style={{ width: '100%', display: 'flex', justifyContent: 'center', textDecoration: 'none' }}>
-                  <ProductCard data={item} />
+                  <ProductCard data={item} userId={userId} />
                 </Link>
               ) : (
                 <Box sx={{ width: '100%', maxWidth: '320px' }}>
@@ -142,7 +225,7 @@ export default function Cards({
       )}
 
       {/* Empty State - Only show if enabled */}
-      {showEmptyState && !loading && !hasData && (
+      {showEmptyState && !isDisplayLoading && !hasData && (
         <Box sx={{
           textAlign: 'center',
           py: 10,
@@ -152,10 +235,12 @@ export default function Cards({
           border: '2px dashed rgba(99, 102, 241, 0.2)'
         }}>
           <Typography variant="h5" sx={{ fontWeight: 700, color: '#0f172a', mb: 1 }}>
-            No listings found
+            {activeFilter === 'Nearby' ? 'No nearby listings' : 'No listings found'}
           </Typography>
           <Typography variant="body1" sx={{ color: '#64748b' }}>
-            Be the first to post an ad in this category!
+            {activeFilter === 'Nearby'
+              ? "We couldn't find any items matching your location."
+              : "Be the first to post an ad in this category!"}
           </Typography>
         </Box>
       )}

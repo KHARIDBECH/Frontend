@@ -14,19 +14,26 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import CheckroomIcon from '@mui/icons-material/Checkroom';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 
-// Category configuration
-const CATEGORIES = [
-    { name: 'Cars', icon: <DirectionsCarIcon sx={{ fontSize: 18 }} /> },
-    { name: 'Bikes', icon: <TwoWheelerIcon sx={{ fontSize: 18 }} /> },
-    { name: 'Mobiles', icon: <PhoneIphoneIcon sx={{ fontSize: 18 }} /> },
-    { name: 'Electronics', icon: <DevicesIcon sx={{ fontSize: 18 }} /> },
-    { name: 'Appliances', icon: <KitchenIcon sx={{ fontSize: 18 }} /> },
-    { name: 'Furniture', icon: <ChairIcon sx={{ fontSize: 18 }} /> },
-    { name: 'Watches', icon: <WatchIcon sx={{ fontSize: 18 }} /> },
-    { name: 'Books', icon: <MenuBookIcon sx={{ fontSize: 18 }} /> },
-    { name: 'Clothing', icon: <CheckroomIcon sx={{ fontSize: 18 }} /> },
-    { name: 'Sports', icon: <SportsSoccerIcon sx={{ fontSize: 18 }} /> },
-];
+import { config } from '../Constants';
+
+// Category Definitions
+const iconMap = {
+    'Cars': <DirectionsCarIcon sx={{ fontSize: 18 }} />,
+    'Bikes': <TwoWheelerIcon sx={{ fontSize: 18 }} />,
+    'Mobiles': <PhoneIphoneIcon sx={{ fontSize: 18 }} />,
+    'Electronics': <DevicesIcon sx={{ fontSize: 18 }} />,
+    'Appliances': <KitchenIcon sx={{ fontSize: 18 }} />,
+    'Furniture': <ChairIcon sx={{ fontSize: 18 }} />,
+    'Watches': <WatchIcon sx={{ fontSize: 18 }} />,
+    'Books': <MenuBookIcon sx={{ fontSize: 18 }} />,
+    'Clothing': <CheckroomIcon sx={{ fontSize: 18 }} />,
+    'Sports': <SportsSoccerIcon sx={{ fontSize: 18 }} />
+};
+
+const CATEGORIES = config.CATEGORIES.map(name => ({
+    name,
+    icon: iconMap[name] || <DevicesIcon sx={{ fontSize: 18 }} /> // Fallback icon
+}));
 
 /**
  * CategoriesMenu Component

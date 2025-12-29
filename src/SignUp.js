@@ -206,24 +206,23 @@ const SignUp = () => {
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
+        scroll="body"
         PaperProps={{
           sx: {
             borderRadius: '28px',
-            overflow: 'hidden',
             boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
             maxWidth: '480px',
             width: '100%',
-            m: 2,
-            maxHeight: '90vh',
-            overflowY: 'auto'
+            m: { xs: 2, md: 3 },
+            position: 'relative'
           }
         }}
       >
         {/* Gradient Header */}
         <Box sx={{
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          p: 4,
-          pb: 6,
+          p: { xs: 3, md: 4 },
+          pb: { xs: 5, md: 6 },
           position: 'relative',
           textAlign: 'center'
         }}>
@@ -258,10 +257,10 @@ const SignUp = () => {
         </Box>
 
         {/* Form Section */}
-        <Box sx={{ p: 4, pt: 3, mt: -3, bgcolor: 'white', borderRadius: '24px 24px 0 0' }}>
+        <Box sx={{ p: { xs: 3, md: 4 }, pt: 3, mt: -3, bgcolor: 'white', borderRadius: '24px 24px 0 0' }}>
           <SignUpForm onSubmit={handleSubmit}>
             <Grid container spacing={2}>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   name="firstName"
@@ -280,7 +279,7 @@ const SignUp = () => {
                   sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   name="lastName"
@@ -339,7 +338,7 @@ const SignUp = () => {
                   sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <FormControl fullWidth error={!!errors.gender}>
                   <InputLabel>Gender</InputLabel>
                   <Select
@@ -356,7 +355,7 @@ const SignUp = () => {
                   {errors.gender && <FormHelperText>{errors.gender}</FormHelperText>}
                 </FormControl>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
                   name="address"

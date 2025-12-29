@@ -25,7 +25,19 @@ const currentEnv = isDevelopment ? 'development' : 'production';
 export const config = {
   url: environments[currentEnv],
   env: currentEnv,
-  isDev: isDevelopment
+  isDev: isDevelopment,
+  CATEGORIES: [
+    'Cars',
+    'Bikes',
+    'Mobiles',
+    'Electronics',
+    'Appliances',
+    'Furniture',
+    'Watches',
+    'Books',
+    'Clothing',
+    'Sports'
+  ]
 };
 
 export default config;

@@ -6,8 +6,10 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import VerifiedIcon from '@mui/icons-material/Verified';
 
-export default function ProductCard({ data }) {
+const ProductCard = React.memo(({ data, userId }) => {
   const [isFavorite, setIsFavorite] = React.useState(false);
+
+  const isMyPost = data.postedBy === userId;
 
   const formatPrice = (price) => {
     if (price >= 100000) {
@@ -120,6 +122,26 @@ export default function ProductCard({ data }) {
           }}
         />
 
+        {/* My Post Tag */}
+        {isMyPost && (
+          <Chip
+            label="My Post"
+            size="small"
+            sx={{
+              position: 'absolute',
+              top: '12px',
+              left: '85px', // Adjust offset to be next to category
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              color: 'white',
+              fontWeight: 700,
+              fontSize: '0.7rem',
+              height: '24px',
+              boxShadow: '0 4px 12px rgba(16,185,129,0.3)',
+              border: 'none'
+            }}
+          />
+        )}
+
         {/* Price Tag */}
         <Box
           className="price-tag"
@@ -207,4 +229,6 @@ export default function ProductCard({ data }) {
       </CardContent>
     </Card>
   );
-}
+});
+
+export default ProductCard;

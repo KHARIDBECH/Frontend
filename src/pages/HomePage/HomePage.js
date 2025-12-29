@@ -6,7 +6,7 @@ import { config } from '../../Constants'
 import { useAuth } from '../../AuthContext';
 
 export default function Home() {
-  const { token } = useAuth();
+  const { token, loading: authLoading } = useAuth();
   const url = config.url.API_URL;
 
   const [data, setData] = useState([]);
@@ -14,6 +14,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Wait for auth state to settle before fetching to avoid double calls
+    if (authLoading) return;
+
     const fetchData = async () => {
       setLoading(true);
       try {
@@ -39,7 +42,7 @@ export default function Home() {
     };
 
     fetchData();
-  }, [url, token]);
+  }, [url, token, authLoading]);
 
   const showMoreItems = () => {
     setVisible((prevValue) => prevValue + 8);

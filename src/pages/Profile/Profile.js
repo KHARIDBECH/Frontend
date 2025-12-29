@@ -239,7 +239,7 @@ const Profile = () => {
                             />
 
                             {/* Quick Stats */}
-                            <Grid container spacing={2} sx={{ mt: 4 }}>
+                            {/* <Grid container spacing={2} sx={{ mt: 4 }}>
                                 {stats.map((stat, idx) => (
                                     <Grid item xs={4} key={idx}>
                                         <StatCard onClick={() => navigate(stat.path)}>
@@ -251,7 +251,7 @@ const Profile = () => {
                                         </StatCard>
                                     </Grid>
                                 ))}
-                            </Grid>
+                            </Grid> */}
                         </Grid>
 
                         {/* Right: Details */}
