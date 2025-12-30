@@ -1,145 +1,251 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import Carousel from '../src/components/Carousel';
-import "react-responsive-carousel/lib/styles/carousel.min.css";
-import './ItemDetails.css';
-import { config } from './Constants';
-import { Grid, Container, Typography, Avatar } from '@mui/material';
-import Paper from '@mui/material/Paper';
-import { Box } from '@mui/material';
-import { Button } from '@mui/material';
-import AdDetailSkeletonLoader from './components/AdDetailSkeletonLoader';
-import Cookies from 'js-cookie';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-function LineByLineDescription({ lines }) {
-    return (
-        <div className="line-by-line">
-            {lines?.map((line, index) => (
-                <p key={index}>{line}</p>
-            ))}
-        </div>
-    );
-}
+import {
+    Grid,
+    Container,
+    Typography,
+    Avatar,
+    Box,
+    Button,
+    IconButton
+} from '@mui/material';
+import ShareIcon from '@mui/icons-material/Share';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
+// Components
+import Carousel from './components/Carousel';
+import AdDetailSkeletonLoader from './components/AdDetailSkeletonLoader';
+
+// Context & Config
+import { useAuth } from './AuthContext';
+import { config } from './Constants';
+
+// Styles
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
+
+/**
+ * ItemDetails Component
+ * Displays detailed information about a product listing
+ */
 export default function ItemDetails() {
-    const url = config.url.API_URL;
-
-    const [itemDetail, setitemDetail] = useState([]);
-    const [loading, setloading] = useState(false);
-    const [notFound, setNotFound] = useState(false); // State to track if item is not found
     const { productUrl } = useParams();
     const navigate = useNavigate();
+    const { userId, isAuth, loading: authLoading, setOpenSignIn, authHeader } = useAuth();
 
+    // State
+    const [itemDetail, setItemDetail] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [notFound, setNotFound] = useState(false);
+
+    const apiUrl = config.url.API_URL;
+
+    // Fetch product details
     useEffect(() => {
-        setloading(true);
-        fetch(`${url}/api/product/itemdetail/${productUrl}`)
-            .then((res) => {
-                if (res.status === 404) {
-                    setNotFound(true); // Set notFound to true if status is 404
-                    setloading(false);
-                    return null; // Return null to avoid further processing
-                }
-                return res.json();
-            })
-            .then((data) => {
-                setitemDetail(data);
-                setloading(false);
-            })
-            .catch((err) => {
-                console.log(err);
-                setloading(false);
-            });
-    }, [productUrl, url]);
+        const fetchItemDetails = async () => {
+            setLoading(true);
+            try {
+                const response = await fetch(`${apiUrl}/api/product/itemdetail/${productUrl}`);
 
-    const handleChatWithSeller = async () => {
-        console.log(itemDetail)
-        const senderId = Cookies.get('userId'); // Get the sender ID from cookies or context
-        const receiverId = itemDetail?.postedBy?._id// Assuming item.sellerId contains the seller's ID
+                if (response.status === 404) {
+                    setNotFound(true);
+                    return;
+                }
+
+                const result = await response.json();
+                if (result?.data) {
+                    setItemDetail(result.data);
+                }
+            } catch (error) {
+                console.error('Error fetching item details:', error);
+                setNotFound(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchItemDetails();
+    }, [productUrl, apiUrl]);
+
+    // Handle chat with seller
+    const handleChatWithSeller = useCallback(async () => {
+        if (!isAuth) {
+            setOpenSignIn(true);
+            return;
+        }
+
+        if (!userId) return; // Prevent action if userId is not yet available but isAuth is true
 
         try {
-            const response = await axios.post(`${config.url.API_URL}/api/chatConvo`, {
-                senderId,
-                receiverId,
-                productId: itemDetail?._id
-            });
-            console.log('Conversation created:', response.data);
-            navigate(`/chat`);
-            // Optionally, navigate to the chat or update the UI
+            await axios.post(
+                `${apiUrl}/api/chatConvo`,
+                {
+                    senderId: userId,
+                    receiverId: itemDetail?.postedBy?._id,
+                    productId: itemDetail?._id
+                },
+                { headers: authHeader() }
+            );
+            navigate('/chat');
         } catch (error) {
             console.error('Error creating conversation:', error);
         }
+    }, [userId, isAuth, itemDetail, apiUrl, navigate, setOpenSignIn, authHeader]);
+
+    // Format price
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('en-IN').format(price);
     };
 
-    const lines = itemDetail?.description?.split('\n');
+    // Format date
+    const formatDate = (date) => {
+        return new Intl.DateTimeFormat('en-US', {
+            month: 'long',
+            day: 'numeric'
+        }).format(new Date(date));
+    };
+
+    // Loading state
+    if (loading || authLoading) {
+        return (
+            <Container maxWidth="lg" sx={{ mt: 4 }}>
+                <AdDetailSkeletonLoader />
+            </Container>
+        );
+    }
+
+    // Not found state
+    if (notFound || !itemDetail) {
+        return (
+            <Container maxWidth="lg" sx={{ mt: 8 }}>
+                <Typography variant="h5" align="center">
+                    Product Not Found
+                </Typography>
+            </Container>
+        );
+    }
+
+    const descriptionLines = itemDetail.description?.split('\n') || [];
+    const isOwnListing = itemDetail.postedBy?._id === userId;
 
     return (
-        <Container maxWidth="lg">
-            {loading ? (
-                <AdDetailSkeletonLoader />
-            ) : notFound ? ( // Check if notFound is true
-                <Typography variant="h6" color="error" align="center">
-                    No items found
-                </Typography>
-            ) : (
-                <Grid container spacing={2} sx={{ marginTop: "20px", padding: "12px" }}>
-                    <Grid item xs={12} md={6} sx={{
-                        alignItems: "center",
-                        display: "flex",
-                        flexDirection: "column",
+        <Container maxWidth="lg" sx={{ py: 6 }}>
+            <Grid container spacing={4}>
+                {/* Left Side: Images and Description */}
+                <Grid item xs={12} md={7}>
+                    {/* Image Carousel */}
+                    <Box sx={{
+                        borderRadius: '24px',
+                        overflow: 'hidden',
+                        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                        bgcolor: 'black',
+                        mb: 4
                     }}>
                         <Carousel itemDetail={itemDetail.images} />
-                        <Paper elevation={3} sx={{
-                            minHeight: "100px",
-                            padding: "15px",
-                            width: "100%",
-                            boxSizing: "border-box"
-                        }}>
-                            <Typography variant="h6">Details</Typography>
-                            <Typography variant="body2">
-                                <div className="line-by-line">
-                                    {lines?.map((line, index) => (
-                                        <p key={index}>{line}</p>
-                                    ))}
-                                </div>
-                            </Typography>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <Grid container direction="column" spacing={2}>
-                            <Grid item xs={12}>
-                                <Paper elevation={3} sx={{ padding: "20px" }}>
-                                    <Typography variant="h5">Rs {itemDetail.price}</Typography>
-                                    <Typography variant="body2">{itemDetail.title}</Typography>
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Paper elevation={3} sx={{
-                                    padding: "20px", display: "flex",
-                                    flexDirection: "column",
-                                    justifyContent: "space-between",
-                                    height: "140px"
-                                }}>
-                                    <Typography variant="h6">Seller description</Typography>
-                                    <Box display="flex" gap={2}>
-                                        <Avatar alt="Remy Sharp" src="/broken-image.jpg" />
-                                        <Typography variant="body2">
-                                            <span>{itemDetail["postedBy"]?.firstName}&nbsp;{itemDetail["postedBy"]?.lastName}</span>
-                                            <br />
-                                            <span>Member since Feb 2017</span>
-                                        </Typography>
-                                    </Box>
-                                    {itemDetail?.postedBy?._id !== Cookies.get('userId') && (
-                                        <Button variant="outlined" color="primary" fullWidth={true} onClick={handleChatWithSeller}>
-                                            Chat with Seller
-                                        </Button>
-                                    )}
-                                </Paper>
-                            </Grid>
-                        </Grid>
-                    </Grid>
+                    </Box>
+
+                    {/* Description Card */}
+                    <Box className="glass" sx={{ p: 4, borderRadius: '24px' }}>
+                        <Typography variant="h5" sx={{ fontWeight: 800, mb: 3 }}>
+                            Description
+                        </Typography>
+                        <Box sx={{ color: 'var(--text-muted)', lineHeight: 1.8 }}>
+                            {descriptionLines.map((line, index) => (
+                                <Typography key={index} variant="body1" sx={{ mb: 1.5 }}>
+                                    {line}
+                                </Typography>
+                            ))}
+                        </Box>
+                    </Box>
                 </Grid>
-            )}
+
+                {/* Right Side: Sticky Info Panel */}
+                <Grid item xs={12} md={5}>
+                    <Box sx={{ position: 'sticky', top: '100px' }}>
+                        {/* Price & Title Card */}
+                        <Box className="glass" sx={{ p: 4, borderRadius: '24px', mb: 3 }}>
+                            <Box sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-start',
+                                mb: 2
+                            }}>
+                                <Typography variant="h3" sx={{ fontWeight: 800, color: 'var(--primary)' }}>
+                                    ₹{formatPrice(itemDetail.price)}
+                                </Typography>
+                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                    <IconButton size="small" sx={{ border: '1px solid rgba(0,0,0,0.05)' }}>
+                                        <ShareIcon fontSize="small" />
+                                    </IconButton>
+                                    <IconButton size="small" sx={{ border: '1px solid rgba(0,0,0,0.05)' }}>
+                                        <FavoriteBorderIcon fontSize="small" />
+                                    </IconButton>
+                                </Box>
+                            </Box>
+
+                            <Typography variant="h5" sx={{ fontWeight: 600, mb: 2, color: 'var(--text-main)' }}>
+                                {itemDetail.title}
+                            </Typography>
+
+                            <Typography variant="body2" sx={{ color: 'var(--text-muted)', display: 'flex', gap: 1 }}>
+                                {itemDetail.location?.city}, {itemDetail.location?.state}
+                                <span>•</span>
+                                {itemDetail?.postedAt && formatDate(itemDetail.postedAt)}
+                            </Typography>
+                        </Box>
+
+                        {/* Seller Card */}
+                        <Box className="glass" sx={{ p: 4, borderRadius: '24px' }}>
+                            <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
+                                Seller Information
+                            </Typography>
+
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+                                <Avatar
+                                    src={itemDetail.postedBy?.profilePic}
+                                    sx={{
+                                        width: 64,
+                                        height: 64,
+                                        bgcolor: 'var(--primary)',
+                                        fontWeight: 700,
+                                        fontSize: '1.5rem'
+                                    }}
+                                >
+                                    {itemDetail.postedBy?.firstName?.[0]}
+                                </Avatar>
+                                <Box>
+                                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                        {itemDetail.postedBy?.firstName} {itemDetail.postedBy?.lastName}
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: 'var(--text-muted)' }}>
+                                        Verified Seller
+                                    </Typography>
+                                </Box>
+                            </Box>
+
+                            {isOwnListing ? (
+                                <Button
+                                    fullWidth
+                                    variant="outlined"
+                                    disabled
+                                    sx={{ py: 1.5, borderRadius: '12px' }}
+                                >
+                                    This is your listing
+                                </Button>
+                            ) : (
+                                <Button
+                                    fullWidth
+                                    className="btn-primary"
+                                    onClick={handleChatWithSeller}
+                                    sx={{ py: 1.5, fontSize: '1rem' }}
+                                >
+                                    Chat with Seller
+                                </Button>
+                            )}
+                        </Box>
+                    </Box>
+                </Grid>
+            </Grid>
         </Container>
     );
 }

@@ -1,52 +1,123 @@
-import React, { useState, createContext, useContext, useEffect } from 'react';
-import Cookies from 'js-cookie';
+import React, { useState, createContext, useContext, useEffect, useCallback } from 'react';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import axios from 'axios';
+import { auth } from './firebase';
+import { config } from './Constants';
 
-const AuthContext = createContext();
+// Create context
+const AuthContext = createContext(null);
 
-export const useAuth = () => useContext(AuthContext);
+// Custom hook for accessing auth context
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthContextProvider');
+    }
+    return context;
+};
 
+// Auth Provider Component
 export function AuthContextProvider({ children }) {
+    // Auth state
     const [token, setToken] = useState(null);
     const [isAuth, setIsAuth] = useState(false);
+    const [user, setUser] = useState(null);
     const [userId, setUserId] = useState(null);
+    const [loading, setLoading] = useState(true);
 
+    // Modal state
+    const [openSignIn, setOpenSignIn] = useState(false);
+    const [openSignUp, setOpenSignUp] = useState(false);
+
+    const apiUrl = config.url.API_URL;
+
+    // Sync user with database
+    const syncUserWithDB = async (idToken) => {
+        try {
+            const response = await axios.get(`${apiUrl}/api/users/me`, {
+                headers: { Authorization: `Bearer ${idToken}` }
+            });
+
+            if (response.data.success && response.data.data) {
+                setUser(response.data.data);
+                setUserId(response.data.data._id);
+            } else {
+                setUser(null);
+                setUserId(null);
+            }
+        } catch (error) {
+            console.error('Failed to sync user with DB:', error.message);
+            setUser(null);
+            setUserId(null);
+        }
+    };
+
+    // Firebase auth state listener
     useEffect(() => {
-        const storedToken = Cookies.get('token');
-        const storedIsAuth = Cookies.get('isAuth');
-        const storedUserId = Cookies.get('userId');
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            setLoading(true);
 
-        if (storedToken) {
-            setToken(storedToken);
-            setIsAuth(storedIsAuth === 'true');
-            setUserId(storedUserId);
+            if (user) {
+                const idToken = await user.getIdToken();
+                setToken(idToken);
+                setIsAuth(true);
+                await syncUserWithDB(idToken);
+            } else {
+                setToken(null);
+                setUserId(null);
+                setUser(null);
+                setIsAuth(false);
+            }
+
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, [apiUrl]);
+
+    // Logout function
+    const logout = useCallback(async () => {
+        try {
+            await signOut(auth);
+            setToken(null);
+            setUserId(null);
+            setUser(null);
+            setIsAuth(false);
+        } catch (error) {
+            console.error('Logout failed:', error.message);
         }
     }, []);
 
-    const login = (newToken, newUserId) => {
-        setToken(newToken);
-        setUserId(newUserId);
-        setIsAuth(true);
-        Cookies.set('token', newToken, { expires: 7 });
-        Cookies.set('isAuth', 'true', { expires: 7 });
-        Cookies.set('userId', newUserId, { expires: 7 });
-    };
-
-    const logout = () => {
-        setToken(null);
-        setUserId(null);
-        setIsAuth(false);
-        Cookies.remove('token');
-        Cookies.remove('isAuth');
-        Cookies.remove('userId');
-    };
-
-    const authHeader = () => {
+    // Get auth header for API requests
+    const authHeader = useCallback(() => {
         return token ? { Authorization: `Bearer ${token}` } : {};
-    };
+    }, [token]);
+
+    // Context value
+    const value = React.useMemo(() => ({
+        // Auth state
+        isAuth,
+        token,
+        userId,
+        user,
+        loading,
+
+        // Auth actions
+        logout,
+        authHeader,
+
+        // Modal state
+        openSignIn,
+        setOpenSignIn,
+        openSignUp,
+        setOpenSignUp
+    }), [isAuth, token, userId, user, loading, logout, authHeader, openSignIn, openSignUp]);
 
     return (
-        <AuthContext.Provider value={{ isAuth, token, userId, login, logout, authHeader }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );
 }
+
+export default AuthContext;

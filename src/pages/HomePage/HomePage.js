@@ -1,65 +1,80 @@
 import { useState, useEffect } from 'react'
 import Banner from '../../components/Banner';
-import React from 'react';
-import Container from '@mui/material/Container';
+import { Container, Box, Button } from '@mui/material';
 import Cards from '../../components/Cards';
 import { config } from '../../Constants'
-import CustomButton from '../../components/CustomButton';
-import Cookies from 'js-cookie';
-export default function Home({ searchVal }) {
-  const url = config.url.API_URL
-  const token = Cookies.get('token')
+import { useAuth } from '../../AuthContext';
 
-  const [data, setData] = useState([])
-  const [error, setError] = useState([{}])
-  const [visible, setvisible] = useState(4)
-  const [loading, setLoading] = useState(false)
-  const [lengthTrack, setlengthTrack] = useState(4)
+export default function Home() {
+  const { token, loading: authLoading } = useAuth();
+  const url = config.url.API_URL;
 
+  const [data, setData] = useState([]);
+  const [visible, setVisible] = useState(8);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Wait for auth state to settle before fetching to avoid double calls
+    if (authLoading) return;
+
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${url}/api/product`,
-          {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
-          });
+        const response = await fetch(`${url}/api/product`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+          }
+        });
 
         if (!response.ok) {
           throw new Error(`Error fetching data: ${response.statusText}`);
         }
 
-        const data = await response.json();
-        setData(data);
-      } catch (error) {
-        setError(error);
+        const result = await response.json();
+        setData(result.data || []);
+      } catch (err) {
+        console.error("Fetch error:", err.message);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-
-  }, []);
+  }, [url, token, authLoading]);
 
   const showMoreItems = () => {
-    setvisible((prevValue) => prevValue + 4)
-    setlengthTrack((prevValue) => prevValue + 4)
-  }
+    setVisible((prevValue) => prevValue + 8);
+  };
+
   return (
-    <>
-      <Container >
-        <Banner />
-        <Cards data={data} visible={visible} loading={loading} />
-        {
-          (lengthTrack < data?.length) ? 
-            <CustomButton onClick={showMoreItems} text="Show more" style={{display:"flex",justifyContent:"center"}}/> : null
+    <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
+      <Banner />
+      <Cards data={data} visible={visible} loading={loading} />
 
-        }
-      </Container>
-
-    </>
+      {visible < data?.length && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+          <Button
+            onClick={showMoreItems}
+            variant="outlined"
+            sx={{
+              px: 6,
+              py: 1.5,
+              borderRadius: '12px',
+              fontWeight: 600,
+              color: 'var(--primary)',
+              borderColor: 'rgba(99, 102, 241, 0.3)',
+              '&:hover': {
+                borderColor: 'var(--primary)',
+                bgcolor: 'rgba(99, 102, 241, 0.05)'
+              }
+            }}
+          >
+            Show more
+          </Button>
+        </Box>
+      )}
+    </Container>
   );
 }

@@ -1,16 +1,40 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from './AuthContext'; // Import the useAuth hook
+import { useEffect } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 
-const ProtectedRoute = ({ element, setOpenSignIn }) => {
-    const { isAuth } = useAuth(); // Access the isAuth state from AuthContext
+/**
+ * ProtectedRoute Component
+ * 
+ * Wrapper component that protects routes requiring authentication.
+ * Redirects unauthenticated users to the home page and opens the sign-in modal.
+ * 
+ * @param {Object} props
+ * @param {React.ReactElement} props.element - The component to render if authenticated
+ * @param {string} [props.redirectTo='/'] - Path to redirect unauthenticated users
+ */
+const ProtectedRoute = ({ element, redirectTo = '/' }) => {
+    const { isAuth, loading, setOpenSignIn } = useAuth();
+    const location = useLocation();
 
-    if (!isAuth) {
-        setOpenSignIn(true); // Open the login modal if not authenticated
-        return <Navigate to="/" />; // Optionally redirect to home or stay on the same page
+    useEffect(() => {
+        // Only prompt sign in if not authenticated and not loading
+        if (!loading && !isAuth) {
+            setOpenSignIn(true);
+        }
+    }, [isAuth, loading, setOpenSignIn]);
+
+    // Show nothing while checking auth status
+    if (loading) {
+        return null;
     }
 
-    return element; // Render the protected element if authenticated
+    // Redirect to home if not authenticated
+    if (!isAuth) {
+        return <Navigate to={redirectTo} state={{ from: location }} replace />;
+    }
+
+    // Render protected component
+    return element;
 };
 
 export default ProtectedRoute;

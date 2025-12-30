@@ -1,39 +1,45 @@
-import React, { useState } from "react";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// Layout
+import Nav from './Nav';
+
+// Pages
 import HomePage from './pages/HomePage/HomePage';
-import AdsDetails from './pages/AdPostPage/AdPostPage';
-import { AuthContextProvider } from './AuthContext';
-import ItemDetails from "./ItemDetails"
-import Messenger from "./pages/Chat/Messenger"
-import Favourites from "../src/components/Favourites"
-import "./App.css"
-import Nav from './Nav'
-import AdTabs from "../src/components/AdTabs"
-import Category from "./pages/Category/Category";
-import ProtectedRoute from "./ProtectedRoute";
+import AdPostPage from './pages/AdPostPage/AdPostPage';
+import ItemDetails from './ItemDetails';
+import Messenger from './pages/Chat/Messenger';
+import Favourites from './components/Favourites';
+import AdTabs from './components/AdTabs';
+import Category from './pages/Category/Category';
+import Profile from './pages/Profile/Profile';
+
+// Auth
+import ProtectedRoute from './ProtectedRoute';
+
+// Styles
+import './App.css';
+
 function App() {
-  const [openSignIn, setopenSignIn] = useState(false)
-  const [openSignUp, setopenSignUp] = useState(false)
-
-
   return (
     <Router>
       <div className="App">
-        <AuthContextProvider>
-          <Nav openSignIn={openSignIn} setopenSignIn={setopenSignIn} openSignUp={openSignUp} setopenSignUp={setopenSignUp} />
-          <Routes>
-            <Route exact path="/" element={<HomePage />}/>
-          <Route exact path="/:category"  element={<ProtectedRoute element={<Category />} setOpenSignIn={setopenSignIn}/>} />
-          <Route exact path="/Product"  element={<ProtectedRoute element={<AdsDetails />} setOpenSignIn={setopenSignIn}/>}/>
-          <Route exact path="/item/:productUrl"  element={<ProtectedRoute element={<ItemDetails />} setOpenSignIn={setopenSignIn}/>} />
+        <Nav />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<HomePage />} />
 
-        
-          <Route exact path="/myads/*"  element={<ProtectedRoute element={<AdTabs />} setOpenSignIn={setopenSignIn}/>}/> 
-          <Route exact path="/favourites"  element={<ProtectedRoute element={<Favourites />} setOpenSignIn={setopenSignIn}/>}/> 
-          <Route exact path="/chat" element={<ProtectedRoute element={<Messenger/>} setOpenSignIn={setopenSignIn}/>}/>
-          </Routes>  
-        </AuthContextProvider>
+          {/* Protected Routes */}
+          <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
+          <Route path="/post-ad" element={<ProtectedRoute element={<AdPostPage />} />} />
+          <Route path="/item/:productUrl" element={<ProtectedRoute element={<ItemDetails />} />} />
+          <Route path="/my-ads/*" element={<ProtectedRoute element={<AdTabs />} />} />
+          <Route path="/favourites" element={<ProtectedRoute element={<Favourites />} />} />
+          <Route path="/chat" element={<ProtectedRoute element={<Messenger />} />} />
+
+          {/* Category Route - Keep at end to avoid conflicts */}
+          <Route path="/:category" element={<ProtectedRoute element={<Category />} />} />
+        </Routes>
       </div>
     </Router>
   );
