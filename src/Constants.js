@@ -2,16 +2,24 @@
  * Application Configuration
  * 
  * This file contains environment-specific configuration.
- * Uses REACT_APP_ENV or NODE_ENV to determine the environment.
+ * Uses environment variables for API URLs, with fallbacks.
  */
 
-const environments = {
-  production: {
-    API_URL: 'https://backend-1-q12v.onrender.com'
-  },
-  development: {
-    API_URL: 'http://localhost:5000'
+// Get API URL from environment variable or use fallback based on NODE_ENV
+const getApiUrl = () => {
+  // First priority: explicit REACT_APP_API_URL environment variable
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
   }
+
+  // Fallback based on environment
+  const isDevelopment =
+    process.env.NODE_ENV === 'development' ||
+    process.env.REACT_APP_ENV === 'development';
+
+  return isDevelopment
+    ? 'http://localhost:5000'
+    : 'https://backend-xstc.onrender.com';
 };
 
 // Determine current environment
@@ -23,7 +31,9 @@ const currentEnv = isDevelopment ? 'development' : 'production';
 
 // Export configuration
 export const config = {
-  url: environments[currentEnv],
+  url: {
+    API_URL: getApiUrl()
+  },
   env: currentEnv,
   isDev: isDevelopment,
   CATEGORIES: [
