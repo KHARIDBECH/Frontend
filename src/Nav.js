@@ -26,7 +26,7 @@ import {
   Favorite as FavoriteIcon,
   Chat as ChatIcon
 } from '@mui/icons-material';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import CategoriesMenu from './components/CategoriesMenu';
@@ -86,6 +86,11 @@ const PrimarySearchAppBar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Pages where search should be hidden
+  const hideSearchRoutes = ['/chat', '/profile', '/post-ad'];
+  const shouldHideSearch = hideSearchRoutes.some(route => location.pathname.startsWith(route));
 
   const handleMenuOpen = (event) => setMenuAnchor(event.currentTarget);
   const handleMenuClose = () => setMenuAnchor(null);
@@ -143,15 +148,17 @@ const PrimarySearchAppBar = () => {
           </Link>
 
           {/* Search */}
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search for anything..."
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </Search>
+          {!shouldHideSearch && (
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search for anything..."
+                inputProps={{ 'aria-label': 'search' }}
+              />
+            </Search>
+          )}
 
           {/* Actions */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 2 } }}>
@@ -310,7 +317,7 @@ const PrimarySearchAppBar = () => {
           </Box>
         </Toolbar>
       </AppBar>
-      <CategoriesMenu />
+      {!shouldHideSearch && <CategoriesMenu />}
       <SignIn />
       <SignUp />
     </Box>

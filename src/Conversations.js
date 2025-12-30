@@ -25,29 +25,34 @@ export default function Conversation({ conversation, userId, active }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const friendId = conversation.members.find(memberId => memberId !== userId);
+        const friend = conversation.members.find(member => {
+            const memberId = typeof member === 'object' ? member._id : member;
+            return memberId !== userId;
+        });
 
-            if (!friendId) {
-                setLoading(false);
-                return;
-            }
-
-            try {
-                setLoading(true);
-                const response = await axios.get(
-                    `${apiUrl}/api/users/user/${friendId}`,
-                    { headers: authHeader() }
-                );
-                setUser(response.data);
-            } catch (error) {
-                console.error('Error fetching user:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUser();
+        if (friend && typeof friend === 'object') {
+            setUser(friend);
+            setLoading(false);
+        } else if (friend) {
+            // Fallback if not populated for some reason
+            const fetchUser = async () => {
+                try {
+                    setLoading(true);
+                    const response = await axios.get(
+                        `${apiUrl}/api/users/user/${friend}`,
+                        { headers: authHeader() }
+                    );
+                    setUser(response.data);
+                } catch (error) {
+                    console.error('Error fetching user:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchUser();
+        } else {
+            setLoading(false);
+        }
     }, [conversation, userId, apiUrl, authHeader]);
 
     // Loading skeleton

@@ -31,7 +31,7 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 export default function ItemDetails() {
     const { productUrl } = useParams();
     const navigate = useNavigate();
-    const { userId, setOpenSignIn, authHeader } = useAuth();
+    const { userId, isAuth, loading: authLoading, setOpenSignIn, authHeader } = useAuth();
 
     // State
     const [itemDetail, setItemDetail] = useState(null);
@@ -69,10 +69,12 @@ export default function ItemDetails() {
 
     // Handle chat with seller
     const handleChatWithSeller = useCallback(async () => {
-        if (!userId) {
+        if (!isAuth) {
             setOpenSignIn(true);
             return;
         }
+
+        if (!userId) return; // Prevent action if userId is not yet available but isAuth is true
 
         try {
             await axios.post(
@@ -88,7 +90,7 @@ export default function ItemDetails() {
         } catch (error) {
             console.error('Error creating conversation:', error);
         }
-    }, [userId, itemDetail, apiUrl, navigate, setOpenSignIn, authHeader]);
+    }, [userId, isAuth, itemDetail, apiUrl, navigate, setOpenSignIn, authHeader]);
 
     // Format price
     const formatPrice = (price) => {
@@ -104,7 +106,7 @@ export default function ItemDetails() {
     };
 
     // Loading state
-    if (loading) {
+    if (loading || authLoading) {
         return (
             <Container maxWidth="lg" sx={{ mt: 4 }}>
                 <AdDetailSkeletonLoader />
