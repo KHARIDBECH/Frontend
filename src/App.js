@@ -4,6 +4,12 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // Layout
 import Nav from './Nav';
 
+// Auth
+import ProtectedRoute from './ProtectedRoute';
+
+// Styles
+import './App.css';
+
 // Pages - Lazy Loaded
 const HomePage = lazy(() => import('./pages/HomePage/HomePage'));
 const AdPostPage = lazy(() => import('./pages/AdPostPage/AdPostPage'));
@@ -13,12 +19,6 @@ const Favourites = lazy(() => import('./components/Favourites'));
 const AdTabs = lazy(() => import('./components/AdTabs'));
 const Category = lazy(() => import('./pages/Category/Category'));
 const Profile = lazy(() => import('./pages/Profile/Profile'));
-
-// Auth
-import ProtectedRoute from './ProtectedRoute';
-
-// Styles
-import './App.css';
 
 // Loading Component
 const PageLoader = () => (
