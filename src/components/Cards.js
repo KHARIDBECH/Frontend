@@ -179,7 +179,7 @@ export default function Cards({
       {/* Products Grid */}
       {(isDisplayLoading || hasData) && (
         <Grid container spacing={3}>
-          {(isDisplayLoading ? Array.from(new Array(8)) : displayData?.slice(0, visible))?.map((item, index) => (
+          {(isDisplayLoading ? Array.from(new Array(8)) : (displayData || []).slice(0, visible)).map((item, index) => (
             <Grid
               item
               xs={12}
@@ -187,16 +187,19 @@ export default function Cards({
               md={4}
               lg={3}
               key={item?._id || index}
-              sx={{
+              className="animate-fadeInUp"
+              style={{
+                animationDelay: `${(index % 8) * 0.05}s`,
                 display: 'flex',
-                justifyContent: 'center',
-                animation: 'fadeInUp 0.5s ease forwards',
-                animationDelay: `${index * 0.05}s`,
-                opacity: 0,
+                justifyContent: 'center'
               }}
             >
               {item ? (
-                <Link to={`/item/${item._id}`} style={{ width: '100%', display: 'flex', justifyContent: 'center', textDecoration: 'none' }}>
+                <Link
+                  to={`/item/${item.productUrl}`}
+                  className="product-card-link"
+                  style={{ width: '100%', textDecoration: 'none' }}
+                >
                   <ProductCard data={item} userId={userId} />
                 </Link>
               ) : (

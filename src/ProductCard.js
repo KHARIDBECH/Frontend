@@ -67,6 +67,9 @@ const ProductCard = React.memo(({ data, userId }) => {
           }}
           image={data.images?.[0]?.url || 'https://via.placeholder.com/320x200?text=No+Image'}
           alt={data.title}
+          loading="lazy"
+          width="320"
+          height="200"
         />
 
         {/* Gradient Overlay */}

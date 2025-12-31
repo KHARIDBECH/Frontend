@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Kharid Bech",
+  "name": "Kharid Bech - Buy & Sell Used Products",
+  "description": "India's trusted marketplace for buying and selling used products. Find deals on cars, bikes, mobiles, electronics & more.",
   "icons": [
     {
       "src": "favicon.ico",
@@ -10,15 +11,27 @@
     {
       "src": "appLogo.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "appLogo.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000"
+  "theme_color": "#6366F1",
+  "background_color": "#0F0F23",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "en-IN",
+  "categories": [
+    "shopping",
+    "business",
+    "lifestyle"
+  ],
+  "prefer_related_applications": false
 }

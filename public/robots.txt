@@ -1,3 +1,34 @@
+# Kharid Bech - Robots.txt
 # https://www.robotstxt.org/robotstxt.html
+
+# Allow all crawlers
 User-agent: *
-Disallow:
+Allow: /
+
+# Disallow private/user-specific pages
+Disallow: /chat
+Disallow: /my-ads/
+Disallow: /favourites
+Disallow: /profile
+Disallow: /post-ad
+
+# Block API and static resources that shouldn't be indexed
+Disallow: /api/
+Disallow: /static/js/
+Disallow: /static/css/
+
+# Google-specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+# Bing-specific
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+# Sitemap location
+Sitemap: https://kharidbech.vercel.app/sitemap.xml
+
+# Host directive
+Host: https://kharidbech.vercel.app
