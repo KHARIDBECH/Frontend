@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, Typography, Container, Button, InputBase, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -80,6 +80,7 @@ const StatBox = styled(Box)(({ theme }) => ({
 export default function Banner() {
   const navigate = useNavigate();
   const { setOpenSignUp, isAuth } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleSell = () => {
     if (isAuth) {
@@ -89,9 +90,22 @@ export default function Banner() {
     }
   };
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/?search=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <HeroSection>
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
+        {/* ... (existing code) ... */}
         {/* Feature Chips */}
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 4, flexWrap: 'wrap' }}>
           <FeatureChip>
@@ -158,10 +172,14 @@ export default function Banner() {
                 fontSize: '1rem',
                 '& input::placeholder': { color: '#94a3b8' }
               }}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
           </Box>
           <Button
             variant="contained"
+            onClick={handleSearch}
             sx={{
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               color: 'white',

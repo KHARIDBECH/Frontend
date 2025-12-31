@@ -37,7 +37,7 @@ export default function Category() {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${apiUrl}/api/product/${category}`, {
+        const response = await fetch(`${apiUrl}/api/product/category/${category}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });
@@ -89,7 +89,7 @@ export default function Category() {
         item: {
           '@type': 'Product',
           name: item.title,
-          url: `${BASE_URL}/item/${item.productUrl}`,
+          url: `${BASE_URL}/item/${item.slug || item._id}`,
           offers: {
             '@type': 'Offer',
             price: item.price,

@@ -196,9 +196,9 @@ export default function Cards({
             >
               {item ? (
                 <Link
-                  to={`/item/${item.productUrl}`}
+                  to={`/item/${item.slug || item._id}`}
                   className="product-card-link"
-                  style={{ width: '100%', textDecoration: 'none' }}
+                  style={{ width: '100%', textDecoration: 'none', display: 'flex', justifyContent: 'center' }}
                 >
                   <ProductCard data={item} userId={userId} />
                 </Link>

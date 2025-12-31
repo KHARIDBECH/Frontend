@@ -31,7 +31,7 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
  * Displays detailed information about a product listing with full SEO optimization
  */
 export default function ItemDetails() {
-    const { productUrl } = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
     const { userId, isAuth, loading: authLoading, setOpenSignIn, authHeader } = useAuth();
 
@@ -47,7 +47,7 @@ export default function ItemDetails() {
         const fetchItemDetails = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`${apiUrl}/api/product/itemdetail/${productUrl}`);
+                const response = await fetch(`${apiUrl}/api/product/itemdetail/${id}`);
 
                 if (response.status === 404) {
                     setNotFound(true);
@@ -67,7 +67,7 @@ export default function ItemDetails() {
         };
 
         fetchItemDetails();
-    }, [productUrl, apiUrl]);
+    }, [id, apiUrl]);
 
     // Handle chat with seller
     const handleChatWithSeller = useCallback(async () => {
@@ -128,7 +128,7 @@ export default function ItemDetails() {
         const description = `Buy ${itemDetail.title} for ₹${formatPrice(itemDetail.price)} in ${itemDetail.location?.city || ''}, ${itemDetail.location?.state || ''}. ${itemDetail.description?.substring(0, 120)}...`;
         const keywords = `${itemDetail.title}, ${itemDetail.category}, buy ${itemDetail.category?.toLowerCase()}, used ${itemDetail.category?.toLowerCase()}, ${itemDetail.location?.city}, second hand`;
         const image = itemDetail.images?.[0] || `${BASE_URL}/appLogo.png`;
-        const url = `${BASE_URL}/item/${productUrl}`;
+        const url = `${BASE_URL}/item/${id}`;
 
         return { title, description, keywords, image, url };
     };
@@ -138,7 +138,7 @@ export default function ItemDetails() {
     const breadcrumbSchema = itemDetail ? generateBreadcrumbSchema([
         { name: 'Home', url: BASE_URL },
         { name: itemDetail.category, url: `${BASE_URL}/${itemDetail.category}` },
-        { name: itemDetail.title, url: `${BASE_URL}/item/${productUrl}` },
+        { name: itemDetail.title, url: `${BASE_URL}/item/${id}` },
     ]) : null;
 
     const combinedSchema = productSchema && breadcrumbSchema ? [productSchema, breadcrumbSchema] : null;

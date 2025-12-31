@@ -47,7 +47,7 @@ function App() {
             {/* Protected Routes */}
             <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
             <Route path="/post-ad" element={<ProtectedRoute element={<AdPostPage />} />} />
-            <Route path="/item/:productUrl" element={<ProtectedRoute element={<ItemDetails />} />} />
+            <Route path="/item/:id" element={<ProtectedRoute element={<ItemDetails />} />} />
             <Route path="/my-ads/*" element={<ProtectedRoute element={<AdTabs />} />} />
             <Route path="/favourites" element={<ProtectedRoute element={<Favourites />} />} />
             <Route path="/chat" element={<ProtectedRoute element={<Messenger />} />} />

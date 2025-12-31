@@ -88,6 +88,14 @@ const PrimarySearchAppBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      navigate(`/?search=${searchQuery}`);
+    }
+  };
+
   // Pages where search should be hidden
   const hideSearchRoutes = ['/chat', '/profile', '/post-ad'];
   const shouldHideSearch = hideSearchRoutes.some(route => location.pathname.startsWith(route));
@@ -147,6 +155,7 @@ const PrimarySearchAppBar = () => {
             </Box>
           </Link>
 
+
           {/* Search */}
           {!shouldHideSearch && (
             <Search>
@@ -156,6 +165,9 @@ const PrimarySearchAppBar = () => {
               <StyledInputBase
                 placeholder="Search for anything..."
                 inputProps={{ 'aria-label': 'search' }}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
               />
             </Search>
           )}

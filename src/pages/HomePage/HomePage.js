@@ -5,10 +5,12 @@ import Cards from '../../components/Cards';
 import SEOHead from '../../components/SEOHead';
 import { config } from '../../Constants'
 import { useAuth } from '../../AuthContext';
+import { useLocation } from 'react-router-dom';
 
 export default function Home() {
   const { token, loading: authLoading } = useAuth();
   const url = config.url.API_URL;
+  const location = useLocation();
 
   const [data, setData] = useState([]);
   const [visible, setVisible] = useState(8);
@@ -21,7 +23,15 @@ export default function Home() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${url}/api/product`, {
+        const searchParams = new URLSearchParams(location.search);
+        const searchQuery = searchParams.get('search');
+
+        let apiUrl = `${url}/api/product`;
+        if (searchQuery) {
+          apiUrl += `?search=${encodeURIComponent(searchQuery)}`;
+        }
+
+        const response = await fetch(apiUrl, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -43,7 +53,7 @@ export default function Home() {
     };
 
     fetchData();
-  }, [url, token, authLoading]);
+  }, [url, token, authLoading, location.search]);
 
   const showMoreItems = () => {
     setVisible((prevValue) => prevValue + 8);
@@ -65,6 +75,7 @@ export default function Home() {
         item: {
           '@type': 'Product',
           name: item.title,
+          url: `https://kharidbech.vercel.app/item/${item.slug || item._id}`,
           description: item.description?.substring(0, 150),
           offers: {
             '@type': 'Offer',
