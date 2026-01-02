@@ -204,7 +204,6 @@ const SignUp = () => {
       <Dialog
         open={openSignUp}
         TransitionComponent={Transition}
-        keepMounted
         onClose={handleClose}
         scroll="body"
         PaperProps={{

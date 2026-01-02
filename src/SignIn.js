@@ -154,7 +154,6 @@ const SignIn = () => {
       <Dialog
         open={openSignIn}
         TransitionComponent={Transition}
-        keepMounted
         onClose={handleClose}
         PaperProps={{
           sx: {
