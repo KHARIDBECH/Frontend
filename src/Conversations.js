@@ -91,25 +91,6 @@ export default function Conversation({ conversation, userId, active }) {
                     bgcolor: active ? 'rgba(99, 102, 241, 0.12)' : 'rgba(0, 0, 0, 0.04)'
                 }
             }}
-            secondaryAction={
-                unreadCount > 0 && (
-                    <Box sx={{
-                        bgcolor: 'var(--primary)',
-                        color: 'white',
-                        borderRadius: '10px',
-                        minWidth: '20px',
-                        height: '20px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '0.7rem',
-                        fontWeight: 700,
-                        px: 0.5
-                    }}>
-                        {unreadCount}
-                    </Box>
-                )
-            }
         >
             <ListItemAvatar>
                 <Avatar
@@ -127,22 +108,41 @@ export default function Conversation({ conversation, userId, active }) {
             </ListItemAvatar>
             <ListItemText
                 primary={
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
                         <Typography
                             variant="subtitle1"
-                            sx={{ fontWeight: unreadCount > 0 || active ? 700 : 600, color: 'var(--text-main)', fontSize: '0.95rem' }}
+                            sx={{
+                                fontWeight: unreadCount > 0 || active ? 700 : 600,
+                                color: 'var(--text-main)',
+                                fontSize: '0.95rem',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                            }}
                         >
                             {fullName}
                         </Typography>
                         {product && (
-                            <Typography variant="caption" sx={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.7rem' }}>
-                                {product.title.length > 15 ? product.title.substring(0, 15) + '...' : product.title}
+                            <Typography
+                                variant="caption"
+                                sx={{
+                                    color: 'var(--primary)',
+                                    fontWeight: 600,
+                                    fontSize: '0.65rem',
+                                    bgcolor: 'rgba(99, 102, 241, 0.1)',
+                                    px: 1,
+                                    py: 0.2,
+                                    borderRadius: '4px',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                {product.title.length > 12 ? product.title.substring(0, 12) + '...' : product.title}
                             </Typography>
                         )}
                     </Box>
                 }
                 secondary={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5, gap: 1 }}>
                         <Typography
                             variant="body2"
                             sx={{
@@ -152,11 +152,30 @@ export default function Conversation({ conversation, userId, active }) {
                                 display: '-webkit-box',
                                 WebkitLineClamp: 1,
                                 WebkitBoxOrient: 'vertical',
-                                overflow: 'hidden'
+                                overflow: 'hidden',
+                                flex: 1
                             }}
                         >
                             {lastMessage ? lastMessage.text : 'No messages yet'}
                         </Typography>
+                        {unreadCount > 0 && (
+                            <Box sx={{
+                                bgcolor: 'var(--primary)',
+                                color: 'white',
+                                borderRadius: '10px',
+                                minWidth: '18px',
+                                height: '18px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.65rem',
+                                fontWeight: 800,
+                                px: 0.6,
+                                flexShrink: 0
+                            }}>
+                                {unreadCount}
+                            </Box>
+                        )}
                     </Box>
                 }
             />
