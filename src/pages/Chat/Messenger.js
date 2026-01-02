@@ -1,4 +1,5 @@
 import { React, useEffect, useState, useRef } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './messenger.css'
 import Conversation from '../../Conversations.js'
 import Message from '../../Message.js'
@@ -10,13 +11,17 @@ import { useAuth } from '../../AuthContext';
 import { Box, Container, Typography, IconButton, Skeleton } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import ChatIcon from '@mui/icons-material/Chat';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+
 
 export default function Messenger() {
-    const { userId, authHeader } = useAuth();
+    const { userId, authHeader, refreshUnreadCount } = useAuth();
     const url = config.url.API_URL;
+    const location = useLocation();
     const [conversations, setConversations] = useState([]);
     const [loadingConversations, setLoadingConversations] = useState(true);
-    const [currentChat, setCurrentChat] = useState(null);
+    const [currentChat, setCurrentChat] = useState(location.state?.conversation || null);
     const [messages, setMessages] = useState([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -31,14 +36,41 @@ export default function Messenger() {
     useEffect(() => {
         socket.current = io(url);
         socket.current.on("getMessage", (data) => {
-            setArrivalMessage({
+            const newArrival = {
                 senderId: data.senderId,
                 text: data.text,
                 createdAt: Date.now(),
+            };
+            setArrivalMessage(newArrival);
+
+            // Update the conversations list state dynamically
+            setConversations(prev => {
+                const updated = prev.map(c => {
+                    // Check if the message belongs to this conversation
+                    // Note: This logic assumes we can identify the conversation from senderId
+                    // In a more robust system, the socket event should include conversationId.
+                    // For now, we find the conversation where the sender is a member.
+                    const isMember = c.members.some(m => (typeof m === 'object' ? m._id : m) === data.senderId);
+
+                    if (isMember) {
+                        return {
+                            ...c,
+                            lastMessage: newArrival,
+                            unreadCount: (currentChat?._id === c._id) ? 0 : (c.unreadCount + 1),
+                            updatedAt: new Date().toISOString()
+                        };
+                    }
+                    return c;
+                });
+                // Re-sort by latest message
+                return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
             });
+
+            // Refresh global count when message arrives
+            refreshUnreadCount();
         });
         return () => socket.current.disconnect();
-    }, [url]);
+    }, [url, refreshUnreadCount, currentChat]);
 
     useEffect(() => {
         if (arrivalMessage && currentChat?.members.includes(arrivalMessage.senderId)) {
@@ -47,8 +79,15 @@ export default function Messenger() {
             setTimeout(() => {
                 scrollRef.current?.scrollIntoView({ behavior: "smooth" });
             }, 100);
+
+            // Mark as read if it's the current chat
+            if (currentChat) {
+                axios.patch(`${url}/api/chatConvo/read/${currentChat._id}`, {}, { headers: authHeader() })
+                    .then(() => refreshUnreadCount())
+                    .catch(err => console.error(err));
+            }
         }
-    }, [arrivalMessage, currentChat]);
+    }, [arrivalMessage, currentChat, url, authHeader, refreshUnreadCount]);
 
     useEffect(() => {
         if (userId) {
@@ -76,12 +115,23 @@ export default function Messenger() {
     }, [userId, url, authHeader]);
 
     useEffect(() => {
-        const getMessages = async () => {
+        const handleChatSelection = async () => {
             if (currentChat) {
                 setPage(1);
                 setHasMore(true);
                 isInitialLoad.current = true;
+
                 try {
+                    // Mark as read
+                    await axios.patch(`${url}/api/chatConvo/read/${currentChat._id}`, {}, { headers: authHeader() });
+                    refreshUnreadCount();
+
+                    // Update local conversations list to show 0 unread
+                    setConversations(prev => prev.map(c =>
+                        c._id === currentChat._id ? { ...c, unreadCount: 0 } : c
+                    ));
+
+                    // Get messages
                     const res = await axios.get(`${url}/api/chatMessages/${currentChat._id}?limit=10&page=1`, { headers: authHeader() });
                     setMessages(res.data.data || []);
                     setHasMore(res.data.hasMore);
@@ -90,8 +140,8 @@ export default function Messenger() {
                 }
             }
         };
-        if (currentChat) getMessages();
-    }, [currentChat, url, authHeader]);
+        handleChatSelection();
+    }, [currentChat, url, authHeader, refreshUnreadCount]);
 
     const loadMoreMessages = async () => {
         if (!hasMore || loadingMore || !currentChat) return;
@@ -152,7 +202,10 @@ export default function Messenger() {
             text: newMessages
         };
 
-        const receiverId = currentChat.members.find(member => member !== userId);
+        const receiverId = currentChat.members.find(member => {
+            const mId = typeof member === 'object' ? member._id : member;
+            return mId !== userId;
+        });
 
         socket.current.emit("sendMessage", {
             senderId: userId,
@@ -164,6 +217,17 @@ export default function Messenger() {
             const res = await axios.post(`${url}/api/chatMessages/`, addMessagesFormat, { headers: authHeader() });
             setMessages([...messages, res.data.data]);
             setNewMessages('');
+
+            // Update local conversation list snippet
+            setConversations(prev => {
+                const updated = prev.map(c => {
+                    if (c._id === currentChat._id) {
+                        return { ...c, lastMessage: res.data.data, updatedAt: new Date().toISOString() };
+                    }
+                    return c;
+                });
+                return updated.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+            });
         } catch (err) {
             console.error(err);
         }
@@ -174,8 +238,8 @@ export default function Messenger() {
             <Box sx={{ display: 'flex', height: '100%', gap: 2 }}>
                 {/* Conversations Sidebar */}
                 <Box className="glass" sx={{
-                    flex: { xs: 0, md: 3, lg: 2.5 },
-                    display: { xs: 'none', md: 'flex' },
+                    flex: { xs: 1, md: 3, lg: 2.5 },
+                    display: { xs: currentChat ? 'none' : 'flex', md: 'flex' },
                     flexDirection: 'column',
                     borderRadius: '24px',
                     overflow: 'hidden'
@@ -249,7 +313,7 @@ export default function Messenger() {
                 {/* Chat Area */}
                 <Box className="glass" sx={{
                     flex: { xs: 1, md: 6, lg: 7.5 },
-                    display: 'flex',
+                    display: { xs: currentChat ? 'flex' : 'none', md: 'flex' },
                     flexDirection: 'column',
                     borderRadius: '24px',
                     overflow: 'hidden'
@@ -257,7 +321,13 @@ export default function Messenger() {
                     {currentChat ? (
                         <>
                             {/* Chat Header */}
-                            <Box sx={{ p: 2.5, borderBottom: '1px solid rgba(0,0,0,0.05)', bgcolor: 'rgba(255,255,255,0.3)' }}>
+                            <Box sx={{ p: 2.5, borderBottom: '1px solid rgba(0,0,0,0.05)', bgcolor: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <IconButton
+                                    onClick={() => setCurrentChat(null)}
+                                    sx={{ display: { xs: 'flex', md: 'none' }, color: 'var(--text-main)' }}
+                                >
+                                    <ArrowBackIcon />
+                                </IconButton>
                                 <Typography variant="h6" sx={{ fontWeight: 700 }}>
                                     {(() => {
                                         const friend = currentChat.members.find(m => (typeof m === 'object' ? m._id : m) !== userId);

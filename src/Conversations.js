@@ -72,6 +72,9 @@ export default function Conversation({ conversation, userId, active }) {
 
     const fullName = user ? `${user.firstName} ${user.lastName}` : 'Unknown User';
     const initials = user?.firstName?.[0] || '?';
+    const unreadCount = conversation.unreadCount || 0;
+    const lastMessage = conversation.lastMessage;
+    const product = conversation.product;
 
     return (
         <ListItem
@@ -88,6 +91,25 @@ export default function Conversation({ conversation, userId, active }) {
                     bgcolor: active ? 'rgba(99, 102, 241, 0.12)' : 'rgba(0, 0, 0, 0.04)'
                 }
             }}
+            secondaryAction={
+                unreadCount > 0 && (
+                    <Box sx={{
+                        bgcolor: 'var(--primary)',
+                        color: 'white',
+                        borderRadius: '10px',
+                        minWidth: '20px',
+                        height: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '0.7rem',
+                        fontWeight: 700,
+                        px: 0.5
+                    }}>
+                        {unreadCount}
+                    </Box>
+                )
+            }
         >
             <ListItemAvatar>
                 <Avatar
@@ -105,26 +127,36 @@ export default function Conversation({ conversation, userId, active }) {
             </ListItemAvatar>
             <ListItemText
                 primary={
-                    <Typography
-                        variant="subtitle1"
-                        sx={{ fontWeight: active ? 700 : 600, color: 'var(--text-main)' }}
-                    >
-                        {fullName}
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography
+                            variant="subtitle1"
+                            sx={{ fontWeight: unreadCount > 0 || active ? 700 : 600, color: 'var(--text-main)', fontSize: '0.95rem' }}
+                        >
+                            {fullName}
+                        </Typography>
+                        {product && (
+                            <Typography variant="caption" sx={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.7rem' }}>
+                                {product.title.length > 15 ? product.title.substring(0, 15) + '...' : product.title}
+                            </Typography>
+                        )}
+                    </Box>
                 }
                 secondary={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="body2" sx={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                            Tap to view messages
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: unreadCount > 0 ? 'var(--text-main)' : 'var(--text-muted)',
+                                fontSize: '0.8rem',
+                                fontWeight: unreadCount > 0 ? 600 : 400,
+                                display: '-webkit-box',
+                                WebkitLineClamp: 1,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden'
+                            }}
+                        >
+                            {lastMessage ? lastMessage.text : 'No messages yet'}
                         </Typography>
-                        {active && (
-                            <Box sx={{
-                                width: 8,
-                                height: 8,
-                                borderRadius: '50%',
-                                bgcolor: '#10b981'
-                            }} />
-                        )}
                     </Box>
                 }
             />

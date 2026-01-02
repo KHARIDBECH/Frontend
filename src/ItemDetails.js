@@ -8,7 +8,13 @@ import {
     Avatar,
     Box,
     Button,
-    IconButton
+    IconButton,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    CircularProgress
 } from '@mui/material';
 import ShareIcon from '@mui/icons-material/Share';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -39,6 +45,11 @@ export default function ItemDetails() {
     const [itemDetail, setItemDetail] = useState(null);
     const [loading, setLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
+
+    // Chat Dialog State
+    const [openMessageDialog, setOpenMessageDialog] = useState(false);
+    const [messageText, setMessageText] = useState('');
+    const [sendingMessage, setSendingMessage] = useState(false);
 
     const apiUrl = config.url.API_URL;
 
@@ -76,10 +87,35 @@ export default function ItemDetails() {
             return;
         }
 
-        if (!userId) return; // Prevent action if userId is not yet available but isAuth is true
+        if (!userId || !itemDetail) return;
 
         try {
-            await axios.post(
+            // Check if conversation already exists
+            const response = await axios.get(
+                `${apiUrl}/api/chatConvo/find?receiverId=${itemDetail.postedBy._id}&productId=${itemDetail._id}`,
+                { headers: authHeader() }
+            );
+
+            if (response.data.data) {
+                // Conversation exists -> Navigate to it
+                navigate('/chat', { state: { conversation: response.data.data } });
+            } else {
+                // No conversation -> Open dialog
+                setOpenMessageDialog(true);
+            }
+        } catch (error) {
+            console.error('Error checking conversation:', error);
+            // Fallback: just try to create it directly (old behavior) or open dialog
+            setOpenMessageDialog(true);
+        }
+    }, [userId, isAuth, itemDetail, apiUrl, navigate, setOpenSignIn, authHeader]);
+
+    const handleSendMessage = async () => {
+        if (!messageText.trim()) return;
+        setSendingMessage(true);
+        try {
+            // 1. Create Conversation
+            const convoRes = await axios.post(
                 `${apiUrl}/api/chatConvo`,
                 {
                     senderId: userId,
@@ -88,11 +124,30 @@ export default function ItemDetails() {
                 },
                 { headers: authHeader() }
             );
-            navigate('/chat');
+
+            const conversation = convoRes.data.data;
+
+            // 2. Send Message
+            await axios.post(
+                `${apiUrl}/api/chatMessages`,
+                {
+                    conversationId: conversation._id,
+                    senderId: userId,
+                    text: messageText
+                },
+                { headers: authHeader() }
+            );
+
+            // 3. Navigate
+            setOpenMessageDialog(false);
+            navigate('/chat', { state: { conversation } });
+
         } catch (error) {
-            console.error('Error creating conversation:', error);
+            console.error('Error sending message:', error);
+        } finally {
+            setSendingMessage(false);
         }
-    }, [userId, isAuth, itemDetail, apiUrl, navigate, setOpenSignIn, authHeader]);
+    };
 
     // Handle share functionality
     const handleShare = useCallback(() => {
@@ -342,6 +397,63 @@ export default function ItemDetails() {
                     </Grid>
                 </article>
             </Container>
+            {/* Message Dialog */}
+            <Dialog
+                open={openMessageDialog}
+                onClose={() => !sendingMessage && setOpenMessageDialog(false)}
+                PaperProps={{
+                    sx: { borderRadius: '24px', padding: 2, minWidth: { xs: '300px', md: '450px' } }
+                }}
+            >
+                <DialogTitle sx={{ fontWeight: 700, pb: 1 }}>
+                    Contact Seller
+                </DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+                        Start a conversation with {itemDetail?.postedBy?.firstName}.
+                    </Typography>
+                    <TextField
+                        autoFocus
+                        multiline
+                        rows={4}
+                        margin="dense"
+                        id="message"
+                        label="Your Message"
+                        type="text"
+                        fullWidth
+                        variant="outlined"
+                        value={messageText}
+                        onChange={(e) => setMessageText(e.target.value)}
+                        placeholder={`Hi, I'm interested in your ${itemDetail?.title}...`}
+                        InputProps={{
+                            sx: { borderRadius: '16px' }
+                        }}
+                    />
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button
+                        onClick={() => setOpenMessageDialog(false)}
+                        disabled={sendingMessage}
+                        sx={{ borderRadius: '12px', textTransform: 'none', fontWeight: 600, color: 'text.secondary' }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleSendMessage}
+                        disabled={!messageText.trim() || sendingMessage}
+                        variant="contained"
+                        sx={{
+                            borderRadius: '12px',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                            px: 3
+                        }}
+                    >
+                        {sendingMessage ? <CircularProgress size={24} color="inherit" /> : 'Send Message'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 }

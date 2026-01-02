@@ -24,12 +24,31 @@ export function AuthContextProvider({ children }) {
     const [user, setUser] = useState(null);
     const [userId, setUserId] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [unreadCount, setUnreadCount] = useState(0);
 
     // Modal state
     const [openSignIn, setOpenSignIn] = useState(false);
     const [openSignUp, setOpenSignUp] = useState(false);
 
     const apiUrl = config.url.API_URL;
+
+    // Refresh unread count
+    const refreshUnreadCount = useCallback(async (currentId, idToken) => {
+        const uid = currentId || userId;
+        const tk = idToken || token;
+        if (!uid || !tk) return;
+
+        try {
+            const res = await axios.get(`${apiUrl}/api/chatConvo/unread/count`, {
+                headers: { Authorization: `Bearer ${tk}` }
+            });
+            if (res.data.success) {
+                setUnreadCount(res.data.data.count);
+            }
+        } catch (error) {
+            console.error('Failed to fetch unread count:', error.message);
+        }
+    }, [apiUrl, userId, token]);
 
     // Sync user with database
     const syncUserWithDB = async (idToken) => {
@@ -40,7 +59,10 @@ export function AuthContextProvider({ children }) {
 
             if (response.data.success && response.data.data) {
                 setUser(response.data.data);
-                setUserId(response.data.data._id);
+                const uid = response.data.data._id;
+                setUserId(uid);
+                // Also fetch unread count here
+                await refreshUnreadCount(uid, idToken);
             } else {
                 setUser(null);
                 setUserId(null);
@@ -67,6 +89,7 @@ export function AuthContextProvider({ children }) {
                 setUserId(null);
                 setUser(null);
                 setIsAuth(false);
+                setUnreadCount(0);
             }
 
             setLoading(false);
@@ -83,6 +106,7 @@ export function AuthContextProvider({ children }) {
             setUserId(null);
             setUser(null);
             setIsAuth(false);
+            setUnreadCount(0);
         } catch (error) {
             console.error('Logout failed:', error.message);
         }
@@ -101,17 +125,19 @@ export function AuthContextProvider({ children }) {
         userId,
         user,
         loading,
+        unreadCount,
 
         // Auth actions
         logout,
         authHeader,
+        refreshUnreadCount,
 
         // Modal state
         openSignIn,
         setOpenSignIn,
         openSignUp,
         setOpenSignUp
-    }), [isAuth, token, userId, user, loading, logout, authHeader, openSignIn, openSignUp]);
+    }), [isAuth, token, userId, user, loading, unreadCount, logout, authHeader, refreshUnreadCount, openSignIn, openSignUp]);
 
     return (
         <AuthContext.Provider value={value}>

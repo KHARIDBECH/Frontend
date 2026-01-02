@@ -81,7 +81,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const PrimarySearchAppBar = () => {
-  const { isAuth, loading, logout, setOpenSignIn, setOpenSignUp } = useAuth();
+  const { isAuth, loading, logout, setOpenSignIn, setOpenSignUp, unreadCount } = useAuth();
   const [menuAnchor, setMenuAnchor] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -186,7 +186,7 @@ const PrimarySearchAppBar = () => {
                       '&:hover': { color: 'var(--primary)', bgcolor: 'rgba(99, 102, 241, 0.08)' }
                     }}
                   >
-                    <Badge badgeContent={3} color="error" sx={{ '& .MuiBadge-badge': { fontSize: '0.7rem', height: 18, minWidth: 18 } }}>
+                    <Badge badgeContent={unreadCount} color="error" sx={{ '& .MuiBadge-badge': { fontSize: '0.7rem', height: 18, minWidth: 18 } }}>
                       <ChatIcon />
                     </Badge>
                   </IconButton>
