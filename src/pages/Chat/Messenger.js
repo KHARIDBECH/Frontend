@@ -40,7 +40,8 @@ export default function Messenger() {
                 const updated = prev.map(c => {
                     const isMember = c.members.some(m => {
                         const mId = typeof m === 'object' ? m._id : m;
-                        return mId === arrivalMessage.senderId;
+                        const arrivalId = typeof arrivalMessage.senderId === 'object' ? arrivalMessage.senderId._id : arrivalMessage.senderId;
+                        return mId === arrivalId;
                     });
 
                     if (isMember) {
@@ -59,7 +60,8 @@ export default function Messenger() {
             // If it belongs to current chat, add to messages list
             const isFromCurrentChat = currentChat?.members.some(m => {
                 const mId = typeof m === 'object' ? m._id : m;
-                return mId === arrivalMessage.senderId;
+                const arrivalId = typeof arrivalMessage.senderId === 'object' ? arrivalMessage.senderId._id : arrivalMessage.senderId;
+                return mId === arrivalId;
             });
 
             if (isFromCurrentChat) {
@@ -183,7 +185,12 @@ export default function Messenger() {
         const optimisticMessage = {
             _id: `temp-${Date.now()}`,
             conversationId: currentChat._id,
-            senderId: userId,
+            senderId: {
+                _id: userId,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                profilePic: user.profilePic
+            },
             text: newMessages,
             createdAt: new Date().toISOString(),
             isRead: false
@@ -207,7 +214,12 @@ export default function Messenger() {
 
         // 2. SOCKET EMIT (V. FAST)
         socket.emit("sendMessage", {
-            senderId: userId,
+            sender: {
+                _id: userId,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                profilePic: user.profilePic
+            },
             receiverId,
             text: newMessages,
         });
