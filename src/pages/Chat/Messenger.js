@@ -4,7 +4,6 @@ import './messenger.css'
 import Conversation from '../../Conversations.js'
 import Message from '../../Message.js'
 import axios from 'axios'
-import { io } from "socket.io-client";
 import { config } from '../../Constants.js'
 
 import { useAuth } from '../../AuthContext';
@@ -16,7 +15,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 
 export default function Messenger() {
-    const { userId, authHeader, refreshUnreadCount } = useAuth();
+    const { userId, authHeader, refreshUnreadCount, socket, arrivalMessage, setArrivalMessage } = useAuth();
     const url = config.url.API_URL;
     const location = useLocation();
     const [conversations, setConversations] = useState([]);
@@ -27,73 +26,48 @@ export default function Messenger() {
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [newMessages, setNewMessages] = useState('');
-    const [arrivalMessage, setArrivalMessage] = useState(null);
-    const socket = useRef();
     const scrollRef = useRef();
     const chatBoxRef = useRef();
     const isInitialLoad = useRef(true);
 
+    // Dynamic sidebar updates when arrivalMessage changes (global listener handled by Context)
     useEffect(() => {
-        socket.current = io(url);
-        socket.current.on("getMessage", (data) => {
-            const newArrival = {
-                senderId: data.senderId,
-                text: data.text,
-                createdAt: Date.now(),
-            };
-            setArrivalMessage(newArrival);
-
+        if (arrivalMessage) {
             // Update the conversations list state dynamically
             setConversations(prev => {
                 const updated = prev.map(c => {
-                    // Check if the message belongs to this conversation
-                    // Note: This logic assumes we can identify the conversation from senderId
-                    // In a more robust system, the socket event should include conversationId.
-                    // For now, we find the conversation where the sender is a member.
-                    const isMember = c.members.some(m => (typeof m === 'object' ? m._id : m) === data.senderId);
+                    const isMember = c.members.some(m => (typeof m === 'object' ? m._id : m) === arrivalMessage.senderId);
 
                     if (isMember) {
                         return {
                             ...c,
-                            lastMessage: newArrival,
+                            lastMessage: arrivalMessage,
                             unreadCount: (currentChat?._id === c._id) ? 0 : (c.unreadCount + 1),
                             updatedAt: new Date().toISOString()
                         };
                     }
                     return c;
                 });
-                // Re-sort by latest message
                 return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
             });
 
-            // Refresh global count when message arrives
-            refreshUnreadCount();
-        });
-        return () => socket.current.disconnect();
-    }, [url, refreshUnreadCount, currentChat]);
+            // If it belongs to current chat, add to messages list
+            if (currentChat?.members.includes(arrivalMessage.senderId)) {
+                setMessages((prev) => [...prev, arrivalMessage]);
+                setTimeout(() => {
+                    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+                }, 100);
 
-    useEffect(() => {
-        if (arrivalMessage && currentChat?.members.includes(arrivalMessage.senderId)) {
-            setMessages((prev) => [...prev, arrivalMessage]);
-            // Scroll to bottom for new messages
-            setTimeout(() => {
-                scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-            }, 100);
-
-            // Mark as read if it's the current chat
-            if (currentChat) {
+                // Mark as read and refresh unread count
                 axios.patch(`${url}/api/chatConvo/read/${currentChat._id}`, {}, { headers: authHeader() })
                     .then(() => refreshUnreadCount())
                     .catch(err => console.error(err));
             }
-        }
-    }, [arrivalMessage, currentChat, url, authHeader, refreshUnreadCount]);
 
-    useEffect(() => {
-        if (userId) {
-            socket.current.emit("addUser", userId);
+            // Clear arrival message from context after handling
+            setArrivalMessage(null);
         }
-    }, [userId]);
+    }, [arrivalMessage, currentChat, url, authHeader, refreshUnreadCount, setArrivalMessage]);
 
     useEffect(() => {
         const getConversation = async () => {
@@ -207,7 +181,7 @@ export default function Messenger() {
             return mId !== userId;
         });
 
-        socket.current.emit("sendMessage", {
+        socket.emit("sendMessage", {
             senderId: userId,
             receiverId,
             text: newMessages,

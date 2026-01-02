@@ -1,6 +1,7 @@
 import React, { useState, createContext, useContext, useEffect, useCallback } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import axios from 'axios';
+import { io } from 'socket.io-client';
 import { auth } from './firebase';
 import { config } from './Constants';
 
@@ -25,6 +26,8 @@ export function AuthContextProvider({ children }) {
     const [userId, setUserId] = useState(null);
     const [loading, setLoading] = useState(true);
     const [unreadCount, setUnreadCount] = useState(0);
+    const [arrivalMessage, setArrivalMessage] = useState(null);
+    const socket = React.useRef(null);
 
     // Modal state
     const [openSignIn, setOpenSignIn] = useState(false);
@@ -90,6 +93,10 @@ export function AuthContextProvider({ children }) {
                 setUser(null);
                 setIsAuth(false);
                 setUnreadCount(0);
+                if (socket.current) {
+                    socket.current.disconnect();
+                    socket.current = null;
+                }
             }
 
             setLoading(false);
@@ -97,6 +104,26 @@ export function AuthContextProvider({ children }) {
 
         return () => unsubscribe();
     }, [apiUrl]);
+
+    // Socket Setup
+    useEffect(() => {
+        if (isAuth && userId) {
+            if (!socket.current) {
+                socket.current = io(apiUrl);
+                socket.current.emit("addUser", userId);
+
+                socket.current.on("getMessage", (data) => {
+                    setArrivalMessage({
+                        senderId: data.senderId,
+                        text: data.text,
+                        createdAt: Date.now(),
+                    });
+                    // Global unread increment
+                    setUnreadCount(prev => prev + 1);
+                });
+            }
+        }
+    }, [isAuth, userId, apiUrl]);
 
     // Logout function
     const logout = useCallback(async () => {
@@ -107,6 +134,10 @@ export function AuthContextProvider({ children }) {
             setUser(null);
             setIsAuth(false);
             setUnreadCount(0);
+            if (socket.current) {
+                socket.current.disconnect();
+                socket.current = null;
+            }
         } catch (error) {
             console.error('Logout failed:', error.message);
         }
@@ -126,6 +157,9 @@ export function AuthContextProvider({ children }) {
         user,
         loading,
         unreadCount,
+        socket: socket.current,
+        arrivalMessage,
+        setArrivalMessage,
 
         // Auth actions
         logout,
@@ -137,7 +171,7 @@ export function AuthContextProvider({ children }) {
         setOpenSignIn,
         openSignUp,
         setOpenSignUp
-    }), [isAuth, token, userId, user, loading, unreadCount, logout, authHeader, refreshUnreadCount, openSignIn, openSignUp]);
+    }), [isAuth, token, userId, user, loading, unreadCount, arrivalMessage, logout, authHeader, refreshUnreadCount, openSignIn, openSignUp]);
 
     return (
         <AuthContext.Provider value={value}>
