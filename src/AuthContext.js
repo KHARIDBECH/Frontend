@@ -4,6 +4,7 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import { auth } from './firebase';
 import { config } from './Constants';
+import logger from './utils/logger';
 
 // Create context
 const AuthContext = createContext(null);
@@ -27,7 +28,6 @@ export function AuthContextProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const [unreadCount, setUnreadCount] = useState(0);
     const [arrivalMessage, setArrivalMessage] = useState(null);
-    const socket = React.useRef(null);
 
     // Modal state
     const [openSignIn, setOpenSignIn] = useState(false);
@@ -35,23 +35,91 @@ export function AuthContextProvider({ children }) {
 
     const apiUrl = config.url.API_URL;
 
-    // Refresh unread count
-    const refreshUnreadCount = useCallback(async (currentId, idToken) => {
-        const uid = currentId || userId;
-        const tk = idToken || token;
-        if (!uid || !tk) return;
+    const socketRef = React.useRef(null);
+    const [socketConnected, setSocketConnected] = useState(false);
+
+    // Stable refresh function
+    const refreshUnreadCount = useCallback(async (uid, tk) => {
+        const activeUid = uid || userId;
+        const activeTk = tk || token;
+        if (!activeUid || !activeTk) return;
 
         try {
             const res = await axios.get(`${apiUrl}/api/chatConvo/unread/count`, {
-                headers: { Authorization: `Bearer ${tk}` }
+                headers: { Authorization: `Bearer ${activeTk}` }
             });
             if (res.data.success) {
                 setUnreadCount(res.data.data.count);
             }
         } catch (error) {
-            console.error('Failed to fetch unread count:', error.message);
+            logger.error('Failed to fetch unread count:', error.message);
         }
-    }, [apiUrl, userId, token]);
+    }, [apiUrl, userId, token]); // Fixed dependency array
+
+    // 1. Socket Connection Management (Stable ID)
+    useEffect(() => {
+        if (isAuth && userId && !socketRef.current) {
+            logger.info('Initializing socket connection...');
+            socketRef.current = io(apiUrl, {
+                reconnection: true,
+                reconnectionAttempts: 10,
+                reconnectionDelay: 1000,
+            });
+
+            socketRef.current.on("connect", () => {
+                logger.debug('Socket connected successfully');
+                socketRef.current.emit("addUser", String(userId));
+                setSocketConnected(true);
+            });
+
+            socketRef.current.on("disconnect", (reason) => {
+                logger.debug('Socket disconnected:', reason);
+                setSocketConnected(false);
+            });
+
+            socketRef.current.on("connect_error", (err) => {
+                logger.error('Socket Connection Error:', err.message);
+            });
+        }
+
+        return () => {
+            if (!isAuth && socketRef.current) {
+                socketRef.current.disconnect();
+                socketRef.current = null;
+                setSocketConnected(false);
+            }
+        };
+    }, [isAuth, userId, apiUrl]);
+
+    // 2. Global Listener Management
+    useEffect(() => {
+        const socket = socketRef.current;
+        if (!socket) return;
+
+        // Message Listener
+        const handleGetMessage = (data) => {
+            logger.info('New message arrival over socket');
+            setArrivalMessage({
+                senderId: data.senderId,
+                text: data.text,
+                createdAt: Date.now(),
+            });
+            setUnreadCount(prev => prev + 1);
+        };
+
+        socket.on("getMessage", handleGetMessage);
+
+        return () => {
+            socket.off("getMessage", handleGetMessage);
+        };
+    }, [isAuth, userId, socketConnected]);
+
+    // 3. User Registration Enforcer
+    useEffect(() => {
+        if (isAuth && userId && socketRef.current && socketConnected) {
+            socketRef.current.emit("addUser", String(userId));
+        }
+    }, [isAuth, userId, socketConnected]);
 
     // Sync user with database
     const syncUserWithDB = async (idToken) => {
@@ -61,17 +129,16 @@ export function AuthContextProvider({ children }) {
             });
 
             if (response.data.success && response.data.data) {
-                setUser(response.data.data);
-                const uid = response.data.data._id;
-                setUserId(uid);
-                // Also fetch unread count here
-                await refreshUnreadCount(uid, idToken);
+                const dbUser = response.data.data;
+                setUser(dbUser);
+                setUserId(dbUser._id);
+                await refreshUnreadCount(dbUser._id, idToken);
             } else {
                 setUser(null);
                 setUserId(null);
             }
         } catch (error) {
-            console.error('Failed to sync user with DB:', error.message);
+            logger.error('User sync error:', error.message);
             setUser(null);
             setUserId(null);
         }
@@ -79,11 +146,11 @@ export function AuthContextProvider({ children }) {
 
     // Firebase auth state listener
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
             setLoading(true);
 
-            if (user) {
-                const idToken = await user.getIdToken();
+            if (fbUser) {
+                const idToken = await fbUser.getIdToken();
                 setToken(idToken);
                 setIsAuth(true);
                 await syncUserWithDB(idToken);
@@ -93,9 +160,10 @@ export function AuthContextProvider({ children }) {
                 setUser(null);
                 setIsAuth(false);
                 setUnreadCount(0);
-                if (socket.current) {
-                    socket.current.disconnect();
-                    socket.current = null;
+                if (socketRef.current) {
+                    socketRef.current.disconnect();
+                    socketRef.current = null;
+                    setSocketConnected(false);
                 }
             }
 
@@ -104,26 +172,6 @@ export function AuthContextProvider({ children }) {
 
         return () => unsubscribe();
     }, [apiUrl]);
-
-    // Socket Setup
-    useEffect(() => {
-        if (isAuth && userId) {
-            if (!socket.current) {
-                socket.current = io(apiUrl);
-                socket.current.emit("addUser", userId);
-
-                socket.current.on("getMessage", (data) => {
-                    setArrivalMessage({
-                        senderId: data.senderId,
-                        text: data.text,
-                        createdAt: Date.now(),
-                    });
-                    // Global unread increment
-                    setUnreadCount(prev => prev + 1);
-                });
-            }
-        }
-    }, [isAuth, userId, apiUrl]);
 
     // Logout function
     const logout = useCallback(async () => {
@@ -134,9 +182,10 @@ export function AuthContextProvider({ children }) {
             setUser(null);
             setIsAuth(false);
             setUnreadCount(0);
-            if (socket.current) {
-                socket.current.disconnect();
-                socket.current = null;
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+                socketRef.current = null;
+                setSocketConnected(false);
             }
         } catch (error) {
             console.error('Logout failed:', error.message);
@@ -157,7 +206,7 @@ export function AuthContextProvider({ children }) {
         user,
         loading,
         unreadCount,
-        socket: socket.current,
+        socket: socketRef.current,
         arrivalMessage,
         setArrivalMessage,
 
@@ -171,7 +220,7 @@ export function AuthContextProvider({ children }) {
         setOpenSignIn,
         openSignUp,
         setOpenSignUp
-    }), [isAuth, token, userId, user, loading, unreadCount, arrivalMessage, logout, authHeader, refreshUnreadCount, openSignIn, openSignUp]);
+    }), [isAuth, token, userId, user, loading, unreadCount, socketConnected, arrivalMessage, logout, authHeader, refreshUnreadCount, openSignIn, openSignUp]);
 
     return (
         <AuthContext.Provider value={value}>

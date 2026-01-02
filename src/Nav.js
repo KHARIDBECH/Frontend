@@ -251,7 +251,11 @@ const PrimarySearchAppBar = () => {
                       <ListItemText primary="My Listings" primaryTypographyProps={{ fontWeight: 500 }} />
                     </MenuItem>
                     <MenuItem onClick={() => handleMenuClick('Messages')} sx={{ py: 1.5, display: { md: 'none' } }}>
-                      <ListItemIcon><ChatIcon fontSize="small" sx={{ color: '#64748b' }} /></ListItemIcon>
+                      <ListItemIcon>
+                        <Badge badgeContent={unreadCount} color="error" sx={{ '& .MuiBadge-badge': { fontSize: '0.6rem', height: 16, minWidth: 16 } }}>
+                          <ChatIcon fontSize="small" sx={{ color: '#64748b' }} />
+                        </Badge>
+                      </ListItemIcon>
                       <ListItemText primary="Messages" primaryTypographyProps={{ fontWeight: 500 }} />
                     </MenuItem>
                     <MenuItem onClick={() => handleMenuClick('Favourites')} sx={{ py: 1.5, display: { md: 'none' } }}>

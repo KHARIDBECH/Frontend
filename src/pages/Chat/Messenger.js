@@ -11,6 +11,7 @@ import { Box, Container, Typography, IconButton, Skeleton } from '@mui/material'
 import SendIcon from '@mui/icons-material/Send';
 import ChatIcon from '@mui/icons-material/Chat';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import logger from '../../utils/logger';
 
 
 
@@ -33,10 +34,14 @@ export default function Messenger() {
     // Dynamic sidebar updates when arrivalMessage changes (global listener handled by Context)
     useEffect(() => {
         if (arrivalMessage) {
+            logger.info("Messenger: Syncing new arrival message to UI state");
             // Update the conversations list state dynamically
             setConversations(prev => {
                 const updated = prev.map(c => {
-                    const isMember = c.members.some(m => (typeof m === 'object' ? m._id : m) === arrivalMessage.senderId);
+                    const isMember = c.members.some(m => {
+                        const mId = typeof m === 'object' ? m._id : m;
+                        return mId === arrivalMessage.senderId;
+                    });
 
                     if (isMember) {
                         return {
@@ -52,7 +57,12 @@ export default function Messenger() {
             });
 
             // If it belongs to current chat, add to messages list
-            if (currentChat?.members.includes(arrivalMessage.senderId)) {
+            const isFromCurrentChat = currentChat?.members.some(m => {
+                const mId = typeof m === 'object' ? m._id : m;
+                return mId === arrivalMessage.senderId;
+            });
+
+            if (isFromCurrentChat) {
                 setMessages((prev) => [...prev, arrivalMessage]);
                 setTimeout(() => {
                     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -170,40 +180,58 @@ export default function Messenger() {
     const sendMessage = async () => {
         if (!newMessages.trim()) return;
 
+        const optimisticMessage = {
+            _id: `temp-${Date.now()}`,
+            conversationId: currentChat._id,
+            senderId: userId,
+            text: newMessages,
+            createdAt: new Date().toISOString(),
+            isRead: false
+        };
+
         const addMessagesFormat = {
             conversationId: currentChat._id,
             senderId: userId,
             text: newMessages
         };
 
-        const receiverId = currentChat.members.find(member => {
+        const activeMember = currentChat.members.find(member => {
             const mId = typeof member === 'object' ? member._id : member;
             return mId !== userId;
         });
+        const receiverId = typeof activeMember === 'object' ? activeMember._id : activeMember;
 
+        // 1. CLEAR INPUT & OPTIMISTIC UI UPDATE
+        setNewMessages('');
+        setMessages(prev => [...prev, optimisticMessage]);
+
+        // 2. SOCKET EMIT (V. FAST)
         socket.emit("sendMessage", {
             senderId: userId,
             receiverId,
             text: newMessages,
         });
 
+        // 3. UPDATE CONVO LIST IMMEDIATELY
+        setConversations(prev => {
+            const updated = prev.map(c => {
+                if (c._id === currentChat._id) {
+                    return { ...c, lastMessage: optimisticMessage, updatedAt: new Date().toISOString() };
+                }
+                return c;
+            });
+            return updated.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        });
+
+        // 4. API CALL IN BACKGROUND
         try {
             const res = await axios.post(`${url}/api/chatMessages/`, addMessagesFormat, { headers: authHeader() });
-            setMessages([...messages, res.data.data]);
-            setNewMessages('');
-
-            // Update local conversation list snippet
-            setConversations(prev => {
-                const updated = prev.map(c => {
-                    if (c._id === currentChat._id) {
-                        return { ...c, lastMessage: res.data.data, updatedAt: new Date().toISOString() };
-                    }
-                    return c;
-                });
-                return updated.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-            });
+            // Replace optimistic message with real message from DB to sync IDs
+            setMessages(prev => prev.map(m => m._id === optimisticMessage._id ? res.data.data : m));
         } catch (err) {
-            console.error(err);
+            logger.error('Failed to send message:', err.message);
+            // Optionally remove the message if it failed
+            setMessages(prev => prev.filter(m => m._id !== optimisticMessage._id));
         }
     };
 
