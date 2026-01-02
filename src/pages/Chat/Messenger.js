@@ -34,20 +34,28 @@ export default function Messenger() {
     // Dynamic sidebar updates when arrivalMessage changes (global listener handled by Context)
     useEffect(() => {
         if (arrivalMessage) {
-            logger.info("Messenger: Syncing new arrival message to UI state");
-            // Update the conversations list state dynamically
+            logger.info("Messenger: Processing arrivalMessage", arrivalMessage.conversationId);
+
+            // 1. SMART AUGMENTATION: Find the sender profile from the conversation data we already have
+            const targetConvo = conversations.find(c => c._id === arrivalMessage.conversationId);
+            const senderProfile = targetConvo?.members.find(m => {
+                const mId = typeof m === 'object' ? m._id : m;
+                return mId === arrivalMessage.senderId;
+            });
+
+            // If we found the profile, decorate the message bubble with it
+            const augmentedMessage = {
+                ...arrivalMessage,
+                senderId: senderProfile || arrivalMessage.senderId // Fallback to ID if not found
+            };
+
+            // 2. SIDEBAR UPDATE: Use conversationId for precise matching
             setConversations(prev => {
                 const updated = prev.map(c => {
-                    const isMember = c.members.some(m => {
-                        const mId = typeof m === 'object' ? m._id : m;
-                        const arrivalId = typeof arrivalMessage.senderId === 'object' ? arrivalMessage.senderId._id : arrivalMessage.senderId;
-                        return mId === arrivalId;
-                    });
-
-                    if (isMember) {
+                    if (c._id === arrivalMessage.conversationId) {
                         return {
                             ...c,
-                            lastMessage: arrivalMessage,
+                            lastMessage: augmentedMessage,
                             unreadCount: (currentChat?._id === c._id) ? 0 : (c.unreadCount + 1),
                             updatedAt: new Date().toISOString()
                         };
@@ -57,15 +65,9 @@ export default function Messenger() {
                 return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
             });
 
-            // If it belongs to current chat, add to messages list
-            const isFromCurrentChat = currentChat?.members.some(m => {
-                const mId = typeof m === 'object' ? m._id : m;
-                const arrivalId = typeof arrivalMessage.senderId === 'object' ? arrivalMessage.senderId._id : arrivalMessage.senderId;
-                return mId === arrivalId;
-            });
-
-            if (isFromCurrentChat) {
-                setMessages((prev) => [...prev, arrivalMessage]);
+            // 3. CHAT WINDOW UPDATE: Add to messages if it's the current chat
+            if (currentChat?._id === arrivalMessage.conversationId) {
+                setMessages((prev) => [...prev, augmentedMessage]);
                 setTimeout(() => {
                     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
                 }, 100);
@@ -73,13 +75,13 @@ export default function Messenger() {
                 // Mark as read and refresh unread count
                 axios.patch(`${url}/api/chatConvo/read/${currentChat._id}`, {}, { headers: authHeader() })
                     .then(() => refreshUnreadCount())
-                    .catch(err => console.error(err));
+                    .catch(err => logger.error("Read Error:", err.message));
             }
 
             // Clear arrival message from context after handling
             setArrivalMessage(null);
         }
-    }, [arrivalMessage, currentChat, url, authHeader, refreshUnreadCount, setArrivalMessage]);
+    }, [arrivalMessage, currentChat, url, authHeader, refreshUnreadCount, setArrivalMessage, conversations]);
 
     useEffect(() => {
         const getConversation = async () => {
@@ -187,9 +189,9 @@ export default function Messenger() {
             conversationId: currentChat._id,
             senderId: {
                 _id: userId,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                profilePic: user.profilePic
+                firstName: user?.firstName || 'Me',
+                lastName: user?.lastName || '',
+                profilePic: user?.profilePic || ''
             },
             text: newMessages,
             createdAt: new Date().toISOString(),
@@ -214,13 +216,9 @@ export default function Messenger() {
 
         // 2. SOCKET EMIT (V. FAST)
         socket.emit("sendMessage", {
-            sender: {
-                _id: userId,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                profilePic: user.profilePic
-            },
+            senderId: userId,
             receiverId,
+            conversationId: currentChat._id,
             text: newMessages,
         });
 

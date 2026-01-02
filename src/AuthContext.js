@@ -101,6 +101,7 @@ export function AuthContextProvider({ children }) {
             logger.info('New message arrival over socket');
             setArrivalMessage({
                 senderId: data.senderId,
+                conversationId: data.conversationId,
                 text: data.text,
                 createdAt: Date.now(),
             });
