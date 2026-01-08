@@ -28,6 +28,7 @@ export function AuthContextProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const [unreadCount, setUnreadCount] = useState(0);
     const [arrivalMessage, setArrivalMessage] = useState(null);
+    const [favorites, setFavorites] = useState([]); // List of product IDs
 
     // Modal state
     const [openSignIn, setOpenSignIn] = useState(false);
@@ -128,6 +129,7 @@ export function AuthContextProvider({ children }) {
                 const dbUser = response.data.data;
                 setUser(dbUser);
                 setUserId(dbUser._id);
+                setFavorites(dbUser.favoriteIds || []);
                 await refreshUnreadCount(dbUser._id, idToken);
             } else {
                 setUser(null);
@@ -154,6 +156,7 @@ export function AuthContextProvider({ children }) {
                 setToken(null);
                 setUserId(null);
                 setUser(null);
+                setFavorites([]);
                 setIsAuth(false);
                 setUnreadCount(0);
                 if (socketRef.current) {
@@ -176,6 +179,7 @@ export function AuthContextProvider({ children }) {
             setToken(null);
             setUserId(null);
             setUser(null);
+            setFavorites([]);
             setIsAuth(false);
             setUnreadCount(0);
             if (socketRef.current) {
@@ -192,6 +196,76 @@ export function AuthContextProvider({ children }) {
     const authHeader = useCallback(() => {
         return token ? { Authorization: `Bearer ${token}` } : {};
     }, [token]);
+
+    // 5. Debounced synchronization for favorites
+    const pendingFavoritesRef = React.useRef(new Map()); // Map<productId, { timer, initialIsFavorited }>
+
+    /**
+     * Toggles the favorite status of a product with optimized debounced synchronization.
+     * Provides instant UI feedback while minimizing backend API pressure.
+     * 
+     * @param {string} productId - The ID of the product to toggle
+     */
+    const toggleFavorite = useCallback(async (productId) => {
+        if (!isAuth) {
+            setOpenSignIn(true);
+            return;
+        }
+
+        const initialIsFavorited = favorites?.includes(productId);
+
+        // 1. Instant UI Feedback (Optimistic)
+        setFavorites(prev => {
+            const currentlyFavorited = prev.includes(productId);
+            if (currentlyFavorited) {
+                return prev.filter(id => id !== productId);
+            } else {
+                return [...prev, productId];
+            }
+        });
+
+        // 2. Debouncing Logic
+        if (pendingFavoritesRef.current.has(productId)) {
+            clearTimeout(pendingFavoritesRef.current.get(productId).timer);
+        } else {
+            // First click in a while for this product
+            pendingFavoritesRef.current.set(productId, {
+                timer: null,
+                initialIsFavorited
+            });
+        }
+
+        const timer = setTimeout(async () => {
+            const { initialIsFavorited: originalState } = pendingFavoritesRef.current.get(productId);
+            // After the delay, check what the final state in the UI is
+            setFavorites(currentFavorites => {
+                const finalIsFavorited = currentFavorites.includes(productId);
+
+                // Only call API if the final state is different from the initial state
+                if (finalIsFavorited !== originalState) {
+                    axios.post(`${apiUrl}/api/users/favorites/${productId}`, {}, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }).catch(error => {
+                        logger.error('Sync favorite error:', error.message);
+                        // Revert on serious failure
+                        setFavorites(revertPrev => {
+                            if (originalState) {
+                                return revertPrev.includes(productId) ? revertPrev : [...revertPrev, productId];
+                            } else {
+                                return revertPrev.filter(id => id !== productId);
+                            }
+                        });
+                    });
+                }
+
+                return currentFavorites;
+            });
+
+            pendingFavoritesRef.current.delete(productId);
+        }, 500); // 500ms debounce window
+
+        pendingFavoritesRef.current.get(productId).timer = timer;
+    }, [isAuth, favorites, token, apiUrl]);
 
     // Context value
     const value = React.useMemo(() => ({
@@ -210,13 +284,15 @@ export function AuthContextProvider({ children }) {
         logout,
         authHeader,
         refreshUnreadCount,
+        toggleFavorite,
+        favorites,
 
         // Modal state
         openSignIn,
         setOpenSignIn,
         openSignUp,
         setOpenSignUp
-    }), [isAuth, token, userId, user, loading, unreadCount, socketConnected, arrivalMessage, logout, authHeader, refreshUnreadCount, openSignIn, openSignUp]);
+    }), [isAuth, token, userId, user, loading, unreadCount, socketConnected, arrivalMessage, logout, authHeader, refreshUnreadCount, favorites, toggleFavorite, openSignIn, openSignUp]);
 
     return (
         <AuthContext.Provider value={value}>

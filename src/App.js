@@ -19,6 +19,7 @@ const Favourites = lazy(() => import('./components/Favourites'));
 const AdTabs = lazy(() => import('./components/AdTabs'));
 const Category = lazy(() => import('./pages/Category/Category'));
 const Profile = lazy(() => import('./pages/Profile/Profile'));
+const SearchResults = lazy(() => import('./pages/Search/SearchResults'));
 
 // Loading Component
 const PageLoader = () => (
@@ -43,6 +44,7 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<HomePage />} />
+            <Route path="/:category" element={<Category />} />
 
             {/* Protected Routes */}
             <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
@@ -52,8 +54,8 @@ function App() {
             <Route path="/favourites" element={<ProtectedRoute element={<Favourites />} />} />
             <Route path="/chat" element={<ProtectedRoute element={<Messenger />} />} />
 
-            {/* Category Route - Keep at end to avoid conflicts */}
-            <Route path="/:category" element={<ProtectedRoute element={<Category />} />} />
+            {/* Search Route */}
+            <Route path="/search" element={<SearchResults />} />
           </Routes>
         </Suspense>
       </div>

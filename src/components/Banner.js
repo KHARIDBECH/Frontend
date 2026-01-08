@@ -92,7 +92,7 @@ export default function Banner() {
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      navigate(`/?search=${encodeURIComponent(searchQuery)}`);
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
 

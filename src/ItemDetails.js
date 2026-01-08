@@ -17,6 +17,7 @@ import {
     CircularProgress
 } from '@mui/material';
 import ShareIcon from '@mui/icons-material/Share';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 // Components
@@ -28,6 +29,7 @@ import SEOHead from './components/SEOHead';
 import { useAuth } from './AuthContext';
 import { config } from './Constants';
 import { generateProductSchema, generateBreadcrumbSchema, BASE_URL } from './utils/seo';
+import { formatFullPrice, formatLongDate } from './utils/formatters';
 
 // Styles
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
@@ -39,7 +41,7 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 export default function ItemDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { userId, isAuth, loading: authLoading, setOpenSignIn, authHeader } = useAuth();
+    const { userId, isAuth, loading: authLoading, setOpenSignIn, authHeader, favorites, toggleFavorite } = useAuth();
 
     // State
     const [itemDetail, setItemDetail] = useState(null);
@@ -154,7 +156,7 @@ export default function ItemDetails() {
         if (navigator.share && itemDetail) {
             navigator.share({
                 title: itemDetail.title,
-                text: `Check out this ${itemDetail.title} for ₹${formatPrice(itemDetail.price)} on Kharid Bech`,
+                text: `Check out this ${itemDetail.title} for ₹${formatFullPrice(itemDetail.price)} on Kharid Bech`,
                 url: window.location.href,
             });
         } else {
@@ -162,25 +164,13 @@ export default function ItemDetails() {
         }
     }, [itemDetail]);
 
-    // Format price
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('en-IN').format(price);
-    };
-
-    // Format date
-    const formatDate = (date) => {
-        return new Intl.DateTimeFormat('en-US', {
-            month: 'long',
-            day: 'numeric'
-        }).format(new Date(date));
-    };
 
     // Generate SEO content
     const getSEOContent = () => {
         if (!itemDetail) return {};
 
-        const title = `${itemDetail.title} - ₹${formatPrice(itemDetail.price)}`;
-        const description = `Buy ${itemDetail.title} for ₹${formatPrice(itemDetail.price)} in ${itemDetail.location?.city || ''}, ${itemDetail.location?.state || ''}. ${itemDetail.description?.substring(0, 120)}...`;
+        const title = `${itemDetail.title} - ₹${formatFullPrice(itemDetail.price)}`;
+        const description = `Buy ${itemDetail.title} for ₹${formatFullPrice(itemDetail.price)} in ${itemDetail.location?.city || ''}, ${itemDetail.location?.state || ''}. ${itemDetail.description?.substring(0, 120)}...`;
         const keywords = `${itemDetail.title}, ${itemDetail.category}, buy ${itemDetail.category?.toLowerCase()}, used ${itemDetail.category?.toLowerCase()}, ${itemDetail.location?.city}, second hand`;
         const image = itemDetail.images?.[0] || `${BASE_URL}/appLogo.png`;
         const url = `${BASE_URL}/item/${id}`;
@@ -231,6 +221,7 @@ export default function ItemDetails() {
     const { title, description, keywords, image, url } = getSEOContent();
     const descriptionLines = itemDetail.description?.split('\n') || [];
     const isOwnListing = itemDetail.postedBy?._id === userId;
+    const isFavorite = favorites?.includes(itemDetail._id);
 
     return (
         <>
@@ -300,7 +291,7 @@ export default function ItemDetails() {
                                             itemType="https://schema.org/Offer"
                                         >
                                             <meta itemProp="priceCurrency" content="INR" />
-                                            <span itemProp="price" content={itemDetail.price}>₹{formatPrice(itemDetail.price)}</span>
+                                            <span itemProp="price" content={itemDetail.price}>₹{formatFullPrice(itemDetail.price)}</span>
                                             <link itemProp="availability" href="https://schema.org/InStock" />
                                             <link itemProp="itemCondition" href="https://schema.org/UsedCondition" />
                                         </Typography>
@@ -313,13 +304,20 @@ export default function ItemDetails() {
                                             >
                                                 <ShareIcon fontSize="small" />
                                             </IconButton>
-                                            <IconButton
-                                                size="small"
-                                                sx={{ border: '1px solid rgba(0,0,0,0.05)' }}
-                                                aria-label="Add to favorites"
-                                            >
-                                                <FavoriteBorderIcon fontSize="small" />
-                                            </IconButton>
+                                            {!isOwnListing && (
+                                                <IconButton
+                                                    size="small"
+                                                    sx={{ border: '1px solid rgba(0,0,0,0.05)' }}
+                                                    onClick={() => toggleFavorite(itemDetail._id)}
+                                                    aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                                                >
+                                                    {isFavorite ? (
+                                                        <FavoriteIcon fontSize="small" sx={{ color: '#ef4444' }} />
+                                                    ) : (
+                                                        <FavoriteBorderIcon fontSize="small" />
+                                                    )}
+                                                </IconButton>
+                                            )}
                                         </Box>
                                     </Box>
 
@@ -335,7 +333,7 @@ export default function ItemDetails() {
                                         <span itemProp="areaServed">{itemDetail.location?.city}, {itemDetail.location?.state}</span>
                                         <span>•</span>
                                         <time dateTime={itemDetail?.postedAt}>
-                                            {itemDetail?.postedAt && formatDate(itemDetail.postedAt)}
+                                            {itemDetail?.postedAt && formatLongDate(itemDetail.postedAt)}
                                         </time>
                                     </Typography>
                                 </Box>

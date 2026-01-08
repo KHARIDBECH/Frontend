@@ -1,54 +1,46 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardMedia, CardContent, Box, IconButton, Typography, Chip } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import VerifiedIcon from '@mui/icons-material/Verified';
+import { useAuth } from './AuthContext';
+import { formatPrice, getTimeAgo } from './utils/formatters';
 
-const ProductCard = React.memo(({ data, userId }) => {
-  const [isFavorite, setIsFavorite] = React.useState(false);
+const ProductCard = React.memo(({ data }) => {
+  const navigate = useNavigate();
+  const { favorites, toggleFavorite, userId } = useAuth();
 
-  const isMyPost = data.postedBy === userId;
+  const isFavorite = favorites?.includes(data._id);
+  const isMyPost = data.postedBy?._id === userId || data.postedBy === userId;
 
-  const formatPrice = (price) => {
-    if (price >= 100000) {
-      return `₹${(price / 100000).toFixed(1)}L`;
-    } else if (price >= 1000) {
-      return `₹${(price / 1000).toFixed(0)}K`;
-    }
-    return `₹${price?.toLocaleString()}`;
-  };
 
-  const getTimeAgo = (date) => {
-    if (!date) return '';
-    const now = new Date();
-    const posted = new Date(date);
-    const diffDays = Math.floor((now - posted) / (1000 * 60 * 60 * 24));
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays}d ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
-    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(posted);
+  const handleClick = () => {
+    navigate(`/item/${data._id}`);
   };
 
   return (
-    <Card sx={{
-      width: '100%',
-      maxWidth: '320px',
-      borderRadius: '20px',
-      overflow: 'hidden',
-      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      border: '1px solid rgba(0,0,0,0.04)',
-      boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)',
-      bgcolor: '#fff',
-      '&:hover': {
-        transform: 'translateY(-6px)',
-        boxShadow: '0 20px 40px -10px rgba(99, 102, 241, 0.15)',
-        '& .card-media': { transform: 'scale(1.08)' },
-        '& .price-tag': { transform: 'translateY(-2px)' }
-      }
-    }}>
+    <Card
+      onClick={handleClick}
+      sx={{
+        width: '100%',
+        maxWidth: '320px',
+        borderRadius: '20px',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        border: '1px solid rgba(0,0,0,0.04)',
+        boxShadow: '0 4px 20px -4px rgba(0,0,0,0.08)',
+        bgcolor: '#fff',
+        '&:hover': {
+          transform: 'translateY(-6px)',
+          boxShadow: '0 20px 40px -10px rgba(99, 102, 241, 0.15)',
+          '& .card-media': { transform: 'scale(1.08)' },
+          '& .price-tag': { transform: 'translateY(-2px)' }
+        }
+      }}>
       {/* Image Container */}
       <Box sx={{
         position: 'relative',
@@ -83,30 +75,37 @@ const ProductCard = React.memo(({ data, userId }) => {
           pointerEvents: 'none'
         }} />
 
-        {/* Favorite Button */}
-        <IconButton
-          onClick={(e) => { e.preventDefault(); setIsFavorite(!isFavorite); }}
-          sx={{
-            position: 'absolute',
-            top: '12px',
-            right: '12px',
-            bgcolor: 'rgba(255,255,255,0.95)',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            width: 36,
-            height: 36,
-            transition: 'all 0.2s ease',
-            '&:hover': {
-              bgcolor: 'white',
-              transform: 'scale(1.1)',
-            }
-          }}
-        >
-          {isFavorite ? (
-            <FavoriteIcon sx={{ fontSize: 18, color: '#ef4444' }} />
-          ) : (
-            <FavoriteBorderIcon sx={{ fontSize: 18, color: '#64748b' }} />
-          )}
-        </IconButton>
+        {/* Favorite Button - Hide for own posts */}
+        {!isMyPost && (
+          <IconButton
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation(); // Prevent link navigation
+              toggleFavorite(data._id);
+            }}
+            sx={{
+              position: 'absolute',
+              top: '12px',
+              right: '12px',
+              bgcolor: 'rgba(255,255,255,0.95)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              width: 36,
+              height: 36,
+              transition: 'all 0.2s ease',
+              zIndex: 2,
+              '&:hover': {
+                bgcolor: 'white',
+                transform: 'scale(1.1)',
+              }
+            }}
+          >
+            {isFavorite ? (
+              <FavoriteIcon sx={{ fontSize: 18, color: '#ef4444' }} />
+            ) : (
+              <FavoriteBorderIcon sx={{ fontSize: 18, color: '#64748b' }} />
+            )}
+          </IconButton>
+        )}
 
         {/* Category Tag */}
         <Chip

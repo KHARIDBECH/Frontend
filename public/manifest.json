@@ -4,9 +4,9 @@
   "description": "India's trusted marketplace for buying and selling used products. Find deals on cars, bikes, mobiles, electronics & more.",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "favicon.png",
+      "sizes": "192x192 512x512 64x64 32x32",
+      "type": "image/png"
     },
     {
       "src": "appLogo.png",

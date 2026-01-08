@@ -92,7 +92,7 @@ const PrimarySearchAppBar = () => {
 
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
-      navigate(`/?search=${searchQuery}`);
+      navigate(`/search?q=${searchQuery}`);
     }
   };
 
