@@ -9,6 +9,7 @@ import {
     Divider,
     CircularProgress,
     Button,
+    Skeleton,
     TextField,
     MenuItem,
     Select,
@@ -164,8 +165,51 @@ const Profile = () => {
 
     if (loading) {
         return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
-                <CircularProgress sx={{ color: 'var(--primary)' }} />
+            <Box sx={{ minHeight: '100vh', bgcolor: '#f8fafc', pb: 8 }}>
+                {/* Skeleton Header */}
+                <GradientBackground>
+                    <Container maxWidth="lg">
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                            <Skeleton variant="text" width={200} height={40} sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />
+                            <Skeleton variant="text" width={300} height={20} sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />
+                        </Box>
+                    </Container>
+                </GradientBackground>
+
+                <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
+                    <ProfileCard>
+                        <Grid container spacing={4}>
+                            {/* Left: Avatar Skeleton */}
+                            <Grid item xs={12} md={4} sx={{ textAlign: 'center', borderRight: { md: '1px solid rgba(0,0,0,0.06)' }, pr: { md: 4 } }}>
+                                <Skeleton variant="circular" width={150} height={150} sx={{ mx: 'auto', mb: 2 }} />
+                                <Skeleton variant="text" width="60%" height={32} sx={{ mx: 'auto', mb: 1 }} />
+                                <Skeleton variant="text" width="40%" height={24} sx={{ mx: 'auto', mb: 2 }} />
+                                <Skeleton variant="rounded" width={100} height={24} sx={{ mx: 'auto', borderRadius: '12px' }} />
+                            </Grid>
+
+                            {/* Right: Details Skeleton */}
+                            <Grid item xs={12} md={8}>
+                                <Box sx={{ pl: { md: 4 } }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+                                        <Skeleton variant="text" width={200} height={32} />
+                                        <Skeleton variant="rounded" width={100} height={36} sx={{ borderRadius: '12px' }} />
+                                    </Box>
+
+                                    {/* Info Rows Skeletons */}
+                                    {[1, 2, 3].map((i) => (
+                                        <InfoRow key={i}>
+                                            <Skeleton variant="rounded" width={40} height={40} sx={{ mr: 2, borderRadius: '12px' }} />
+                                            <Box sx={{ flex: 1 }}>
+                                                <Skeleton variant="text" width={100} height={16} sx={{ mb: 0.5 }} />
+                                                <Skeleton variant="text" width="60%" height={24} />
+                                            </Box>
+                                        </InfoRow>
+                                    ))}
+                                </Box>
+                            </Grid>
+                        </Grid>
+                    </ProfileCard>
+                </Container>
             </Box>
         );
     }

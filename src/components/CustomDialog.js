@@ -28,7 +28,7 @@ const CustomDialog = ({ open, onClose, title, content, actions }) => {
             </DialogContent>
             <DialogActions>
                 {actions.map((action, index) => (
-                    <Button key={index} onClick={action.onClick} autoFocus={action.autoFocus}>
+                    <Button key={index} {...action} autoFocus={action.autoFocus}>
                         {action.label}
                     </Button>
                 ))}

@@ -1,4 +1,4 @@
-import { React, useEffect, useState, useRef } from 'react'
+import React, { useEffect, useLayoutEffect, useState, useRef } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './messenger.css'
 import Conversation from '../../Conversations.js'
@@ -16,7 +16,7 @@ import logger from '../../utils/logger';
 
 
 export default function Messenger() {
-    const { userId, authHeader, refreshUnreadCount, socket, arrivalMessage, setArrivalMessage } = useAuth();
+    const { userId, user, authHeader, refreshUnreadCount, socket, arrivalMessage, setArrivalMessage } = useAuth();
     const url = config.url.API_URL;
     const location = useLocation();
     const [conversations, setConversations] = useState([]);
@@ -26,6 +26,7 @@ export default function Messenger() {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
+    const [loadingMessages, setLoadingMessages] = useState(false);
     const [newMessages, setNewMessages] = useState('');
     const scrollRef = useRef();
     const chatBoxRef = useRef();
@@ -36,11 +37,11 @@ export default function Messenger() {
         if (arrivalMessage) {
             logger.info("Messenger: Processing arrivalMessage", arrivalMessage.conversationId);
 
-            // 1. SMART AUGMENTATION: Find the sender profile from the conversation data we already have
+            // SMART AUGMENTATION: Find the sender profile from the conversation data we already have
             const targetConvo = conversations.find(c => c._id === arrivalMessage.conversationId);
             const senderProfile = targetConvo?.members.find(m => {
                 const mId = typeof m === 'object' ? m._id : m;
-                return mId === arrivalMessage.senderId;
+                return String(mId) === String(arrivalMessage.senderId);
             });
 
             // If we found the profile, decorate the message bubble with it
@@ -49,7 +50,7 @@ export default function Messenger() {
                 senderId: senderProfile || arrivalMessage.senderId // Fallback to ID if not found
             };
 
-            // 2. SIDEBAR UPDATE: Use conversationId for precise matching
+            // SIDEBAR UPDATE: Use conversationId for precise matching
             setConversations(prev => {
                 const updated = prev.map(c => {
                     if (c._id === arrivalMessage.conversationId) {
@@ -65,7 +66,7 @@ export default function Messenger() {
                 return [...updated].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
             });
 
-            // 3. CHAT WINDOW UPDATE: Add to messages if it's the current chat
+            // CHAT WINDOW UPDATE: Add to messages if it's the current chat
             if (currentChat?._id === arrivalMessage.conversationId) {
                 setMessages((prev) => [...prev, augmentedMessage]);
                 setTimeout(() => {
@@ -108,6 +109,8 @@ export default function Messenger() {
                 setPage(1);
                 setHasMore(true);
                 isInitialLoad.current = true;
+                setMessages([]);
+                setLoadingMessages(true);
 
                 try {
                     // Mark as read
@@ -125,6 +128,8 @@ export default function Messenger() {
                     setHasMore(res.data.hasMore);
                 } catch (err) {
                     console.error(err);
+                } finally {
+                    setLoadingMessages(false);
                 }
             }
         };
@@ -167,7 +172,7 @@ export default function Messenger() {
         }
     };
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (isInitialLoad.current && messages.length > 0) {
             scrollRef.current?.scrollIntoView({ behavior: "auto" });
             isInitialLoad.current = false;
@@ -210,19 +215,28 @@ export default function Messenger() {
         });
         const receiverId = typeof activeMember === 'object' ? activeMember._id : activeMember;
 
-        // 1. CLEAR INPUT & OPTIMISTIC UI UPDATE
+        //  CLEAR INPUT & OPTIMISTIC UI UPDATE
         setNewMessages('');
         setMessages(prev => [...prev, optimisticMessage]);
+        setTimeout(() => {
+            scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
 
-        // 2. SOCKET EMIT (V. FAST)
+
         socket.emit("sendMessage", {
             senderId: userId,
             receiverId,
             conversationId: currentChat._id,
             text: newMessages,
+        }, (response) => {
+            if (response && response.status === 'ok') {
+                setMessages(prev => prev.map(m => m._id === optimisticMessage._id ? response.data : m));
+            } else {
+                console.error('Socket Message Error:', response?.message);
+            }
         });
 
-        // 3. UPDATE CONVO LIST IMMEDIATELY
+        // UPDATE CONVO LIST IMMEDIATELY
         setConversations(prev => {
             const updated = prev.map(c => {
                 if (c._id === currentChat._id) {
@@ -232,17 +246,6 @@ export default function Messenger() {
             });
             return updated.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
         });
-
-        // 4. API CALL IN BACKGROUND
-        try {
-            const res = await axios.post(`${url}/api/chatMessages/`, addMessagesFormat, { headers: authHeader() });
-            // Replace optimistic message with real message from DB to sync IDs
-            setMessages(prev => prev.map(m => m._id === optimisticMessage._id ? res.data.data : m));
-        } catch (err) {
-            logger.error('Failed to send message:', err.message);
-            // Optionally remove the message if it failed
-            setMessages(prev => prev.filter(m => m._id !== optimisticMessage._id));
-        }
     };
 
     return (
@@ -362,14 +365,24 @@ export default function Messenger() {
                                             <Skeleton variant="text" width="100px" />
                                         </Box>
                                     )}
-                                    {messages.map((m, index) => {
-                                        const messageSenderId = typeof m.senderId === 'object' ? m.senderId._id : m.senderId;
-                                        return (
-                                            <div key={m._id || index} ref={index === messages.length - 1 ? scrollRef : null}>
-                                                <Message message={m} own={messageSenderId === userId} />
-                                            </div>
-                                        );
-                                    })}
+                                    {loadingMessages ? (
+                                        [...Array(6)].map((_, i) => (
+                                            <Box key={i} sx={{ display: 'flex', flexDirection: i % 2 === 0 ? 'row' : 'row-reverse', alignItems: 'flex-end', gap: 1.5, mb: 2 }}>
+                                                <Skeleton variant="circular" width={32} height={32} />
+                                                <Skeleton variant="rounded" width={i % 2 === 0 ? "60%" : "40%"} height={60} sx={{ borderRadius: '18px' }} />
+                                            </Box>
+                                        ))
+                                    ) : (
+                                        messages.map((m, index) => {
+                                            const mSid = typeof m.senderId === 'object' ? m.senderId._id : m.senderId;
+                                            const isOwn = String(mSid) === String(userId);
+                                            return (
+                                                <div key={m._id || index} ref={index === messages.length - 1 ? scrollRef : null}>
+                                                    <Message message={m} own={isOwn} />
+                                                </div>
+                                            );
+                                        })
+                                    )}
                                 </Box>
 
                                 {/* Input Area */}

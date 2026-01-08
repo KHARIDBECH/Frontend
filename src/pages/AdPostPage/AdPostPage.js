@@ -69,7 +69,7 @@ const StyledDropzone = styled(Box)(({ theme }) => ({
 
 // Validation Schema
 const validationSchema = yup.object({
-    title: yup.string().min(10).required('Title is required'),
+    title: yup.string().min(5).required('Title is required'),
     description: yup.string().min(20).required('Description is required'),
     price: yup.number().positive().required('Price is required'),
     category: yup.string().required('Category is required'),
@@ -126,7 +126,6 @@ const AdPostPage = () => {
         formData.append('condition', values.condition);
         formData.append('price', values.price);
         formData.append('negotiable', values.negotiable);
-        formData.append('postedBy', userId);
 
         values.images.forEach(file => formData.append('images', file));
 

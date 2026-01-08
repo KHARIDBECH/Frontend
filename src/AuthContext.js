@@ -98,13 +98,8 @@ export function AuthContextProvider({ children }) {
 
         // Message Listener
         const handleGetMessage = (data) => {
-            logger.info('New message arrival over socket');
-            setArrivalMessage({
-                senderId: data.senderId,
-                conversationId: data.conversationId,
-                text: data.text,
-                createdAt: Date.now(),
-            });
+            logger.info('New message arrival over socket:', data);
+            setArrivalMessage(data);
             setUnreadCount(prev => prev + 1);
         };
 

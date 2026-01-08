@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { config } from '../../Constants';
 import { useAuth } from '../../AuthContext';
-import { Paper, Typography, Box, Skeleton, Button, Container } from '@mui/material';
+import { Paper, Typography, Box, Skeleton, Button, Container, CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CustomDialog from '../../components/CustomDialog';
 
@@ -72,16 +72,21 @@ export default function Ads() {
   const [adId, setAdId] = useState(null);
   const { authHeader, userId } = useAuth();
   const [open, setOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const url = config.url.API_URL;
 
   const handleRemove = async () => {
+    setDeleting(true);
     try {
       await axios.delete(`${url}/api/product/${adId}`, { headers: authHeader() });
       setAds(ads.filter(p => p._id !== adId));
       setOpen(false);
     } catch (err) {
       console.error("Remove failed:", err.message);
-      setOpen(false);
+      // setOpen(false); // keep open on error? or close? User probably wants to retry or see error. For now let's keep logic simple as requested.
+    } finally {
+      setDeleting(false);
+      setOpen(false); // Close dialog in finally to ensure it closes even on error, or if success
     }
   };
 
@@ -115,7 +120,11 @@ export default function Ads() {
         </Typography>
       </Box>
 
-      {ads.length === 0 && !loading ? (
+      {loading ? (
+        <Box>
+          {[...Array(6)].map((_, i) => <AdItem key={i} />)}
+        </Box>
+      ) : ads.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 10, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: '24px' }}>
           <Typography variant="h6" color="textSecondary">You haven't posted any ads yet.</Typography>
           <Link to="/post-ad" style={{ textDecoration: 'none' }}>
@@ -141,8 +150,13 @@ export default function Ads() {
         title="Delete Advertisement?"
         content="This action cannot be undone. Are you sure you want to remove this listing?"
         actions={[
-          { label: 'Cancel', onClick: () => setOpen(false) },
-          { label: 'Delete', onClick: handleRemove, color: 'error' }
+          { label: 'Cancel', onClick: () => setOpen(false), disabled: deleting },
+          {
+            label: deleting ? <CircularProgress size={24} color="inherit" /> : 'Delete',
+            onClick: handleRemove,
+            color: 'error',
+            disabled: deleting
+          }
         ]}
       />
     </Container>
