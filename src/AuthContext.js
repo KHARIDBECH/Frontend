@@ -61,10 +61,15 @@ export function AuthContextProvider({ children }) {
     useEffect(() => {
         if (isAuth && userId && !socketRef.current) {
             logger.info('Initializing socket connection...');
-            socketRef.current = io(apiUrl, {
+
+            // Derive the base URL for the socket connection (avoiding /api/v1 namespace issues)
+            const socketUrl = apiUrl.includes('/api') ? apiUrl.split('/api')[0] : apiUrl;
+
+            socketRef.current = io(socketUrl, {
                 reconnection: true,
                 reconnectionAttempts: 10,
                 reconnectionDelay: 1000,
+                transports: ['polling', 'websocket'] // Explicitly allow upgrades
             });
 
             socketRef.current.on("connect", () => {
