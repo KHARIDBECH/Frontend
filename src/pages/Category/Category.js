@@ -65,7 +65,7 @@ export default function Category() {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${apiUrl}/api/product/category/${category}`, {
+        const response = await fetch(`${apiUrl}/product/category/${category}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         });

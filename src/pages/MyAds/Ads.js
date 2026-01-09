@@ -78,7 +78,7 @@ export default function Ads() {
   const handleRemove = async () => {
     setDeleting(true);
     try {
-      await axios.delete(`${url}/api/product/${adId}`, { headers: authHeader() });
+      await axios.delete(`${url}/product/${adId}`, { headers: authHeader() });
       setAds(ads.filter(p => p._id !== adId));
       setOpen(false);
     } catch (err) {
@@ -99,9 +99,12 @@ export default function Ads() {
           return;
         }
 
-        const response = await axios.get(`${url}/api/users/my-listing?page=${currentPage}`, { headers });
-        setAds(prev => currentPage === 1 ? response.data.ads : [...prev, ...response.data.ads]);
-        setTotalPages(response.data.pagination.totalPages);
+        const response = await axios.get(`${url}/users/my-listing?page=${currentPage}`, { headers });
+        if (response.data.success && response.data.data) {
+          const { ads: fetchedAds, pagination } = response.data.data;
+          setAds(prev => currentPage === 1 ? fetchedAds : [...prev, ...fetchedAds]);
+          setTotalPages(pagination.totalPages);
+        }
         setLoading(false);
       } catch (err) {
         console.error("Fetch ads failed:", err.message);

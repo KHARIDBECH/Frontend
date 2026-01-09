@@ -83,7 +83,7 @@ const validationSchema = yup.object({
  * Allows users to create and post new advertisements
  */
 const AdPostPage = () => {
-    const { authHeader, userId } = useAuth();
+    const { authHeader } = useAuth();
     const apiUrl = config.url.API_URL;
 
     // Location State
@@ -134,7 +134,7 @@ const AdPostPage = () => {
         if (selectedState) formData.append('location[state]', selectedState.name);
 
         try {
-            await axios.post(`${apiUrl}/api/product`, formData, {
+            await axios.post(`${apiUrl}/product`, formData, {
                 headers: { ...authHeader(), 'Content-Type': 'multipart/form-data' }
             });
 

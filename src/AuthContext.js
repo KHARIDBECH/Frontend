@@ -46,7 +46,7 @@ export function AuthContextProvider({ children }) {
         if (!activeUid || !activeTk) return;
 
         try {
-            const res = await axios.get(`${apiUrl}/api/chatConvo/unread/count`, {
+            const res = await axios.get(`${apiUrl}/chatConvo/unread/count`, {
                 headers: { Authorization: `Bearer ${activeTk}` }
             });
             if (res.data.success) {
@@ -119,9 +119,9 @@ export function AuthContextProvider({ children }) {
     }, [isAuth, userId, socketConnected]);
 
     // Sync user with database
-    const syncUserWithDB = async (idToken) => {
+    const syncUserWithDB = useCallback(async (idToken) => {
         try {
-            const response = await axios.get(`${apiUrl}/api/users/me`, {
+            const response = await axios.get(`${apiUrl}/users/me`, {
                 headers: { Authorization: `Bearer ${idToken}` }
             });
 
@@ -140,7 +140,7 @@ export function AuthContextProvider({ children }) {
             setUser(null);
             setUserId(null);
         }
-    };
+    }, [apiUrl, refreshUnreadCount]);
 
     // Firebase auth state listener
     useEffect(() => {
@@ -170,7 +170,7 @@ export function AuthContextProvider({ children }) {
         });
 
         return () => unsubscribe();
-    }, [apiUrl]);
+    }, [apiUrl, syncUserWithDB]);
 
     // Logout function
     const logout = useCallback(async () => {
@@ -243,7 +243,7 @@ export function AuthContextProvider({ children }) {
 
                 // Only call API if the final state is different from the initial state
                 if (finalIsFavorited !== originalState) {
-                    axios.post(`${apiUrl}/api/users/favorites/${productId}`, {}, {
+                    axios.post(`${apiUrl}/users/favorites/${productId}`, {}, {
                         headers: { Authorization: `Bearer ${token}` }
                     }).catch(error => {
                         logger.error('Sync favorite error:', error.message);
@@ -292,7 +292,7 @@ export function AuthContextProvider({ children }) {
         setOpenSignIn,
         openSignUp,
         setOpenSignUp
-    }), [isAuth, token, userId, user, loading, unreadCount, socketConnected, arrivalMessage, logout, authHeader, refreshUnreadCount, favorites, toggleFavorite, openSignIn, openSignUp]);
+    }), [isAuth, token, userId, user, loading, unreadCount, arrivalMessage, logout, authHeader, refreshUnreadCount, favorites, toggleFavorite, openSignIn, openSignUp]);
 
     return (
         <AuthContext.Provider value={value}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useState, useRef } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import './messenger.css'
 import Conversation from '../../Conversations.js'
 import Message from '../../Message.js'
@@ -74,7 +74,7 @@ export default function Messenger() {
                 }, 100);
 
                 // Mark as read and refresh unread count
-                axios.patch(`${url}/api/chatConvo/read/${currentChat._id}`, {}, { headers: authHeader() })
+                axios.patch(`${url}/chatConvo/read/${currentChat._id}`, {}, { headers: authHeader() })
                     .then(() => refreshUnreadCount())
                     .catch(err => logger.error("Read Error:", err.message));
             }
@@ -88,7 +88,7 @@ export default function Messenger() {
         const getConversation = async () => {
             setLoadingConversations(true);
             try {
-                const res = await axios.get(`${url}/api/chatConvo/${userId}`, { headers: authHeader() });
+                const res = await axios.get(`${url}/chatConvo/${userId}`, { headers: authHeader() });
                 setConversations(res.data.data || []);
             } catch (err) {
                 console.error(err);
@@ -114,7 +114,7 @@ export default function Messenger() {
 
                 try {
                     // Mark as read
-                    await axios.patch(`${url}/api/chatConvo/read/${currentChat._id}`, {}, { headers: authHeader() });
+                    await axios.patch(`${url}/chatConvo/read/${currentChat._id}`, {}, { headers: authHeader() });
                     refreshUnreadCount();
 
                     // Update local conversations list to show 0 unread
@@ -123,9 +123,11 @@ export default function Messenger() {
                     ));
 
                     // Get messages
-                    const res = await axios.get(`${url}/api/chatMessages/${currentChat._id}?limit=10&page=1`, { headers: authHeader() });
-                    setMessages(res.data.data || []);
-                    setHasMore(res.data.hasMore);
+                    const res = await axios.get(`${url}/chatMessages/${currentChat._id}?limit=10&page=1`, { headers: authHeader() });
+                    if (res.data.success && res.data.data) {
+                        setMessages(res.data.data.messages || []);
+                        setHasMore(res.data.data.hasMore);
+                    }
                 } catch (err) {
                     console.error(err);
                 } finally {
@@ -145,12 +147,12 @@ export default function Messenger() {
 
         try {
             const nextPage = page + 1;
-            const res = await axios.get(`${url}/api/chatMessages/${currentChat._id}?limit=10&page=${nextPage}`, { headers: authHeader() });
+            const res = await axios.get(`${url}/chatMessages/${currentChat._id}?limit=10&page=${nextPage}`, { headers: authHeader() });
 
-            if (res.data.data.length > 0) {
-                setMessages((prev) => [...res.data.data, ...prev]);
+            if (res.data.success && res.data.data && res.data.data.messages.length > 0) {
+                setMessages((prev) => [...res.data.data.messages, ...prev]);
                 setPage(nextPage);
-                setHasMore(res.data.hasMore);
+                setHasMore(res.data.data.hasMore);
 
                 // Use requestAnimationFrame to ensure DOM is updated before restoring scroll
                 requestAnimationFrame(() => {
@@ -203,11 +205,6 @@ export default function Messenger() {
             isRead: false
         };
 
-        const addMessagesFormat = {
-            conversationId: currentChat._id,
-            senderId: userId,
-            text: newMessages
-        };
 
         const activeMember = currentChat.members.find(member => {
             const mId = typeof member === 'object' ? member._id : member;

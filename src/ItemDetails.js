@@ -60,7 +60,7 @@ export default function ItemDetails() {
         const fetchItemDetails = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`${apiUrl}/api/product/itemdetail/${id}`);
+                const response = await fetch(`${apiUrl}/product/itemdetail/${id}`);
 
                 if (response.status === 404) {
                     setNotFound(true);
@@ -94,7 +94,7 @@ export default function ItemDetails() {
         try {
             // Check if conversation already exists
             const response = await axios.get(
-                `${apiUrl}/api/chatConvo/find?receiverId=${itemDetail.postedBy._id}&productId=${itemDetail._id}`,
+                `${apiUrl}/chatConvo/find?receiverId=${itemDetail.postedBy._id}&productId=${itemDetail._id}`,
                 { headers: authHeader() }
             );
 
@@ -118,7 +118,7 @@ export default function ItemDetails() {
         try {
             // 1. Create Conversation
             const convoRes = await axios.post(
-                `${apiUrl}/api/chatConvo`,
+                `${apiUrl}/chatConvo`,
                 {
                     senderId: userId,
                     receiverId: itemDetail?.postedBy?._id,
@@ -131,7 +131,7 @@ export default function ItemDetails() {
 
             // 2. Send Message
             await axios.post(
-                `${apiUrl}/api/chatMessages`,
+                `${apiUrl}/chatMessages`,
                 {
                     conversationId: conversation._id,
                     senderId: userId,

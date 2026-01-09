@@ -39,7 +39,7 @@ export default function Conversation({ conversation, userId, active }) {
                 try {
                     setLoading(true);
                     const response = await axios.get(
-                        `${apiUrl}/api/users/user/${friend}`,
+                        `${apiUrl}/users/user/${friend}`,
                         { headers: authHeader() }
                     );
                     setUser(response.data);

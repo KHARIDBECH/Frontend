@@ -91,7 +91,7 @@ const SignUp = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
 
-      const checkRes = await fetch(`${url}/api/users/me`, {
+      const checkRes = await fetch(`${url}/users/me`, {
         headers: { Authorization: `Bearer ${await user.getIdToken()}` }
       });
       const checkData = await checkRes.json();
@@ -116,7 +116,7 @@ const SignUp = () => {
         profilePic: user.photoURL || ''
       };
 
-      const response = await fetch(`${url}/api/users/register`, {
+      const response = await fetch(`${url}/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +164,7 @@ const SignUp = () => {
         profilePic: ''
       };
 
-      const response = await fetch(`${url}/api/users/register`, {
+      const response = await fetch(`${url}/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

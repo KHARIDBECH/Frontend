@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Box,
     Container,
@@ -7,7 +7,6 @@ import {
     Paper,
     Grid,
     Divider,
-    CircularProgress,
     Button,
     Skeleton,
     TextField,
@@ -18,7 +17,6 @@ import {
     Alert,
     Chip,
     Card,
-    CardContent,
     IconButton,
     useTheme,
     useMediaQuery
@@ -70,19 +68,6 @@ const ProfileCard = styled(Paper)(({ theme }) => ({
     }
 }));
 
-const StatCard = styled(Card)(({ theme }) => ({
-    background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
-    borderRadius: '20px',
-    border: '1px solid rgba(99, 102, 241, 0.15)',
-    boxShadow: 'none',
-    transition: 'all 0.3s ease',
-    cursor: 'pointer',
-    '&:hover': {
-        transform: 'translateY(-5px)',
-        boxShadow: '0 15px 35px -10px rgba(99, 102, 241, 0.25)',
-        border: '1px solid rgba(99, 102, 241, 0.3)',
-    }
-}));
 
 const InfoRow = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -111,9 +96,9 @@ const Profile = () => {
 
     const url = config.url.API_URL;
 
-    const fetchUserData = async () => {
+    const fetchUserData = useCallback(async () => {
         try {
-            const response = await axios.get(`${url}/api/users/me`, {
+            const response = await axios.get(`${url}/users/me`, {
                 headers: authHeader()
             });
             if (response.data.success) {
@@ -128,16 +113,16 @@ const Profile = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [url, authHeader]);
 
     useEffect(() => {
         fetchUserData();
-    }, []);
+    }, [fetchUserData]);
 
     const handleSave = async () => {
         setSaving(true);
         try {
-            const response = await axios.put(`${url}/api/users/profile`, editData, {
+            const response = await axios.put(`${url}/users/profile`, editData, {
                 headers: authHeader()
             });
             if (response.data.success) {
@@ -222,11 +207,6 @@ const Profile = () => {
         );
     }
 
-    const stats = [
-        { icon: <StorefrontIcon sx={{ fontSize: 32 }} />, label: 'My Listings', value: '12', path: '/my-ads' },
-        { icon: <ShoppingBagIcon sx={{ fontSize: 32 }} />, label: 'Purchases', value: '5', path: '/my-ads' },
-        { icon: <ChatBubbleOutlineIcon sx={{ fontSize: 32 }} />, label: 'Messages', value: '8', path: '/chat' },
-    ];
 
     return (
         <Box sx={{ minHeight: '100vh', bgcolor: '#f8fafc', pb: 8 }}>

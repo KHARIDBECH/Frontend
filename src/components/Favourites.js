@@ -27,7 +27,7 @@ export default function Favourites() {
         return;
       }
       try {
-        const res = await axios.get(`${apiUrl}/api/users/favorites`, {
+        const res = await axios.get(`${apiUrl}/users/favorites`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data.success) {

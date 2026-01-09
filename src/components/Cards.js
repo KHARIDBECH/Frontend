@@ -75,7 +75,7 @@ export default function Cards({
         console.log("Detected location:", { city, state });
 
         // Fetch products from backend
-        const response = await fetch(`${config.url.API_URL}/api/product?city=${city || ''}&state=${state || ''}`);
+        const response = await fetch(`${config.url.API_URL}/product?city=${city || ''}&state=${state || ''}`);
         const result = await response.json();
 
         setNearbyData(result.data || []);

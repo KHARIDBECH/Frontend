@@ -26,7 +26,7 @@ export default function Home() {
         const searchParams = new URLSearchParams(location.search);
         const searchQuery = searchParams.get('search');
 
-        let apiUrl = `${url}/api/product`;
+        let apiUrl = `${url}/product`;
         if (searchQuery) {
           apiUrl += `?search=${encodeURIComponent(searchQuery)}`;
         }

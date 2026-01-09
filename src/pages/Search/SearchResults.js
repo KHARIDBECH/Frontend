@@ -35,7 +35,7 @@ export default function SearchResults() {
         const fetchResults = async () => {
             setLoading(true);
             try {
-                let url = `${apiUrl}/api/product`;
+                let url = `${apiUrl}/product`;
                 if (q) {
                     url += `?search=${encodeURIComponent(q)}`;
                 }
