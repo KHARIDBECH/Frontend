@@ -5,7 +5,6 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import VerifiedIcon from '@mui/icons-material/Verified';
 import { useAuth } from './AuthContext';
 import { formatPrice, getTimeAgo } from './utils/formatters';
 
@@ -212,19 +211,11 @@ const ProductCard = React.memo(({ data }) => {
           pt: 1.5,
           borderTop: '1px solid rgba(0,0,0,0.06)'
         }}>
-          {/* Seller Badge */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <VerifiedIcon sx={{ fontSize: 14, color: '#10b981' }} />
-            <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 600, fontSize: '0.75rem' }}>
-              Verified
-            </Typography>
-          </Box>
-
           {/* Time */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#94a3b8' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#94a3b8', ml: 'auto' }}>
             <AccessTimeIcon sx={{ fontSize: 14 }} />
             <Typography variant="caption" sx={{ fontSize: '0.75rem' }}>
-              {getTimeAgo(data.postedAt)}
+              {getTimeAgo(data.createdAt)}
             </Typography>
           </Box>
         </Box>

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import useDebounce from './hooks/useDebounce';
 import { styled, useTheme } from '@mui/material/styles';
 import {
   AppBar,
@@ -34,22 +35,27 @@ import { useAuth } from './AuthContext';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
-  borderRadius: '14px',
-  backgroundColor: 'rgba(0,0,0,0.04)',
-  border: '1.5px solid transparent',
-  transition: 'all 0.2s ease',
+  borderRadius: '16px',
+  backgroundColor: 'rgba(239, 242, 246, 0.6)', // Lighter, more subtle background
+  border: '1px solid transparent', // Prepare for border transition
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  display: 'flex',
+  alignItems: 'center',
+  flex: 1,
+  maxWidth: '600px',
+  marginRight: theme.spacing(2),
+  marginLeft: theme.spacing(2),
   '&:hover': {
-    backgroundColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: 'rgba(239, 242, 246, 1)',
+    border: '1px solid rgba(0,0,0,0.05)',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
   },
   '&:focus-within': {
     backgroundColor: 'white',
-    border: '1.5px solid var(--primary)',
-    boxShadow: '0 0 0 4px rgba(99, 102, 241, 0.1)'
+    border: '1px solid var(--primary)',
+    boxShadow: '0 4px 12px rgba(99, 102, 241, 0.15)',
+    transform: 'translateY(-1px)'
   },
-  marginRight: theme.spacing(2),
-  marginLeft: theme.spacing(2),
-  flex: 1,
-  maxWidth: '500px',
   [theme.breakpoints.down('md')]: {
     display: 'none'
   }
@@ -67,18 +73,24 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: '#1e293b',
-  width: '100%',
+  flex: 1,
   '& .MuiInputBase-input': {
-    padding: theme.spacing(1.5, 1.5, 1.5, 0),
+    padding: theme.spacing(1.5, 1, 1.5, 0),
+    // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
     width: '100%',
+    fontWeight: 500,
     fontSize: '0.95rem',
     '&::placeholder': {
       color: '#94a3b8',
-      opacity: 1
+      opacity: 0.8,
+      fontWeight: 400
     }
   },
 }));
+
+
 
 const PrimarySearchAppBar = () => {
   const { isAuth, loading, logout, setOpenSignIn, setOpenSignUp, unreadCount } = useAuth();
@@ -88,12 +100,73 @@ const PrimarySearchAppBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(new URLSearchParams(location.search).get('q') || '');
+  const debouncedSearch = useDebounce(searchQuery, 400);
+
+  const userInteracted = useRef(false);
+
+  // Sync input with URL changes (e.g. from banner or back button)
+  useEffect(() => {
+    const q = new URLSearchParams(location.search).get('q') || '';
+    setSearchQuery(q);
+    // Reset interaction flag since this update came from URL (external)
+    userInteracted.current = false;
+  }, [location.search]);
+
+  // Auto-search as user types (only when already on search page)
+  useEffect(() => {
+    // If the input hasn't settled (still debouncing), don't trigger navigation
+    if (searchQuery !== debouncedSearch) return;
+
+    // Only auto-navigate when user is already on the search page
+    if (location.pathname !== '/search') return;
+
+    const currentQ = new URLSearchParams(location.search).get('q') || '';
+    const trimmedSearch = debouncedSearch.trim();
+
+    // Only trigger if the search query is different from what's in the URL
+    if (trimmedSearch !== currentQ) {
+      if (trimmedSearch) {
+        navigate(`/search?q=${encodeURIComponent(trimmedSearch)}`, { replace: true });
+      } else if (currentQ) {
+        // Only clear if the user explicitly interacted/cleared the input.
+        // This prevents race conditions (e.g. navigation from Banner) where localized state is empty but URL is full.
+        if (userInteracted.current) {
+          navigate('/search', { replace: true });
+        }
+      }
+    }
+  }, [debouncedSearch, navigate, searchQuery, location.pathname, location.search]);
+
+  const lastSearchTime = useRef(0);
 
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
-      navigate(`/search?q=${searchQuery}`);
+      const now = Date.now();
+      if (now - lastSearchTime.current < 1000) return;
+      lastSearchTime.current = now;
+
+      if (searchQuery.trim()) {
+        navigate(`/search?q=${searchQuery.trim()}`);
+      }
     }
+  };
+
+  const handleSearchClick = () => {
+    const now = Date.now();
+    if (now - lastSearchTime.current < 1000) return;
+    lastSearchTime.current = now;
+
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${searchQuery.trim()}`);
+    }
+  };
+
+  // ... (hidden routes check)
+
+  const handleInputChange = (e) => {
+    setSearchQuery(e.target.value);
+    userInteracted.current = true;
   };
 
   // Pages where search should be hidden
@@ -166,9 +239,32 @@ const PrimarySearchAppBar = () => {
                 placeholder="Search for anything..."
                 inputProps={{ 'aria-label': 'search' }}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleInputChange}
                 onKeyDown={handleSearch}
               />
+              <IconButton
+                onClick={handleSearchClick}
+                size="small"
+                sx={{
+                  mr: 0.75,
+                  p: '6px',
+                  bgcolor: 'transparent',
+                  color: 'var(--primary)',
+                  borderRadius: '10px',
+                  border: '1px solid transparent',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    bgcolor: 'rgba(99, 102, 241, 0.1)',
+                    border: '1px solid rgba(99, 102, 241, 0.2)',
+                    transform: 'scale(1.05)'
+                  },
+                  '&:active': {
+                    transform: 'scale(0.95)'
+                  }
+                }}
+              >
+                <SearchIcon fontSize="small" />
+              </IconButton>
             </Search>
           )}
 

@@ -29,7 +29,6 @@ import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import WcIcon from '@mui/icons-material/Wc';
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CloseIcon from '@mui/icons-material/Close';
@@ -169,7 +168,6 @@ const Profile = () => {
                                 <Skeleton variant="circular" width={150} height={150} sx={{ mx: 'auto', mb: 2 }} />
                                 <Skeleton variant="text" width="60%" height={32} sx={{ mx: 'auto', mb: 1 }} />
                                 <Skeleton variant="text" width="40%" height={24} sx={{ mx: 'auto', mb: 2 }} />
-                                <Skeleton variant="rounded" width={100} height={24} sx={{ mx: 'auto', borderRadius: '12px' }} />
                             </Grid>
 
                             {/* Right: Details Skeleton */}
@@ -250,17 +248,7 @@ const Profile = () => {
                                 {user.email}
                             </Typography>
 
-                            <Chip
-                                icon={<VerifiedUserIcon sx={{ fontSize: 16 }} />}
-                                label="Verified Seller"
-                                sx={{
-                                    bgcolor: 'rgba(16, 185, 129, 0.1)',
-                                    color: '#059669',
-                                    fontWeight: 600,
-                                    borderRadius: '12px',
-                                    px: 1
-                                }}
-                            />
+
 
                             {/* Quick Stats */}
                             {/* <Grid container spacing={2} sx={{ mt: 4 }}>

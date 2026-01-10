@@ -13,6 +13,7 @@ import './App.css';
 // Pages - Lazy Loaded
 const HomePage = lazy(() => import('./pages/HomePage/HomePage'));
 const AdPostPage = lazy(() => import('./pages/AdPostPage/AdPostPage'));
+const EditAdPage = lazy(() => import('./pages/AdPostPage/EditAdPage'));
 const ItemDetails = lazy(() => import('./ItemDetails'));
 const Messenger = lazy(() => import('./pages/Chat/Messenger'));
 const Favourites = lazy(() => import('./components/Favourites'));
@@ -49,6 +50,7 @@ function App() {
             {/* Protected Routes */}
             <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
             <Route path="/post-ad" element={<ProtectedRoute element={<AdPostPage />} />} />
+            <Route path="/edit-ad/:id" element={<ProtectedRoute element={<EditAdPage />} />} />
             <Route path="/item/:id" element={<ProtectedRoute element={<ItemDetails />} />} />
             <Route path="/my-ads/*" element={<ProtectedRoute element={<AdTabs />} />} />
             <Route path="/favourites" element={<ProtectedRoute element={<Favourites />} />} />
@@ -64,3 +66,4 @@ function App() {
 }
 
 export default App;
+

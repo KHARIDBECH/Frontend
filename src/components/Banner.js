@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { styled } from '@mui/material/styles';
-import { Box, Typography, Container, Button, InputBase, IconButton } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import { Box, Typography, Container, Button } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import VerifiedIcon from '@mui/icons-material/Verified';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import SearchBox from './SearchBox';
 
 const HeroSection = styled(Box)(({ theme }) => ({
   position: 'relative',
@@ -42,22 +41,6 @@ const HeroSection = styled(Box)(({ theme }) => ({
   }
 }));
 
-const SearchBar = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  background: 'rgba(255, 255, 255, 0.95)',
-  borderRadius: '16px',
-  padding: '6px',
-  maxWidth: '600px',
-  margin: '0 auto',
-  boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.2)',
-  [theme.breakpoints.down('sm')]: {
-    flexDirection: 'column',
-    gap: '8px',
-    padding: '12px',
-  }
-}));
-
 const FeatureChip = styled(Box)(({ theme }) => ({
   display: 'inline-flex',
   alignItems: 'center',
@@ -80,7 +63,6 @@ const StatBox = styled(Box)(({ theme }) => ({
 export default function Banner() {
   const navigate = useNavigate();
   const { setOpenSignUp, isAuth } = useAuth();
-  const [searchQuery, setSearchQuery] = useState('');
 
   const handleSell = () => {
     if (isAuth) {
@@ -90,31 +72,14 @@ export default function Banner() {
     }
   };
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
   return (
     <HeroSection>
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
-        {/* ... (existing code) ... */}
         {/* Feature Chips */}
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 4, flexWrap: 'wrap' }}>
           <FeatureChip>
             <TrendingUpIcon sx={{ fontSize: 18 }} />
             10K+ Active Listings
-          </FeatureChip>
-          <FeatureChip>
-            <VerifiedIcon sx={{ fontSize: 18 }} />
-            Verified Sellers
           </FeatureChip>
           <FeatureChip>
             <LocalShippingIcon sx={{ fontSize: 18 }} />
@@ -160,44 +125,10 @@ export default function Banner() {
           The most trusted marketplace for pre-owned goods. Join thousands of users buying and selling daily.
         </Typography>
 
-        {/* Search Bar */}
-        <SearchBar>
-          <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, px: 2 }}>
-            <SearchIcon sx={{ color: '#94a3b8', mr: 1 }} />
-            <InputBase
-              placeholder="Search for cars, phones, furniture..."
-              sx={{
-                flex: 1,
-                color: '#1e293b',
-                fontSize: '1rem',
-                '& input::placeholder': { color: '#94a3b8' }
-              }}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-          </Box>
-          <Button
-            variant="contained"
-            onClick={handleSearch}
-            sx={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              px: 4,
-              py: 1.5,
-              borderRadius: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              minWidth: { xs: '100%', sm: 'auto' },
-              '&:hover': {
-                background: 'linear-gradient(135deg, #5b54e0 0%, #6a3d9a 100%)',
-                boxShadow: '0 8px 20px -5px rgba(99, 102, 241, 0.4)'
-              }
-            }}
-          >
-            Search
-          </Button>
-        </SearchBar>
+        {/* Search Bar - Using Reusable Component (Only visible on Mobile) */}
+        <Box sx={{ display: { xs: 'flex', md: 'none' }, justifyContent: 'center' }}>
+          <SearchBox variant="banner" placeholder="Search for cars, phones, furniture..." />
+        </Box>
 
         {/* Quick Actions */}
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4, flexWrap: 'wrap' }}>

@@ -332,8 +332,8 @@ export default function ItemDetails() {
                                     <Typography variant="body2" sx={{ color: 'var(--text-muted)', display: 'flex', gap: 1 }}>
                                         <span itemProp="areaServed">{itemDetail.location?.city}, {itemDetail.location?.state}</span>
                                         <span>•</span>
-                                        <time dateTime={itemDetail?.postedAt}>
-                                            {itemDetail?.postedAt && formatLongDate(itemDetail.postedAt)}
+                                        <time dateTime={itemDetail?.createdAt}>
+                                            {itemDetail?.createdAt && formatLongDate(itemDetail.createdAt)}
                                         </time>
                                     </Typography>
                                 </Box>
@@ -362,9 +362,6 @@ export default function ItemDetails() {
                                         <Box>
                                             <Typography variant="h6" sx={{ fontWeight: 600 }}>
                                                 {itemDetail.postedBy?.firstName} {itemDetail.postedBy?.lastName}
-                                            </Typography>
-                                            <Typography variant="body2" sx={{ color: 'var(--text-muted)' }}>
-                                                Verified Seller
                                             </Typography>
                                         </Box>
                                     </Box>
